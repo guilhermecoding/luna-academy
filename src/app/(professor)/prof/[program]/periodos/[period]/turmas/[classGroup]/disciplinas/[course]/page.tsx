@@ -12,7 +12,6 @@ import {
     IconCalendarEvent,
     IconClockHour2,
     IconUsers,
-    IconUser,
 } from "@tabler/icons-react";
 import { notFound, redirect } from "next/navigation";
 import { Shift, DayOfWeek } from "@/generated/prisma/enums";
@@ -196,7 +195,7 @@ export default async function ProfCoursePage({
                 </div>
             </Section>
 
-            <Section className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Section className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <InfoBoxPeriod
                     label="ALUNOS MATRICULADOS"
                     value={studentCount}
