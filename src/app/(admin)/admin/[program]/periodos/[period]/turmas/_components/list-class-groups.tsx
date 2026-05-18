@@ -56,9 +56,13 @@ function ListClassGroupsSkeleton() {
 function EmptyClassGroupsList({
     programSlug,
     periodSlug,
+    baseUrl = "/admin",
+    showCreateOption = true,
 }: {
     programSlug: string;
     periodSlug: string;
+    baseUrl?: string;
+    showCreateOption?: boolean;
 }) {
     return (
         <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-surface-border rounded-4xl">
@@ -67,12 +71,14 @@ function EmptyClassGroupsList({
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Crie uma classe selecionando a Matriz e a Série. O sistema criará automaticamente as disciplinas ofertadas.
             </p>
-            <Link
-                href={`/admin/${programSlug}/periodos/${periodSlug}/turmas/novo`}
-                className="text-primary hover:underline text-sm font-medium"
-            >
-                + Criar a primeira classe
-            </Link>
+            {showCreateOption ? (
+                <Link
+                    href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/novo`}
+                    className="text-primary hover:underline text-sm font-medium"
+                >
+                    + Criar a primeira classe
+                </Link>
+            ) : null}
         </div>
     );
 }
@@ -82,11 +88,15 @@ async function ListClassGroupsContent({
     programSlug,
     periodSlug,
     teacherId,
+    baseUrl = "/admin",
+    showCreateOption = true,
 }: {
     periodId: string;
     programSlug: string;
     periodSlug: string;
     teacherId?: string;
+    baseUrl?: string;
+    showCreateOption?: boolean;
 }) {
     const groups = await getClassGroupsByPeriodId(periodId, teacherId);
 
@@ -95,6 +105,8 @@ async function ListClassGroupsContent({
             <EmptyClassGroupsList
                 programSlug={programSlug}
                 periodSlug={periodSlug}
+                baseUrl={baseUrl}
+                showCreateOption={showCreateOption}
             />
         );
     }
@@ -177,7 +189,7 @@ async function ListClassGroupsContent({
                                     {/* Actions */}
                                     <div className="mt-auto pt-3 border-t border-surface-border z-20">
                                         <Link
-                                            href={`/admin/${programSlug}/periodos/${periodSlug}/turmas/${group.slug}`}
+                                            href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/${group.slug}`}
                                             className="text-primary hover:text-primary/80 text-sm font-bold flex flex-row justify-center items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-primary/5"
                                         >
                                             <span>Expandir Turma</span>
@@ -201,11 +213,15 @@ export default function ListClassGroups({
     programSlug,
     periodSlug,
     teacherId,
+    baseUrl = "/admin",
+    showCreateOption = true,
 }: {
     periodId: string;
     programSlug: string;
     periodSlug: string;
     teacherId?: string;
+    baseUrl?: string;
+    showCreateOption?: boolean;
 }) {
     return (
         <Suspense fallback={<ListClassGroupsSkeleton />}>
@@ -214,6 +230,8 @@ export default function ListClassGroups({
                 programSlug={programSlug}
                 periodSlug={periodSlug}
                 teacherId={teacherId}
+                baseUrl={baseUrl}
+                showCreateOption={showCreateOption}
             />
         </Suspense>
     );
