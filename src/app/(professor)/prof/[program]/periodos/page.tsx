@@ -64,6 +64,10 @@ async function PeriodsContent({
 }) {
     const periods = await getPeriodsForTeacherByProgramSlug(programSlug, teacherId);
 
+    if (!periods) {
+        return notFound();
+    }
+
     if (periods.length === 0) {
         return (
             <div className="p-8 flex flex-col items-center justify-center text-center border-2 border-dashed border-surface-border rounded-2xl bg-surface/30 gap-3">
