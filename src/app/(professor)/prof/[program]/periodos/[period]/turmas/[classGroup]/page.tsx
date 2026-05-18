@@ -47,9 +47,13 @@ export default async function ProfClassPage({
         notFound();
     }
 
+    const teacherCourses = classGroupData.courses.filter(course =>
+        course.schedules.some(schedule => schedule.teacherId === session.user.id),
+    );
+
     const [studentCount, disciplinesCount, studentsList] = await Promise.all([
         getStudentCountByClassGroupId(classGroupData.id),
-        Promise.resolve(classGroupData.courses.length),
+        Promise.resolve(teacherCourses.length),
         getStudentsByClassGroupList(classGroupData.id, q),
     ]);
 
@@ -86,7 +90,7 @@ export default async function ProfClassPage({
                     icon={<IconUsers className="size-full" />}
                 />
                 <InfoBoxPeriod
-                    label="DISCIPLINAS"
+                    label="SUAS DISCIPLINAS"
                     value={disciplinesCount}
                     color="indigo"
                     icon={<IconBooks className="size-full" />}
@@ -104,11 +108,11 @@ export default async function ProfClassPage({
                     <div className="bg-primary/10 p-2 rounded-lg">
                         <IconBooks className="size-5 text-primary" />
                     </div>
-                    <h2 className="text-xl font-bold text-foreground">Disciplinas Ofertadas</h2>
+                    <h2 className="text-xl font-bold text-foreground">Suas Disciplinas</h2>
                 </div>
 
                 <ListDisciplines
-                    courses={classGroupData.courses}
+                    courses={teacherCourses}
                     programSlug={program}
                     periodSlug={period}
                     classGroupSlug={classGroupSlug}
