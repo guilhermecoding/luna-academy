@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "Minhas Turmas",
 };
 
-export default async function ProfClassGroupsPage({
+export default async function TeacherClassGroupsPage({
     params,
 }: {
     params: Promise<{ program: string; period: string }>;
@@ -54,10 +54,10 @@ export default async function ProfClassGroupsPage({
             </Section>
 
             <Section className="mt-18">
-                <ListClassGroups 
-                    periodId={periodData.id} 
-                    programSlug={program} 
-                    periodSlug={period} 
+                <ListClassGroups
+                    periodId={periodData.id}
+                    programSlug={program}
+                    periodSlug={period}
                     teacherId={teacherId}
                     baseUrl="/prof"
                     showCreateOption={false}

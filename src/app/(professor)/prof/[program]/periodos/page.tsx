@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: "Meus Períodos",
 };
 
-export default async function ProfPeriodsPage({
+export default async function TeacherPeriodsPage({
     params,
 }: {
     params: Promise<{ program: string }>;
