@@ -39,9 +39,9 @@ export function DynamicBreadcrumb() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
 
-            {/* Últimos dois itens */}
-            {segments.slice(-2).map((segment, idx) => {
-              const originalIndex = segments.length - 2 + idx;
+            {/* Últimos três itens */}
+            {segments.slice(-3).map((segment, idx) => {
+              const originalIndex = segments.length - 3 + idx;
               const isLast = originalIndex === segments.length - 1;
               const href = "/" + segments.slice(0, originalIndex + 1).join("/");
               const title = segment.replace(/-/g, " ");

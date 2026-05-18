@@ -17,6 +17,12 @@ export const profMenus: ItemMenuSidebarAdmin[] = [
                 icon: "book",
                 isActive: false,
             },
+            {
+                title: "Aulas",
+                url: "/prof/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]/aulas",
+                icon: "chalkboard-teacher",
+                isActive: false,
+            },
         ],
     },
 ];
