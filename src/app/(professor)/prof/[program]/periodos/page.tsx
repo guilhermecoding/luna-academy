@@ -11,7 +11,7 @@ import { PeriodListItem } from "@/services/periods/periods.type";
 import getPeriodStatus from "@/lib/get-period-status";
 import formatDate from "@/lib/format-date";
 import { IconCalendarEvent, IconCalendarFilled, IconLock } from "@tabler/icons-react";
-import { StaticStatusIndicator } from "@/components/static-status-indicator";
+import PulsingStatusIndicator from "@/components/pulsing-status-indicator";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
@@ -153,7 +153,7 @@ function PeriodCard({
     const cardContent = (
         <div className="mb-4 flex min-w-0 flex-1 flex-col sm:mb-0">
             {/* Status (Celular) */}
-            <StaticStatusIndicator className="flex sm:hidden ml-1 mb-2" text={statusLabel} variant={statusVariant} />
+            <PulsingStatusIndicator className="flex sm:hidden ml-1 mb-2" text={statusLabel} variant={statusVariant} />
 
             <div className="flex w-full @container/item min-w-0 flex-row items-center justify-between">
                 <div className="flex w-full @sm/item:w-1/2 flex-row items-center">
@@ -174,7 +174,7 @@ function PeriodCard({
                 </div>
 
                 {/* Status (Tablet e Desktop) */}
-                <StaticStatusIndicator className="hidden sm:flex" text={statusLabel} variant={statusVariant} />
+                <PulsingStatusIndicator className="hidden sm:flex" text={statusLabel} variant={statusVariant} />
             </div>
         </div>
     );
