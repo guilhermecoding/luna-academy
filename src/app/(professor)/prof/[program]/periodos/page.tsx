@@ -12,8 +12,8 @@ import getPeriodStatus from "@/lib/get-period-status";
 import formatDate from "@/lib/format-date";
 import { IconCalendarEvent, IconCalendarFilled, IconLock } from "@tabler/icons-react";
 import { StaticStatusIndicator } from "@/components/static-status-indicator";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Meus Períodos",
@@ -146,49 +146,53 @@ function PeriodCard({
     statusVariant: "success" | "warning" | "info" | "done";
     disabled: boolean;
 }) {
-    return (
-        <div
-            className={`w-full min-w-0 flex flex-row items-center bg-surface border border-surface-border p-4 rounded-4xl gap-3 transition-opacity ${disabled ? "opacity-50 pointer-events-none select-none" : ""}`}
-            aria-disabled={disabled}
-        >
-            <div className="mb-4 flex min-w-0 flex-1 flex-col sm:mb-0">
-                {/* Status (Celular) */}
-                <StaticStatusIndicator className="flex sm:hidden ml-1 mb-2" text={statusLabel} variant={statusVariant} />
+    const cardContent = (
+        <div className="mb-4 flex min-w-0 flex-1 flex-col sm:mb-0">
+            {/* Status (Celular) */}
+            <StaticStatusIndicator className="flex sm:hidden ml-1 mb-2" text={statusLabel} variant={statusVariant} />
 
-                <div className="flex w-full @container/item min-w-0 flex-row items-center justify-between">
-                    <div className="flex w-full @sm/item:w-1/2 flex-row items-center">
-                        {/* Ícone */}
-                        <div className="size-14 shrink-0 flex justify-center items-center rounded-xl bg-muted-foreground/30">
-                            <IconCalendarFilled className="text-muted-foreground/90 size-7" />
-                        </div>
-
-                        {/* Titulo e período */}
-                        <div className="ml-4 min-w-0 flex-1">
-                            <p className="truncate text-lg font-medium">
-                                {period.name}
-                            </p>
-                            <p className="truncate text-sm font-medium text-muted-foreground/90">
-                                {formatDate(period.startDate)} - {formatDate(period.endDate)}
-                            </p>
-                        </div>
+            <div className="flex w-full @container/item min-w-0 flex-row items-center justify-between">
+                <div className="flex w-full @sm/item:w-1/2 flex-row items-center">
+                    {/* Ícone */}
+                    <div className="size-14 shrink-0 flex justify-center items-center rounded-xl bg-muted-foreground/30">
+                        <IconCalendarFilled className="text-muted-foreground/90 size-7" />
                     </div>
 
-                    {/* Status (Tablet e Desktop) */}
-                    <StaticStatusIndicator className="hidden sm:flex" text={statusLabel} variant={statusVariant} />
+                    {/* Titulo e período */}
+                    <div className="ml-4 min-w-0 flex-1">
+                        <p className="truncate text-lg font-medium text-foreground">
+                            {period.name}
+                        </p>
+                        <p className="truncate text-sm font-medium text-muted-foreground/90">
+                            {formatDate(period.startDate)} - {formatDate(period.endDate)}
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            {/* Ação */}
-            {!disabled && (
-                <ButtonLink
-                    href={`/prof/${programSlug}/periodos/${period.slug}/turmas`}
-                    size="sm"
-                    className="shrink-0"
-                >
-                    Acessar
-                </ButtonLink>
-            )}
+                {/* Status (Tablet e Desktop) */}
+                <StaticStatusIndicator className="hidden sm:flex" text={statusLabel} variant={statusVariant} />
+            </div>
         </div>
+    );
+
+    if (disabled) {
+        return (
+            <div
+                className="w-full min-w-0 flex flex-row items-center bg-surface border border-surface-border p-4 rounded-4xl gap-3 opacity-50 select-none cursor-not-allowed"
+                aria-disabled="true"
+            >
+                {cardContent}
+            </div>
+        );
+    }
+
+    return (
+        <Link
+            href={`/prof/${programSlug}/periodos/${period.slug}/turmas`}
+            className="w-full min-w-0 flex flex-row items-center bg-surface border border-surface-border p-4 rounded-4xl gap-3 transition-all hover:border-primary-theme/50 hover:bg-surface/80 group cursor-pointer"
+        >
+            {cardContent}
+        </Link>
     );
 }
 
