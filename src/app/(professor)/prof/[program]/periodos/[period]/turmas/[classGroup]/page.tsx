@@ -14,12 +14,14 @@ import { DataTableClassStudents } from "@/app/(admin)/admin/[program]/periodos/[
 import { classGroupStudentsColumns } from "@/app/(admin)/admin/[program]/periodos/[period]/alunos/_components/columns-period";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Detalhes da Turma",
 };
 
-export default async function ProfClassPage({
+async function ProfClassPageContent({
     params,
     searchParams,
 }: {
@@ -139,5 +141,20 @@ export default async function ProfClassPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+
+export default function ProfClassPage({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ program: string; period: string; classGroup: string }>;
+    searchParams: Promise<{ q?: string }>;
+}) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <ProfClassPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

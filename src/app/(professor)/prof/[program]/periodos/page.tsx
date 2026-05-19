@@ -19,42 +19,6 @@ export const metadata: Metadata = {
     title: "Meus Períodos",
 };
 
-export default async function TeacherPeriodsPage({
-    params,
-}: {
-    params: Promise<{ program: string }>;
-}) {
-    const { program } = await params;
-
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-
-    if (!session?.user) {
-        redirect("/entrar");
-    }
-
-    return (
-        <Page>
-            <Section>
-                <TitlePage
-                    title="Meus Períodos"
-                    description="Períodos em que você possui turmas alocadas."
-                />
-            </Section>
-
-            <Section className="mt-10">
-                <Suspense fallback={<PeriodsSkeleton />}>
-                    <PeriodsContent
-                        programSlug={program}
-                        teacherId={session.user.id}
-                    />
-                </Suspense>
-            </Section>
-        </Page>
-    );
-}
-
 async function PeriodsContent({
     programSlug,
     teacherId,
@@ -207,5 +171,52 @@ function PeriodsSkeleton() {
                 <Skeleton key={i} className="h-24 w-full rounded-4xl" />
             ))}
         </div>
+    );
+}
+
+async function TeacherPeriodsPageContent({
+    params,
+}: {
+    params: Promise<{ program: string }>;
+}) {
+    const { program } = await params;
+
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session?.user) {
+        redirect("/entrar");
+    }
+
+    return (
+        <PeriodsContent
+            programSlug={program}
+            teacherId={session.user.id}
+        />
+    );
+}
+
+export default function TeacherPeriodsPage({
+    params,
+}: {
+    params: Promise<{ program: string }>;
+}) {
+
+    return (
+        <Page>
+            <Section>
+                <TitlePage
+                    title="Meus Períodos"
+                    description="Períodos em que você possui turmas alocadas."
+                />
+            </Section>
+
+            <Section className="mt-10">
+                <Suspense fallback={<PeriodsSkeleton />}>
+                    <TeacherPeriodsPageContent params={params} />
+                </Suspense>
+            </Section>
+        </Page>
     );
 }

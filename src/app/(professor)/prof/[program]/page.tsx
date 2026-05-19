@@ -2,12 +2,21 @@ import { Suspense } from "react";
 import { DualArc } from "@/components/dual-arc";
 import TeacherHomeRedirectClient from "../_components/teacher-redirect-client";
 
-export default async function ProgramTeacherPage({
+async function ProgramTeacherPageContent({
     params,
 }: {
     params: Promise<{ program: string }>;
 }) {
     const { program } = await params;
+
+    return <TeacherHomeRedirectClient targetUrl={`/prof/${program}/periodos`} />;
+}
+
+export default function ProgramTeacherPage({
+    params,
+}: {
+    params: Promise<{ program: string }>;
+}) {
 
     return (
         <Suspense
@@ -17,7 +26,7 @@ export default async function ProgramTeacherPage({
                 </div>
             }
         >
-            <TeacherHomeRedirectClient targetUrl={`/prof/${program}/periodos`} />
+            <ProgramTeacherPageContent params={params} />
         </Suspense>
     );
 }

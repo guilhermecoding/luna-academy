@@ -8,12 +8,14 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import ListClassGroups from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/_components/list-class-groups";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Minhas Turmas",
 };
 
-export default async function TeacherClassGroupsPage({
+async function TeacherClassGroupsPageContent({
     params,
 }: {
     params: Promise<{ program: string; period: string }>;
@@ -64,5 +66,18 @@ export default async function TeacherClassGroupsPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function TeacherClassGroupsPage({
+    params,
+}: {
+    params: Promise<{ program: string; period: string }>;
+}) {
+
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <TeacherClassGroupsPageContent params={params} />
+        </Suspense>
     );
 }

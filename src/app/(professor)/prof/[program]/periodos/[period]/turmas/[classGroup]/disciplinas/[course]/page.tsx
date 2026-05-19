@@ -20,6 +20,8 @@ import LessonCardList from "@/app/(admin)/admin/[program]/periodos/[period]/turm
 import { CreateLessonSheet } from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]/_components/create-lesson-dialog";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -115,7 +117,8 @@ function generateUpcomingLessons(
     return upcoming;
 }
 
-export default async function ProfCoursePage({
+
+async function ProfCoursePageContent({
     params,
 }: {
     params: Promise<{ program: string; period: string; classGroup: string; course: string }>;
@@ -254,5 +257,17 @@ export default async function ProfCoursePage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function ProfCoursePage({
+    params,
+}: {
+    params: Promise<{ program: string; period: string; classGroup: string; course: string }>;
+}) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <ProfCoursePageContent params={params} />
+        </Suspense>
     );
 }
