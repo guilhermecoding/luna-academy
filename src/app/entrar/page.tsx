@@ -16,11 +16,6 @@ import thumb09 from "@/assets/images/thumbs-login-page/Imagem_09.webp";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Entrar",
-};
 
 const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08, thumb09];
 
@@ -33,11 +28,12 @@ export default async function LoginPage() {
     });
 
     if (session?.user) {
-        if (session.user.isTeacher && !session.user.isAdmin) {
-            redirect("/prof");
+        if (session.user.isActive) {
+            if (session.user.isTeacher && !session.user.isAdmin) {
+                redirect("/prof");
+            }
+            redirect("/admin");
         }
-
-        redirect("/admin");
     }
 
     const logoCorporation = process.env.NEXT_PUBLIC_LOGO_CORPORATION;

@@ -96,7 +96,7 @@ export default async function LessonPage({
                             const timeStr = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(date);
                             const dateStr = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(date);
 
-                            let label = `CHAMADA REALIZADA ${dateStr} ÀS ${timeStr}`;
+                            let label = `CHAMADA REALIZADA EM ${dateStr} ÀS ${timeStr}`;
                             if (isToday) label = `CHAMADA REALIZADA HOJE ÀS ${timeStr}`;
                             if (isYesterday) label = `CHAMADA REALIZADA ONTEM ÀS ${timeStr}`;
 

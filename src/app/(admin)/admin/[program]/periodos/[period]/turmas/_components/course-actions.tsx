@@ -15,9 +15,11 @@ interface CourseActionsProps {
     periodSlug: string;
     classGroupSlug: string;
     courseCode: string;
+    baseUrl?: string;
+    showEditOption?: boolean;
 }
 
-export function CourseActions({ programSlug, periodSlug, classGroupSlug, courseCode }: CourseActionsProps) {
+export function CourseActions({ programSlug, periodSlug, classGroupSlug, courseCode, baseUrl = "/admin", showEditOption = true }: CourseActionsProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -32,22 +34,24 @@ export function CourseActions({ programSlug, periodSlug, classGroupSlug, courseC
             <DropdownMenuContent align="end" className="w-48 rounded-xl border-surface-border p-1.5">
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${courseCode}`}
+                        href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${courseCode}`}
                         className="flex items-center gap-2 cursor-pointer py-2"
                     >
                         <IconEye className="size-4 text-muted-foreground" />
                         <span className="font-medium">Detalhar</span>
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link
-                        href={`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${courseCode}/editar`}
-                        className="flex items-center gap-2 cursor-pointer py-2"
-                    >
-                        <IconEdit className="size-4 text-muted-foreground" />
-                        <span className="font-medium">Editar</span>
-                    </Link>
-                </DropdownMenuItem>
+                {showEditOption && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${courseCode}/editar`}
+                            className="flex items-center gap-2 cursor-pointer py-2"
+                        >
+                            <IconEdit className="size-4 text-muted-foreground" />
+                            <span className="font-medium">Editar</span>
+                        </Link>
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

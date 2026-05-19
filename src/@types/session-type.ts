@@ -3,5 +3,6 @@ export interface SessionUser {
     name?: string;
     isAdmin?: boolean;
     isTeacher?: boolean;
+    isActive?: boolean;
     systemRole?: string;
 };
