@@ -40,7 +40,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { SYSTEM_ROLE } from "@/@types/system-role.type";
+
 import type { Genre } from "@/generated/prisma/enums";
 import { GENRE_VALUES } from "@/lib/genre";
 import { authClient } from "@/lib/auth-client";
@@ -67,8 +67,7 @@ function parseGenre(value: unknown): Genre | undefined {
 }
 
 function roleLabelFromSessionUser(user: Omit<SessionUser, "name">): string {
-  const adminLike =
-    Boolean(user.isAdmin) || user.systemRole === SYSTEM_ROLE.FULL_ACCESS;
+  const adminLike = Boolean(user.isAdmin);
   const teacher = Boolean(user.isTeacher);
   if (adminLike && teacher) return "Administrador & Professor";
   if (adminLike) return "Administrador";
@@ -85,7 +84,7 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
 
   const user = session?.user as SessionUser | undefined;
 
-  const isAdminLike = user ? Boolean(user.isAdmin) || user.systemRole === SYSTEM_ROLE.FULL_ACCESS : false;
+  const isAdminLike = user ? Boolean(user.isAdmin) : false;
   const isTeacher = user ? Boolean(user.isTeacher) : false;
   const canSwitchProfile = isAdminLike && isTeacher;
 

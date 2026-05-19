@@ -24,8 +24,8 @@ export async function proxy(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
 
-    // Rotas /admin: exige isAdmin ou systemRole FULL_ACCESS
-    if (path.startsWith("/admin") && !user.isAdmin && user.systemRole !== "FULL_ACCESS") {
+    // Rotas /admin: exige a flag isAdmin verdadeira
+    if (path.startsWith("/admin") && !user.isAdmin) {
         return NextResponse.redirect(new URL("/entrar", request.url));
     }
 
