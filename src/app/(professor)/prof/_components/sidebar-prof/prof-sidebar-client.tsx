@@ -13,27 +13,22 @@ function injectParams(url: string, params: Record<string, string | string[] | un
             finalUrl = finalUrl.replace(`[${key}]`, String(value));
         }
     }
-    // Se a URL final ainda tiver colchetes (ex: /admin/[program]/cursos),
-    // significa que precisamos de mais parâmetros para acessá-la.
-    // Retornamos null para ocultar esse link.
     if (finalUrl.includes("[")) return null;
     return finalUrl;
 }
 
-export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }) {
+export function ProfSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }) {
     const pathname = usePathname();
     const params = useParams();
 
     const filteredMenus = menus.map(group => {
-        // Filtragem dos itens de nível superior
         const groupItems = group.items.reduce((acc: ItemMenuSidebarAdmin["items"], item) => {
             if (item.hiddenOnPaths?.some(p => new RegExp(p).test(pathname))) return acc;
             if (item.visibleOnPaths && !item.visibleOnPaths.some(p => new RegExp(p).test(pathname))) return acc;
 
             const injectedItemUrl = injectParams(item.url, params);
-            if (!injectedItemUrl) return acc; // Oculta se faltar algum slug na URL
+            if (!injectedItemUrl) return acc;
 
-            // Tratamento de subitens
             let validSubItems: typeof item.items;
             if (item.items) {
                 validSubItems = item.items.reduce((subAcc: NonNullable<typeof item.items>, subItem) => {
@@ -62,6 +57,6 @@ export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }
     return <SideBarContentMenus menus={filteredMenus} />;
 }
 
-export function AdminSidebarFooter() {
-    return <NavUser baseUrl="/admin" />;
+export function ProfSidebarFooter() {
+    return <NavUser baseUrl="/prof" />;
 }

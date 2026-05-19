@@ -1,7 +1,7 @@
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
-import InfoBoxPeriod from "../../../../../../_components/info-box-period";
+import InfoBoxPeriod from "@/app/(admin)/admin/[program]/periodos/[period]/_components/info-box-period";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
@@ -17,9 +17,13 @@ import {
     IconNotebook,
     IconClock,
 } from "@tabler/icons-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Metadata } from "next";
-import { AttendanceTable } from "./_components/attendance-table";
+import { AttendanceTable } from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]/aulas/[lesson]/_components/attendance-table";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Registro de Presença",
@@ -41,7 +45,7 @@ function formatWeekDay(date: Date) {
     }).format(new Date(date));
 }
 
-export default async function LessonPage({
+async function ProfLessonPageContent({
     params,
 }: {
     params: Promise<{ program: string; period: string; classGroup: string; course: string; lesson: string }>;
@@ -53,6 +57,14 @@ export default async function LessonPage({
         course: courseCode,
         lesson: lessonId,
     } = await params;
+
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session?.user) {
+        redirect("/entrar");
+    }
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
     if (!periodData) notFound();
@@ -147,5 +159,17 @@ export default async function LessonPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function ProfLessonPage({
+    params,
+}: {
+    params: Promise<{ program: string; period: string; classGroup: string; course: string; lesson: string }>;
+}) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <ProfLessonPageContent params={params} />
+        </Suspense>
     );
 }

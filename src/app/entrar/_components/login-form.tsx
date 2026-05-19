@@ -59,6 +59,18 @@ export default function LoginForm() {
         setActiveTab("teacher");
     }, [pathname, reset]);
 
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("error") === "account_disabled") {
+                toast.error("Usuário não encontrado", {
+                    description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
+                });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    }, []);
+
     // ---------------------
     // SUBMIT DO LOGIN
     // ---------------------
@@ -95,6 +107,14 @@ export default function LoginForm() {
                 await authClient.signOut();
                 toast.error("Não foi possível validar o perfil", {
                     description: "Tente novamente em instantes.",
+                });
+                return;
+            }
+
+            if (!user.isActive) {
+                await authClient.signOut();
+                toast.error("Usuário não encontrado", {
+                    description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
                 });
                 return;
             }
