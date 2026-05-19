@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 import { RemotePattern } from "next/dist/shared/lib/image-config";
 
+// Configuração do PWA
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const withPWA = require("next-pwa")({
+    dest: "public",
+    disable: process.env.NODE_ENV === "development",
+    register: true,
+    skipWaiting: true,
+    clientsClaim: true,
+});
+
 const remotePatterns: RemotePattern[] = [];
 
 if (process.env.NEXT_PUBLIC_LOGO_CORPORATION) {
@@ -28,4 +38,6 @@ const nextConfig: NextConfig = {
     }),
 };
 
-export default nextConfig;
+
+
+export default withPWA(nextConfig);

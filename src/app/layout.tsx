@@ -31,8 +31,14 @@ export const metadata: Metadata = {
         template: `%s | ${APP_NAME}`,
         default: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
     },
+    applicationName: APP_NAME,
     description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+    manifest: "/manifest.json",
+    authors: [{
+        name: "Joao Guilherme",
+        url: "https://www.linkedin.com/in/jo%C3%A3o-guilherme-ara%C3%BAjo-viana",
+    }],
     openGraph: {
         title: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
         description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
@@ -46,6 +52,7 @@ export const metadata: Metadata = {
         locale: "pt-BR",
         type: "website",
     },
+    keywords: ["luna", "academy", "gestão", "academica", "escola", "educação", "educação superior", "educação profissional", "educação técnica", "educação infantil", "educação básica", "educação superior", "educação profissional", "educação técnica", "educação infantil", "educação básica", "educação superior", "educação profissional", "educação técnica", "educação infantil", "educação básica"],
 };
 
 export default function RootLayout({
