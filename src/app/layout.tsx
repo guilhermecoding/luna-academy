@@ -29,6 +29,7 @@ export const viewport: Viewport = {
 const APP_NAME = "LUNA ACADEMY";
 
 export const metadata: Metadata = {
+    manifest: "/manifest.webmanifest",
     title: {
         template: `%s | ${APP_NAME}`,
         default: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
@@ -68,6 +69,9 @@ export default function RootLayout({
             className={cn("h-full", "antialiased", poppins.variable, silkscreen.variable)}
             suppressHydrationWarning
         >
+            <head>
+                <link rel="manifest" href="/manifest.webmanifest" />
+            </head>
             <body>
                 <SerwistProvider
                     swUrl="/serwist/sw.js"
