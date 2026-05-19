@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Providers from "@/provider/providers";
 import { Suspense } from "react";
 import { FeedBackToast } from "@/components/feedback-toast";
+import { IntroSplash } from "@/components/intro-splash";
 import { SerwistProvider } from "@serwist/turbopack/react";
 
 const poppins = Poppins({
@@ -78,6 +79,7 @@ export default function RootLayout({
                     disable={process.env.NODE_ENV === "development"}
                 >
                     <Providers>
+                        <IntroSplash />
                         <Suspense fallback={null}>
                             <FeedBackToast />
                         </Suspense>
