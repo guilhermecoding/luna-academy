@@ -1,7 +1,7 @@
 "use client";
 
 import { SideBarContentMenus } from "@/components/sidebar-content";
-import { NavUser } from "@/app/(admin)/admin/_components/nav-user-admin";
+import { NavUser } from "@/components/nav-user";
 import { ItemMenuSidebarAdmin } from "@/@types/item-menu-sidebar.type";
 
 import { usePathname, useParams } from "next/navigation";
@@ -63,5 +63,5 @@ export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }
 }
 
 export function AdminSidebarFooter() {
-    return <NavUser />;
+    return <NavUser baseUrl="/admin" />;
 }

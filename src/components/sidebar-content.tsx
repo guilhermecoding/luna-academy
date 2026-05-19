@@ -7,7 +7,7 @@ import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, Sideba
 import { IconChevronRightFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useSidebar } from "@/components/ui/sidebar";
-import { iconMap } from "@/app/(admin)/_config/menus/icon-map-menu";
+import { iconMap } from "@/components/icon-map-menu";
 
 function getIcon(iconName: string): React.ReactNode {
     return iconMap[iconName] || null;

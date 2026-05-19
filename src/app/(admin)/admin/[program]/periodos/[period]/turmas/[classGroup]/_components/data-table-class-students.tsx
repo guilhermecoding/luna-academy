@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
     title?: React.ReactNode;
     periodId: string;
     classGroupId: string;
+    hideActionsAndSelect?: boolean;
 }
 
 export function DataTableClassStudents<TData, TValue>({
@@ -39,6 +40,7 @@ export function DataTableClassStudents<TData, TValue>({
     title,
     periodId,
     classGroupId,
+    hideActionsAndSelect = false,
 }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = useState({});
     const [isPending, startTransition] = useTransition();
@@ -50,9 +52,13 @@ export function DataTableClassStudents<TData, TValue>({
     const searchParams = useSearchParams();
     const [query, setQuery] = useState(searchParams.get("q") || "");
 
+    const filteredColumns = hideActionsAndSelect
+        ? columns.filter((col) => col.id !== "actions" && col.id !== "select")
+        : columns;
+
     const table = useReactTable({
         data,
-        columns,
+        columns: filteredColumns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         onRowSelectionChange: setRowSelection,

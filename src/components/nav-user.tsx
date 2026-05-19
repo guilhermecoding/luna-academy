@@ -4,15 +4,17 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import {
-    IconCircleHalf2,
+  IconCircleHalf2,
   IconDeviceDesktop,
   IconLogout,
   IconMoon,
   IconSelector,
   IconSun,
   IconUser,
+  IconSwitchHorizontal,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 import AvatarUsers from "@/components/avatar-users";
 import {
@@ -38,7 +40,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { SYSTEM_ROLE } from "@/@types/system-role.type";
+
 import type { Genre } from "@/generated/prisma/enums";
 import { GENRE_VALUES } from "@/lib/genre";
 import { authClient } from "@/lib/auth-client";
@@ -65,8 +67,7 @@ function parseGenre(value: unknown): Genre | undefined {
 }
 
 function roleLabelFromSessionUser(user: Omit<SessionUser, "name">): string {
-  const adminLike =
-    Boolean(user.isAdmin) || user.systemRole === SYSTEM_ROLE.FULL_ACCESS;
+  const adminLike = Boolean(user.isAdmin);
   const teacher = Boolean(user.isTeacher);
   if (adminLike && teacher) return "Administrador & Professor";
   if (adminLike) return "Administrador";
@@ -74,14 +75,18 @@ function roleLabelFromSessionUser(user: Omit<SessionUser, "name">): string {
   return "";
 }
 
-export function NavUser() {
+export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { data: session, isPending } = authClient.useSession();
   const [signingOut, setSigningOut] = useState(false);
 
-  const user = session?.user;
+  const user = session?.user as SessionUser | undefined;
+
+  const isAdminLike = user ? Boolean(user.isAdmin) : false;
+  const isTeacher = user ? Boolean(user.isTeacher) : false;
+  const canSwitchProfile = isAdminLike && isTeacher;
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -170,17 +175,39 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUser />
-                Perfil
-              </DropdownMenuItem>
+              {baseUrl === "/admin" ? (
+                <DropdownMenuItem asChild>
+                  <Link href={`/admin/equipe/${user.id}/editar`} className="flex items-center gap-2 cursor-pointer w-full">
+                    <IconUser className="size-4" />
+                    Perfil
+                  </Link>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem asChild>
+                  <Link href="/prof/perfil" className="flex items-center gap-2 cursor-pointer w-full">
+                    <IconUser className="size-4" />
+                    Perfil
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              {canSwitchProfile && (
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={baseUrl === "/admin" ? "/prof" : "/admin"}
+                    className="flex items-center gap-2 cursor-pointer w-full"
+                  >
+                    <IconSwitchHorizontal className="size-4" />
+                    {baseUrl === "/admin" ? "Trocar para Professor" : "Trocar para Administrador"}
+                  </Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <div className="flex items-center gap-2 px-2 py-1.5">
               <IconCircleHalf2 className="size-3.5 ml-1" />
               <span className="text-xs font-medium">Tema</span>
               <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger size="sm" className="h-7 w-[110px] rounded-md px-2 py-1 text-xs">
+                <SelectTrigger size="sm" className="h-7 w-27.5 rounded-md px-2 py-1 text-xs">
                   <SelectValue placeholder="Tema" />
                 </SelectTrigger>
                 <SelectContent>

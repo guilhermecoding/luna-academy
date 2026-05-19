@@ -1,6 +1,7 @@
 import { Program } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { cacheLife, cacheTag } from "next/cache";
+import { PeriodListItem } from "@/services/periods/periods.type";
 
 /**
  * Lista todos os programas disponíveis.
@@ -138,4 +139,117 @@ export async function deleteProgram(slug: string): Promise<Program> {
 
         throw error;
     }
+}
+
+/**
+ * Busca os programas em que um professor possui horários alocados (qualquer período).
+ * Usado no ProgramSwitcher da sidebar do professor.
+ *
+ * @param teacherId ID do professor.
+ * @returns Lista de programas (name, slug) associados ao professor.
+ */
+export async function getProgramsForTeacher(teacherId: string) {
+    "use cache";
+    cacheLife("minutes");
+    cacheTag(`teacher-programs-${teacherId}`);
+
+    return await prisma.program.findMany({
+        where: {
+            periods: {
+                some: {
+                    courses: {
+                        some: {
+                            schedules: {
+                                some: {
+                                    teacherId: teacherId,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        select: {
+            name: true,
+            slug: true,
+        },
+        orderBy: {
+            name: "asc",
+        },
+    });
+}
+
+/**
+ * Busca os períodos de um programa específico em que um professor possui horários alocados.
+ * Retorna todos os períodos (ativos e encerrados) para exibição na tela do professor.
+ *
+ * @param programSlug Slug do programa.
+ * @param teacherId ID do professor.
+ * @returns Lista de períodos ordenados por data de início (mais recente primeiro).
+ */
+export async function getPeriodsForTeacherByProgramSlug(
+    programSlug: string,
+    teacherId: string,
+): Promise<PeriodListItem[]> {
+    "use cache";
+    cacheLife("minutes");
+    cacheTag(`teacher-periods-${programSlug}-${teacherId}`);
+
+    const program = await prisma.program.findUnique({
+        where: { slug: programSlug },
+        select: { id: true },
+    });
+
+    if (!program) {
+        return [];
+    }
+
+    const periods = await prisma.period.findMany({
+        where: {
+            programId: program.id,
+            courses: {
+                some: {
+                    schedules: {
+                        some: {
+                            teacherId: teacherId,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: [{ startDate: "desc" }, { createdAt: "desc" }],
+        select: {
+            id: true,
+            name: true,
+            slug: true,
+            startDate: true,
+            endDate: true,
+            completedAt: true,
+            _count: {
+                select: {
+                    courses: true,
+                    studentPeriods: true,
+                },
+            },
+        },
+    });
+
+    // Buscar contagem de matriculados
+    const enrolledGrouped = await prisma.studentPeriod.groupBy({
+        by: ["periodId"],
+        where: {
+            periodId: { in: periods.map((p) => p.id) },
+            status: "ENROLLED",
+        },
+        _count: {
+            _all: true,
+        },
+    });
+
+    const enrolledMap = new Map(enrolledGrouped.map((g) => [g.periodId, g._count._all]));
+
+    return periods.map((p) => ({
+        ...p,
+        enrolledCount: enrolledMap.get(p.id) || 0,
+    }));
 }

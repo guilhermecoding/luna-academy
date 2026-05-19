@@ -115,12 +115,16 @@ function ListDisciplinesContent({
     periodSlug,
     classGroupSlug,
     studentCount,
+    baseUrl = "/admin",
+    showEditOption = true,
 }: {
     courses: CourseWithRelations[];
     programSlug: string;
     periodSlug: string;
     classGroupSlug: string;
     studentCount: number;
+    baseUrl?: string;
+    showEditOption?: boolean;
 }) {
     if (courses.length === 0) {
         return <EmptyDisciplinesList />;
@@ -159,7 +163,7 @@ function ListDisciplinesContent({
                                             {getInitials(course.subject.name)}
                                         </span>
                                         <div className="flex flex-col">
-                                            <Link href={`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${course.code}`} className="font-bold text-sm sm:text-base text-foreground underline-none hover:underline" title={course.name}>
+                                            <Link href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${course.code}`} className="font-bold text-sm sm:text-base text-foreground underline-none hover:underline" title={course.name}>
                                                 {course.name}
                                             </Link>
                                             <div className="shrink-0 text-muted-foreground font-medium mt-1 flex items-start gap-1">
@@ -243,6 +247,8 @@ function ListDisciplinesContent({
                                         periodSlug={periodSlug}
                                         classGroupSlug={classGroupSlug}
                                         courseCode={course.code}
+                                        baseUrl={baseUrl}
+                                        showEditOption={showEditOption}
                                     />
                                 </td>
                             </tr>
@@ -261,12 +267,16 @@ export default function ListDisciplines({
     periodSlug,
     classGroupSlug,
     studentCount,
+    baseUrl = "/admin",
+    showEditOption = true,
 }: {
     courses: CourseWithRelations[];
     programSlug: string;
     periodSlug: string;
     classGroupSlug: string;
     studentCount: number;
+    baseUrl?: string;
+    showEditOption?: boolean;
 }) {
     return (
         <ListDisciplinesContent
@@ -275,6 +285,8 @@ export default function ListDisciplines({
             periodSlug={periodSlug}
             classGroupSlug={classGroupSlug}
             studentCount={studentCount}
+            baseUrl={baseUrl}
+            showEditOption={showEditOption}
         />
     );
 }
