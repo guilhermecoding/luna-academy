@@ -1,3 +1,4 @@
+import { withSerwist } from "@serwist/turbopack";
 import type { NextConfig } from "next";
 import { RemotePattern } from "next/dist/shared/lib/image-config";
 
@@ -30,4 +31,4 @@ const nextConfig: NextConfig = {
 
 
 
-export default nextConfig;
+export default withSerwist(nextConfig);

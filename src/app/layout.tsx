@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Providers from "@/provider/providers";
 import { Suspense } from "react";
 import { FeedBackToast } from "@/components/feedback-toast";
+import { SerwistProvider } from "@serwist/turbopack/react";
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -22,6 +23,7 @@ export const viewport: Viewport = {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
+    themeColor: "#ffffff",
 };
 
 const APP_NAME = "LUNA ACADEMY";
@@ -34,7 +36,6 @@ export const metadata: Metadata = {
     applicationName: APP_NAME,
     description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-    manifest: "/manifest.json",
     authors: [{
         name: "Joao Guilherme",
         url: "https://www.linkedin.com/in/jo%C3%A3o-guilherme-ara%C3%BAjo-viana",
@@ -68,12 +69,17 @@ export default function RootLayout({
             suppressHydrationWarning
         >
             <body>
-                <Providers>
-                    <Suspense fallback={null}>
-                        <FeedBackToast />
-                    </Suspense>
-                    {children}
-                </Providers>
+                <SerwistProvider
+                    swUrl="/serwist/sw.js"
+                    disable={process.env.NODE_ENV === "development"}
+                >
+                    <Providers>
+                        <Suspense fallback={null}>
+                            <FeedBackToast />
+                        </Suspense>
+                        {children}
+                    </Providers>
+                </SerwistProvider>
             </body>
         </html>
     );
