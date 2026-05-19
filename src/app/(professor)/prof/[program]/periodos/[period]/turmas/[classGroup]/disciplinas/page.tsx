@@ -9,7 +9,7 @@ async function ClassGroupDisciplinesTeacherPageContent({
 }) {
     const { program, period, classGroup } = await params;
 
-    return <TeacherHomeRedirectClient targetUrl={`/prof/${program}/periodos/${period}/turmas/${classGroup}/disciplinas`} />;
+    return <TeacherHomeRedirectClient targetUrl={`/prof/${program}/periodos/${period}/turmas/${classGroup}`} />;
 }
 
 
