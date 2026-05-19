@@ -31,10 +31,10 @@ export const metadata: Metadata = {
         template: `%s | ${APP_NAME}`,
         default: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
     },
-    description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão educacional definitiva.",
+    description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
     openGraph: {
         title: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
-        description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão educacional definitiva.",
+        description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
         url: process.env.NEXT_PUBLIC_APP_URL,
         siteName: APP_NAME,
         images: [
