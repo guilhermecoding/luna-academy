@@ -1,7 +1,7 @@
 "use client";
 
 import { SideBarContentMenus } from "@/components/sidebar-content";
-import { NavUser } from "@/app/(admin)/admin/_components/nav-user-admin"; // Podemos reaproveitar, pois ele é genérico e lê a session
+import { NavUser } from "@/components/nav-user";
 import { ItemMenuSidebarAdmin } from "@/@types/item-menu-sidebar.type";
 
 import { usePathname, useParams } from "next/navigation";
@@ -58,5 +58,5 @@ export function ProfSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] })
 }
 
 export function ProfSidebarFooter() {
-    return <NavUser />;
+    return <NavUser baseUrl="/prof" />;
 }
