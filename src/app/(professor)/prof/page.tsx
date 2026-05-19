@@ -5,11 +5,11 @@ import { redirect } from "next/navigation";
 import { getProgramsForTeacher } from "@/services/programs/programs.service";
 import { IconBook } from "@tabler/icons-react";
 import { DualArc } from "@/components/dual-arc";
-import ProfRedirectClient from "./_components/prof-redirect-client";
+import TeacherHomeRedirectClient from "./_components/teacher-redirect-client";
 
 const ACTIVE_PROGRAM_COOKIE_NAME = "active_program_slug";
 
-async function ProfRedirect() {
+async function TeacherHomeRedirect() {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -42,10 +42,10 @@ async function ProfRedirect() {
     const activeProgram = programs.find((p) => p.slug === activeSlug);
     const targetSlug = activeProgram?.slug ?? programs[0].slug;
 
-    return <ProfRedirectClient targetUrl={`/prof/${targetSlug}/periodos`} />;
+    return <TeacherHomeRedirectClient targetUrl={`/prof/${targetSlug}/periodos`} />;
 }
 
-export default function ProfPage() {
+export default function TeacherHomePage() {
     return (
         <Suspense
             fallback={
@@ -54,7 +54,7 @@ export default function ProfPage() {
                 </div>
             }
         >
-            <ProfRedirect />
+            <TeacherHomeRedirect />
         </Suspense>
     );
 }

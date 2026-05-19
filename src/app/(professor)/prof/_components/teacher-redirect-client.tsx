@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DualArc } from "@/components/dual-arc";
 
-export default function ProfRedirectClient({ targetUrl }: { targetUrl: string }) {
+export default function TeacherHomeRedirectClient({ targetUrl }: { targetUrl: string }) {
     const router = useRouter();
 
     useEffect(() => {
