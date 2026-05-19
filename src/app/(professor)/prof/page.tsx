@@ -4,6 +4,8 @@ import { headers, cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getProgramsForTeacher } from "@/services/programs/programs.service";
 import { IconBook } from "@tabler/icons-react";
+import { DualArc } from "@/components/dual-arc";
+import ProfRedirectClient from "./_components/prof-redirect-client";
 
 const ACTIVE_PROGRAM_COOKIE_NAME = "active_program_slug";
 
@@ -38,13 +40,20 @@ async function ProfRedirect() {
     const activeSlug = cookieStore.get(ACTIVE_PROGRAM_COOKIE_NAME)?.value;
 
     const activeProgram = programs.find((p) => p.slug === activeSlug);
+    const targetSlug = activeProgram?.slug ?? programs[0].slug;
 
-    redirect(`/prof/${activeProgram?.slug ?? programs[0].slug}/periodos`);
+    return <ProfRedirectClient targetUrl={`/prof/${targetSlug}/periodos`} />;
 }
 
 export default function ProfPage() {
     return (
-        <Suspense fallback={null}>
+        <Suspense
+            fallback={
+                <div className="flex min-h-screen w-full items-center justify-center bg-background">
+                    <DualArc className="size-12 text-primary" />
+                </div>
+            }
+        >
             <ProfRedirect />
         </Suspense>
     );
