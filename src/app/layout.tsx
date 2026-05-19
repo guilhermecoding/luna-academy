@@ -32,6 +32,7 @@ export const metadata: Metadata = {
         default: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
     },
     description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
     openGraph: {
         title: `${APP_NAME} - Plataforma de Gestão Acadêmica`,
         description: "Gerencie, acompanhe e otimize o desempenho dos seus alunos com o Luna, a plataforma de gestão acadêmica definitiva.",
