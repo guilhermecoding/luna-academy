@@ -33,11 +33,12 @@ export default async function LoginPage() {
     });
 
     if (session?.user) {
-        if (session.user.isTeacher && !session.user.isAdmin) {
-            redirect("/prof");
+        if (session.user.isActive) {
+            if (session.user.isTeacher && !session.user.isAdmin) {
+                redirect("/prof");
+            }
+            redirect("/admin");
         }
-
-        redirect("/admin");
     }
 
     const logoCorporation = process.env.NEXT_PUBLIC_LOGO_CORPORATION;

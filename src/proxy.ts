@@ -15,6 +15,13 @@ export async function proxy(request: NextRequest) {
     }
 
     const { user } = session;
+
+    if (!user.isActive) {
+        const response = NextResponse.redirect(new URL("/entrar?", request.url));
+        response.cookies.delete("better-auth.session_token");
+        return response;
+    }
+
     const path = request.nextUrl.pathname;
 
     // Rotas /admin: exige isAdmin ou systemRole FULL_ACCESS
