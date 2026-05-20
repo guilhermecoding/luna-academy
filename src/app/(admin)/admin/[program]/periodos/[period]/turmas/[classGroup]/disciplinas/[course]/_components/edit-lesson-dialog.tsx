@@ -23,7 +23,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { IconEdit, IconLoader2, IconCalendarEvent, IconClock, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconLoader2, IconCalendarEvent, IconTrash } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { updateLessonAction, deleteLessonAction, createLessonAction } from "../actions";
 
@@ -62,6 +62,28 @@ const dayOfWeekLabels: Record<string, string> = {
     SATURDAY: "Sábado",
     SUNDAY: "Domingo",
 };
+
+const dayOfWeekShortLabels: Record<string, string> = {
+    MONDAY: "Seg",
+    TUESDAY: "Ter",
+    WEDNESDAY: "Qua",
+    THURSDAY: "Qui",
+    FRIDAY: "Sex",
+    SATURDAY: "Sáb",
+    SUNDAY: "Dom",
+};
+
+function formatScheduleLabel(schedule: ScheduleOption, variant: "short" | "full" = "short"): string {
+    const day =
+        variant === "full"
+            ? dayOfWeekLabels[schedule.dayOfWeek] || schedule.dayOfWeek
+            : dayOfWeekShortLabels[schedule.dayOfWeek] || schedule.dayOfWeek;
+    const time = `${schedule.startTime} - ${schedule.endTime}`;
+    if (schedule.teacherName) {
+        return `${day} · ${time} · ${schedule.teacherName}`;
+    }
+    return `${day} · ${time}`;
+}
 
 export function EditLessonSheet({
     programSlug,
@@ -180,7 +202,7 @@ export function EditLessonSheet({
             <SheetTrigger asChild>
                 {children}
             </SheetTrigger>
-            <SheetContent className="flex h-dvh max-h-dvh min-w-0 flex-col gap-0 overflow-hidden border-l-surface-border bg-surface p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-[50vw]">
+            <SheetContent className="flex h-dvh max-h-dvh w-full max-w-full min-w-0 flex-col gap-0 overflow-hidden border-l-surface-border bg-surface p-0 data-[side=right]:w-full data-[side=right]:max-w-full data-[side=right]:sm:max-w-[50vw]">
                 <SheetHeader className="shrink-0 border-b border-surface-border bg-background/50 p-4 backdrop-blur-sm sm:p-6">
                     <div className="min-w-0 space-y-1">
                         <SheetTitle className="flex min-w-0 items-start gap-2 text-lg font-bold sm:text-2xl">
@@ -200,10 +222,10 @@ export function EditLessonSheet({
                     </div>
                 </SheetHeader>
 
-                <ScrollArea className="min-h-0 flex-1 overflow-x-hidden">
-                    <div className="min-w-0 space-y-6 p-4 sm:p-6">
+                <ScrollArea className="min-h-0 w-full max-w-full flex-1 overflow-x-hidden">
+                    <div className="box-border w-full max-w-full min-w-0 space-y-6 p-4 sm:p-6">
                         {/* Data da Aula */}
-                        <div className="space-y-2">
+                        <div className="min-w-0 space-y-2">
                             <Label htmlFor="edit-lesson-date">Data da Aula *</Label>
                             <Input
                                 id="edit-lesson-date"
@@ -211,40 +233,44 @@ export function EditLessonSheet({
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 disabled={isSubmitting || isDeleting}
-                                className="rounded-lg bg-background h-12"
+                                className="h-12 w-full max-w-full min-w-0 rounded-lg bg-background"
                             />
                         </div>
 
                         {/* Horário (Schedule) */}
                         {schedules.length > 0 && (
-                            <div className="space-y-2">
+                            <div className="min-w-0 space-y-2 overflow-hidden">
                                 <Label>Horário da Grade</Label>
                                 <Select
                                     value={selectedScheduleId}
                                     onValueChange={setSelectedScheduleId}
                                     disabled={isSubmitting || isDeleting}
                                 >
-                                    <SelectTrigger className="h-12 w-full min-w-0 rounded-lg bg-background">
-                                        <SelectValue placeholder="Selecione um horário (opcional)" className="truncate" />
+                                    <SelectTrigger
+                                        className="h-12 !w-full max-w-full min-w-0 overflow-hidden rounded-lg bg-background [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:flex-1 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:text-left"
+                                    >
+                                        <SelectValue placeholder="Selecione um horário (opcional)">
+                                            {isNone
+                                                ? null
+                                                : selectedSchedule
+                                                    ? formatScheduleLabel(selectedSchedule, "short")
+                                                    : null}
+                                        </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent
+                                        position="popper"
+                                        align="start"
+                                        className="w-(--radix-select-trigger-width) max-w-[calc(100vw-2rem)]"
+                                    >
                                         <SelectItem value="none">Nenhum (Aula Avulsa)</SelectItem>
                                         {schedules.map((schedule) => (
-                                            <SelectItem key={schedule.id} value={schedule.id}>
-                                                <div className="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-0">
-                                                    <span className="flex min-w-0 items-center gap-1.5 font-medium">
-                                                        <IconClock className="size-3.5 shrink-0 text-muted-foreground" />
-                                                        {dayOfWeekLabels[schedule.dayOfWeek] || schedule.dayOfWeek}
-                                                    </span>
-                                                    <span className="text-muted-foreground">
-                                                        {schedule.startTime} - {schedule.endTime}
-                                                    </span>
-                                                    {schedule.teacherName && (
-                                                        <span className="truncate text-xs text-muted-foreground">
-                                                            {schedule.teacherName}
-                                                        </span>
-                                                    )}
-                                                </div>
+                                            <SelectItem
+                                                key={schedule.id}
+                                                value={schedule.id}
+                                                className="whitespace-normal"
+                                                title={formatScheduleLabel(schedule, "full")}
+                                            >
+                                                {formatScheduleLabel(schedule, "full")}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
