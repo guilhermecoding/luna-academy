@@ -76,7 +76,7 @@ function roleLabelFromSessionUser(user: Omit<SessionUser, "name">): string {
 }
 
 export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { data: session, isPending } = authClient.useSession();
@@ -87,6 +87,12 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
   const isAdminLike = user ? Boolean(user.isAdmin) : false;
   const isTeacher = user ? Boolean(user.isTeacher) : false;
   const canSwitchProfile = isAdminLike && isTeacher;
+
+  function closeMobileSidebar() {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -177,28 +183,37 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
             <DropdownMenuGroup>
               {baseUrl === "/admin" ? (
                 <DropdownMenuItem asChild>
-                  <Link href={`/admin/equipe/${user.id}/editar`} className="flex items-center gap-2 cursor-pointer w-full">
+                  <Link
+                    href={`/admin/equipe/${user.id}/editar`}
+                    className="flex w-full cursor-pointer items-center gap-2"
+                    onClick={closeMobileSidebar}
+                  >
                     <IconUser className="size-4" />
                     Perfil
                   </Link>
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem asChild>
-                  <Link href="/prof/perfil" className="flex items-center gap-2 cursor-pointer w-full">
+                  <Link
+                    href="/prof/perfil"
+                    className="flex w-full cursor-pointer items-center gap-2"
+                    onClick={closeMobileSidebar}
+                  >
                     <IconUser className="size-4" />
                     Perfil
                   </Link>
                 </DropdownMenuItem>
               )}
               {canSwitchProfile && (
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={baseUrl === "/admin" ? "/prof" : "/admin"}
-                    className="flex items-center gap-2 cursor-pointer w-full"
-                  >
-                    <IconSwitchHorizontal className="size-4" />
-                    {baseUrl === "/admin" ? "Trocar para Professor" : "Trocar para Administrador"}
-                  </Link>
+                <DropdownMenuItem
+                  className="flex cursor-pointer items-center gap-2"
+                  onSelect={() => {
+                    closeMobileSidebar();
+                    window.location.assign(baseUrl === "/admin" ? "/prof" : "/admin");
+                  }}
+                >
+                  <IconSwitchHorizontal className="size-4" />
+                  {baseUrl === "/admin" ? "Trocar para Professor" : "Trocar para Administrador"}
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
@@ -206,7 +221,13 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
             <div className="flex items-center gap-2 px-2 py-1.5">
               <IconCircleHalf2 className="size-3.5 ml-1" />
               <span className="text-xs font-medium">Tema</span>
-              <Select value={theme} onValueChange={setTheme}>
+              <Select
+                value={theme}
+                onValueChange={(value) => {
+                  setTheme(value);
+                  closeMobileSidebar();
+                }}
+              >
                 <SelectTrigger size="sm" className="h-7 w-27.5 rounded-md px-2 py-1 text-xs">
                   <SelectValue placeholder="Tema" />
                 </SelectTrigger>
@@ -238,6 +259,7 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
               disabled={signingOut}
               onSelect={(e) => {
                 e.preventDefault();
+                closeMobileSidebar();
                 void handleSignOut();
               }}
             >
