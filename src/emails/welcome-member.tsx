@@ -22,7 +22,7 @@ interface WelcomeMemberEmailProps {
 }
 
 export const WelcomeMemberEmail = ({
-    userName,
+    userName = "Usuário",
     userEmail,
     userPassword,
     roleName,
