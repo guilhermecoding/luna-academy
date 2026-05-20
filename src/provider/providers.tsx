@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Suspense } from "react";
 
 /**
  * Componente de Providers para fornecer contextos globais.
@@ -16,12 +17,14 @@ export default function Providers({
 }>) {
     return (
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <SidebarProvider>
-                <TooltipProvider>
-                    {children}
-                </TooltipProvider>
-                <Toaster richColors position="top-right" />
-            </SidebarProvider>
+            <Suspense fallback={null}>
+                <SidebarProvider>
+                    <TooltipProvider>
+                        {children}
+                    </TooltipProvider>
+                    <Toaster richColors position="top-right" />
+                </SidebarProvider>
+            </Suspense>
         </ThemeProvider>
     );
 }

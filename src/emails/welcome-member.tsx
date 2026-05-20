@@ -22,13 +22,13 @@ interface WelcomeMemberEmailProps {
 }
 
 export const WelcomeMemberEmail = ({
-    userName,
+    userName = "Usuário",
     userEmail,
     userPassword,
     roleName,
     systemUrl,
 }: WelcomeMemberEmailProps) => {
-    const previewText = `Bem-vindo ao Luna Academy! Seus dados de acesso de ${roleName}.`;
+    const previewText = `Bem-vindo ao Luna Academy! Seus dados de acesso de ${roleName} estão disponíveis.`;
 
     return (
         <Html>
@@ -47,16 +47,16 @@ export const WelcomeMemberEmail = ({
                             />
                         </Section>
                         <Heading className="text-black text-[24px] font-normal text-center p-0 my-7.5 mx-0">
-                            Bem-vindo(a) ao time, <strong>{userName}</strong>!
+                            Bem-vindo(a) ao time, <strong className="capitalize">{userName.split(" ")[0]}</strong>!
                         </Heading>
                         <Text className="text-black text-[14px] leading-6">
-                            Olá! Eu sou o <strong>Gibby</strong>, o mascote do Luna Academy! 🌙
+                            Olá! Aqui quem fala é o <strong>Gibby</strong>, o mascote do Luna Academy! 🌙
                         </Text>
                         <Text className="text-black text-[14px] leading-6">
-                            Estou passando aqui para avisar que um dos nossos administradores acabou de cadastrar você no sistema com o perfil de <strong>{roleName}</strong>.
+                            Estou passando aqui para avisar que um dos nossos administradores acabou de cadastrar você no sistema como <strong>{roleName}</strong>.
                         </Text>
                         <Text className="text-black text-[14px] leading-6">
-                            Aqui estão os seus dados temporários para o primeiro acesso:
+                            Aqui estão os seus dados de acesso:
                         </Text>
 
                         <Section className="bg-[#f6f9fc] rounded p-4 my-6">
@@ -69,7 +69,7 @@ export const WelcomeMemberEmail = ({
                         </Section>
 
                         <Text className="text-black text-[14px] leading-6">
-                            Por questões de segurança, recomendamos que você altere essa senha assim que fizer o login no painel do sistema.
+                            Por questões de segurança, recomendamos que você altere essa senha assim que possível.
                         </Text>
 
                         <Section className="text-center mt-8 mb-8">
