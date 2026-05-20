@@ -247,7 +247,7 @@ export function EditLessonSheet({
                                     disabled={isSubmitting || isDeleting}
                                 >
                                     <SelectTrigger
-                                        className="h-12 w-full! max-w-full min-w-0 overflow-hidden rounded-lg bg-background [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:flex-1 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:text-left"
+                                        className="h-12 w-full! max-w-full min-w-0 overflow-hidden rounded-lg bg-background **:data-[slot=select-value]:block **:data-[slot=select-value]:min-w-0 **:data-[slot=select-value]:flex-1 **:data-[slot=select-value]:truncate **:data-[slot=select-value]:text-left"
                                     >
                                         <SelectValue placeholder="Selecione um horário (opcional)">
                                             {isNone
