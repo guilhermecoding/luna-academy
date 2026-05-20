@@ -213,7 +213,7 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
                   }}
                 >
                   <IconSwitchHorizontal className="size-4" />
-                  {baseUrl === "/admin" ? "Trocar para Professor" : "Trocar para Administrador"}
+                  {baseUrl === "/admin" ? "Trocar para Professor" : "Trocar para Admin."}
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
