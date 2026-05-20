@@ -16,6 +16,7 @@ import thumb09 from "@/assets/images/thumbs-login-page/Imagem_09.webp";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { APP_VERSION } from "@/lib/app-version";
 
 const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08, thumb09];
 
@@ -72,7 +73,7 @@ export default async function LoginPage() {
 
                     {/* Footer opcional */}
                     <p className="text-center text-xs text-muted-foreground">
-                        &copy; <CurrentYear /> Luna Academy. Todos os direitos reservados.
+                        &copy; <CurrentYear /> Luna Academy - v{APP_VERSION}. Todos os direitos reservados.
                     </p>
                 </div>
             </div>
