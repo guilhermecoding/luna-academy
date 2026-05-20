@@ -1,6 +1,7 @@
 import { withSerwist } from "@serwist/turbopack";
 import type { NextConfig } from "next";
 import { RemotePattern } from "next/dist/shared/lib/image-config";
+import packageJson from "./package.json";
 
 const remotePatterns: RemotePattern[] = [];
 
@@ -16,6 +17,9 @@ if (process.env.NEXT_PUBLIC_LOGO_CORPORATION) {
 }
 
 const nextConfig: NextConfig = {
+    env: {
+        NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION ?? packageJson.version,
+    },
     reactCompiler: true,
     cacheComponents: true,
     allowedDevOrigins: process.env.NEXT_PUBLIC_ALLOWED_DEV_ORIGINS
