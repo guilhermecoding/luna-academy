@@ -64,7 +64,7 @@ export function createPeriodStudentColumns(opts: {
             cell: ({ row }) => {
                 return (
                     <div className="flex flex-col gap-1">
-                        <span className="font-medium">{row.original.name}</span>
+                        <span className="font-medium capitalize">{row.original.name.toLowerCase()}</span>
                         <span className="text-sm text-muted-foreground">{row.original.email}</span>
                     </div>
                 );
@@ -180,7 +180,7 @@ export const classGroupStudentsColumns: ColumnDef<StudentListItem>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex flex-col gap-1">
-                    <span className="font-medium">{row.original.name}</span>
+                    <span className="font-medium capitalize">{row.original.name.toLowerCase()}</span>
                     <span className="text-sm text-muted-foreground">{row.original.email}</span>
                 </div>
             );

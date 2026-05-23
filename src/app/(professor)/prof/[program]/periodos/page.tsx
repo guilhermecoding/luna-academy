@@ -14,6 +14,7 @@ import { IconCalendarEvent, IconCalendarFilled, IconLock } from "@tabler/icons-r
 import PulsingStatusIndicator from "@/components/pulsing-status-indicator";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { Greeting } from "../../_components/greeting";
 
 export const metadata: Metadata = {
     title: "Meus Períodos",
@@ -174,6 +175,31 @@ function PeriodsSkeleton() {
     );
 }
 
+async function PeriodsPageHeader() {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session?.user) {
+        redirect("/entrar");
+    }
+
+    return (
+        <>
+            <div className="flex flex-row items-center gap-1 mb-3">
+                <Greeting
+                    userName={session.user.name}
+                    className="text-muted-foreground font-bold"
+                />
+            </div>
+            <TitlePage
+                title="Meus Períodos"
+                description="Períodos em que você possui turmas alocadas."
+            />
+        </>
+    );
+}
+
 async function TeacherPeriodsPageContent({
     params,
 }: {
@@ -202,14 +228,12 @@ export default function TeacherPeriodsPage({
 }: {
     params: Promise<{ program: string }>;
 }) {
-
     return (
         <Page>
             <Section>
-                <TitlePage
-                    title="Meus Períodos"
-                    description="Períodos em que você possui turmas alocadas."
-                />
+                <Suspense fallback={<Skeleton className="h-5 w-48 mb-3" />}>
+                    <PeriodsPageHeader />
+                </Suspense>
             </Section>
 
             <Section className="mt-10">

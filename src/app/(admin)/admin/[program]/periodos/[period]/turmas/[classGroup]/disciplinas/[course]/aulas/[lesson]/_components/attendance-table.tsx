@@ -222,8 +222,8 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
                                             </div>
                                             <div className="px-4 sm:px-6 py-3 flex-1 pointer-events-none">
                                                 <div className="flex flex-col">
-                                                    <span className="font-semibold text-foreground">
-                                                        {attendance.student.name}
+                                                    <span className="font-semibold text-foreground capitalize">
+                                                        {attendance.student.name.toLowerCase()}
                                                     </span>
                                                     <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                                                         Matrícula: {attendance.student.lunaId || "—"}
