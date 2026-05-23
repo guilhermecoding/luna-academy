@@ -7,15 +7,19 @@ function timeGreeting(): string {
     return "Boa noite";
 }
 
-export function Greeting({ userName }: { userName: string }) {
+export function Greeting({
+    userName,
+    className = "text-3xl font-black text-foreground mb-2",
+}: {
+    userName: string;
+    className?: string;
+}) {
     const greeting = timeGreeting();
-
-    // O split(' ')[0] pega apenas o primeiro nome para ser mais pessoal
     const firstName = userName.split(" ")[0];
 
     return (
-        <h1 className="text-3xl font-black text-foreground mb-2">
+        <p className={className}>
             {greeting}, {firstName}!
-        </h1>
+        </p>
     );
 }
