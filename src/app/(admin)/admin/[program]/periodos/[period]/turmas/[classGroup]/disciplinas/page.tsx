@@ -32,7 +32,6 @@ export default async function TurmaDisciplinasPage({
     return (
         <Page>
             <Section>
-
                 <div className="flex flex-row items-center gap-1 mb-3">
                     <IconBooks className="size-4 text-muted-foreground" />
                     <p className="text-muted-foreground font-bold">Disciplinas Ofertadas</p>

@@ -108,8 +108,8 @@ export default function LessonCardList({
             const isLate = !lesson.attendanceUpdatedAt && new Date(lesson.date).getTime() < today.getTime();
 
             const lessonDate = new Date(lesson.date);
-            const day = lessonDate.getDate().toString().padStart(2, "0");
-            const month = (lessonDate.getMonth() + 1).toString().padStart(2, "0");
+            const day = lessonDate.getUTCDate().toString().padStart(2, "0");
+            const month = (lessonDate.getUTCMonth() + 1).toString().padStart(2, "0");
 
             return (
                 <div key={lesson.id} className="group relative">
