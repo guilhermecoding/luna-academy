@@ -1,5 +1,8 @@
 import prisma from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { cacheLife, cacheTag } from "next/cache";
+
+type TransactionClient = Prisma.TransactionClient;
 
 /**
  * Retorna as aulas de uma disciplina (course) ordenadas por data crescente,
@@ -67,30 +70,43 @@ export async function getLessonsCountByCourseId(courseId: string): Promise<numbe
 
 /**
  * Retorna os registros de presença de uma aula.
- * Inclui dados do aluno para exibição na tabela.
+ * Inclui dados do aluno e indica se o aluno foi desvinculado da disciplina.
  */
-export async function getAttendancesByLessonId(lessonId: string) {
+export async function getAttendancesByLessonId(lessonId: string, courseId: string) {
     "use cache";
     cacheLife("minutes");
     cacheTag(`lesson:${lessonId}:attendances`);
 
-    return await prisma.attendance.findMany({
-        where: { lessonId },
-        include: {
-            student: {
-                select: {
-                    id: true,
-                    name: true,
-                    cpf: true,
-                    lunaId: true,
-                    email: true,
-                    genre: true,
-                    birthDate: true,
+    const [attendances, enrollments] = await Promise.all([
+        prisma.attendance.findMany({
+            where: { lessonId },
+            include: {
+                student: {
+                    select: {
+                        id: true,
+                        name: true,
+                        cpf: true,
+                        lunaId: true,
+                        email: true,
+                        genre: true,
+                        birthDate: true,
+                    },
                 },
             },
-        },
-        orderBy: { student: { name: "asc" } },
-    });
+            orderBy: { student: { name: "asc" } },
+        }),
+        prisma.enrollment.findMany({
+            where: { courseId },
+            select: { studentId: true },
+        }),
+    ]);
+
+    const enrolledIds = new Set(enrollments.map((e) => e.studentId));
+
+    return attendances.map((attendance) => ({
+        ...attendance,
+        isUnlinked: !enrolledIds.has(attendance.studentId),
+    }));
 }
 
 export type AttendanceWithStudent = Awaited<ReturnType<typeof getAttendancesByLessonId>>[number];
@@ -109,6 +125,59 @@ export async function getAttendanceStatsByLessonId(lessonId: string) {
     ]);
 
     return { total, present, absent: total - present };
+}
+
+/**
+ * Cria registros de presença faltantes para alunos em aulas já existentes.
+ * Usado ao enturmar alunos após aulas registradas (default: ausente).
+ */
+export async function backfillAttendancesForStudents(
+    tx: TransactionClient,
+    courseIds: string[],
+    studentIds: string[],
+    isPresent = false,
+) {
+    if (courseIds.length === 0 || studentIds.length === 0) {
+        return [];
+    }
+
+    const lessons = await tx.lesson.findMany({
+        where: { courseId: { in: courseIds } },
+        select: { id: true },
+    });
+
+    if (lessons.length === 0) {
+        return [];
+    }
+
+    await tx.attendance.createMany({
+        data: lessons.flatMap((lesson) =>
+            studentIds.map((studentId) => ({
+                lessonId: lesson.id,
+                studentId,
+                isPresent,
+            })),
+        ),
+        skipDuplicates: true,
+    });
+
+    return lessons.map((l) => l.id);
+}
+
+/**
+ * Retorna os IDs das aulas de um conjunto de disciplinas (para invalidação de cache).
+ */
+export async function getLessonIdsByCourseIds(courseIds: string[]) {
+    if (courseIds.length === 0) {
+        return [];
+    }
+
+    const lessons = await prisma.lesson.findMany({
+        where: { courseId: { in: courseIds } },
+        select: { id: true },
+    });
+
+    return lessons.map((l) => l.id);
 }
 
 /**

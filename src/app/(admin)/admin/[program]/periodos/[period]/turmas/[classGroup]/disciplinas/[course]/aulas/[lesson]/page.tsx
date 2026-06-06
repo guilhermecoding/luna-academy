@@ -67,7 +67,7 @@ export default async function LessonPage({
     if (!lesson || lesson.course.id !== courseData.id) notFound();
 
     const [attendances, stats] = await Promise.all([
-        getAttendancesByLessonId(lessonId),
+        getAttendancesByLessonId(lessonId, courseData.id),
         getAttendanceStatsByLessonId(lessonId),
     ]);
 
