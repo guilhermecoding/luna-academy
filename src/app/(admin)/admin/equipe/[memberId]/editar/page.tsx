@@ -14,9 +14,7 @@ export const metadata: Metadata = {
 
 export default async function EditMemberPage({
     params,
-}: {
-    params: Promise<{ memberId: string }>;
-}) {
+}: PageProps<"/admin/equipe/[memberId]/editar">) {
     const { memberId } = await params;
     const [member, session] = await Promise.all([
         getUserById(memberId),

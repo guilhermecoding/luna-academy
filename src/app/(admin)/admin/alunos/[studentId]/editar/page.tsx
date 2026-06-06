@@ -13,9 +13,7 @@ export const metadata: Metadata = {
 
 export default async function EditStudentPage({
     params,
-}: {
-    params: Promise<{ studentId: string }>;
-}) {
+}: PageProps<"/admin/alunos/[studentId]/editar">) {
     const { studentId } = await params;
 
     const student = await getStudentById(studentId);

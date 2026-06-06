@@ -13,9 +13,7 @@ export const metadata: Metadata = {
 
 export default async function TimeSlotsPage({
     params,
-}: {
-    params: Promise<{ program: string }>;
-}) {
+}: PageProps<"/admin/[program]/horarios">) {
     const { program } = await params;
     const timeSlots = await getTimeSlotsByProgramSlug(program);
 

@@ -18,9 +18,7 @@ export const metadata: Metadata = {
 
 export default async function PeriodPage({
     params,
-}: {
-    params: Promise<{ program: string; period: string }>;
-}) {
+}: PageProps<"/admin/[program]/periodos/[period]">) {
     const { program, period } = await params;
     const periodData = await getPeriodByProgramAndSlug(program, period);
 

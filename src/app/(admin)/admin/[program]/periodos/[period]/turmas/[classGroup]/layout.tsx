@@ -7,10 +7,7 @@ import { Suspense } from "react";
 async function ClassGroupLayoutContent({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string; period: string; classGroup: string }>;
-}>) {
+}: LayoutProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]">) {
     const { program: programSlug, period: periodSlug, classGroup: classGroupSlug } = await params;
 
     const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
@@ -31,10 +28,7 @@ async function ClassGroupLayoutContent({
 export default function ClassGroupLayout({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string; period: string; classGroup: string }>;
-}>) {
+}: LayoutProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]">) {
     return (
         <Suspense fallback={<PageSkeleton />}>
             <ClassGroupLayoutContent params={params}>

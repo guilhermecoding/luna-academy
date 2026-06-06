@@ -16,9 +16,7 @@ export const metadata: Metadata = {
 
 async function DegreeDashboardPageContent({
     params,
-}: {
-    params: Promise<{ program: string; degree: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/matrizes/[degree]">, "searchParams">) {
     const { program: programSlug, degree: degreeSlug } = await params;
     const degreeData = await getDegreeBySlug(programSlug, degreeSlug);
 

@@ -18,9 +18,8 @@ export default async function ClassGroupsPage({
     params,
     searchParams,
 }: {
-    params: Promise<{ program: string; period: string }>;
     searchParams: Promise<{ teacherId?: string }>;
-}) {
+} & Omit<PageProps<"/admin/[program]/periodos/[period]/turmas">, "searchParams">) {
     const { program, period } = await params;
     const { teacherId } = await searchParams;
 
@@ -58,10 +57,10 @@ export default async function ClassGroupsPage({
             </Section>
 
             <Section className="mt-18">
-                <ListClassGroups 
-                    periodId={periodData.id} 
-                    programSlug={program} 
-                    periodSlug={period} 
+                <ListClassGroups
+                    periodId={periodData.id}
+                    programSlug={program}
+                    periodSlug={period}
                     teacherId={teacherId}
                 />
             </Section>
