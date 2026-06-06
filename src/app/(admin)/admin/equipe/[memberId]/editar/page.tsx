@@ -7,14 +7,16 @@ import { notFound } from "next/navigation";
 import EditMemberForm from "./_components/edit-member-form";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Suspense } from "react";
+import SkeletonForm from "@/components/skeletons/skeleton-form";
 
 export const metadata: Metadata = {
     title: "Editar Membro",
 };
 
-export default async function EditMemberPage({
+async function AdminEditMemberPageContent({
     params,
-}: PageProps<"/admin/equipe/[memberId]/editar">) {
+}: Omit<PageProps<"/admin/equipe/[memberId]/editar">, "searchParams">) {
     const { memberId } = await params;
     const [member, session] = await Promise.all([
         getUserById(memberId),
@@ -40,5 +42,15 @@ export default async function EditMemberPage({
                 <EditMemberForm member={member} isEditingSelf={isEditingSelf} />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminEditMemberPage({
+    params,
+}: PageProps<"/admin/equipe/[memberId]/editar">) {
+    return (
+        <Suspense fallback={<SkeletonForm />}>
+            <AdminEditMemberPageContent params={params} />
+        </Suspense>
     );
 }

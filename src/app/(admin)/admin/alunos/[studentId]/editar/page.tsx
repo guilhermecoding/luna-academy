@@ -6,14 +6,16 @@ import { Metadata } from "next";
 import EditStudentForm from "./_components/edit-student-form";
 import { getStudentById } from "@/services/students/students.service";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import SkeletonForm from "@/components/skeletons/skeleton-form";
 
 export const metadata: Metadata = {
     title: "Editar Aluno",
 };
 
-export default async function EditStudentPage({
+async function AdminEditStudentPageContent({
     params,
-}: PageProps<"/admin/alunos/[studentId]/editar">) {
+}: Omit<PageProps<"/admin/alunos/[studentId]/editar">, "searchParams">) {
     const { studentId } = await params;
 
     const student = await getStudentById(studentId);
@@ -43,5 +45,15 @@ export default async function EditStudentPage({
                 <EditStudentForm student={student} />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminEditStudentPage({
+    params,
+}: PageProps<"/admin/alunos/[studentId]/editar">) {
+    return (
+        <Suspense fallback={<SkeletonForm />}>
+            <AdminEditStudentPageContent params={params} />
+        </Suspense>
     );
 }
