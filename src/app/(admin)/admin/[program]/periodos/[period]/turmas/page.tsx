@@ -43,7 +43,7 @@ async function AdminClassGroupsPageContent({
                 <div className="flex flex-col lg:flex-row gap-y-6">
                     <div className="flex-1">
                         <TitlePage
-                            title={`Turmas do ${periodData.name}`}
+                            title={`Turmas de ${periodData.name}`}
                             description="Gerencie as turmas deste período letivo."
                         />
                     </div>

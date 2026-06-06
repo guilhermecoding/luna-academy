@@ -1,11 +1,15 @@
 "use client";
 
+import { DualArc } from "@/components/dual-arc";
 import GibbyAnimate from "@/components/gibby-animate";
+import { APP_VERSION } from "@/lib/app-version";
+import { IconHeartFilled } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 const INTRO_STORAGE_KEY = "luna-intro-shown";
 const INTRO_DURATION_MS = 2400;
+const LOADING_DELAY_MS = 7000;
 
 function subscribe() {
     return () => { };
@@ -26,6 +30,7 @@ export function IntroSplash() {
         getServerIntroAlreadyShown,
     );
     const [dismissed, setDismissed] = useState(false);
+    const [showLoading, setShowLoading] = useState(false);
     const visible = !introAlreadyShown && !dismissed;
 
     useEffect(() => {
@@ -33,12 +38,19 @@ export function IntroSplash() {
             return;
         }
 
-        const timer = window.setTimeout(() => {
+        const dismissTimer = window.setTimeout(() => {
             sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
             setDismissed(true);
         }, INTRO_DURATION_MS);
 
-        return () => window.clearTimeout(timer);
+        const loadingTimer = window.setTimeout(() => {
+            setShowLoading(true);
+        }, LOADING_DELAY_MS);
+
+        return () => {
+            window.clearTimeout(dismissTimer);
+            window.clearTimeout(loadingTimer);
+        };
     }, [visible]);
 
     return (
@@ -75,6 +87,24 @@ export function IntroSplash() {
                                 ACADEMY
                             </p>
                         </motion.div>
+                        <div className="mt-6 flex flex-col items-center gap-2">
+                            <span className="flex flex-row items-center shrink-0 text-muted-foreground">
+                                Feito com <IconHeartFilled className="size-7 shrink-0 px-1" /> por <strong>João Guilherme</strong>
+                            </span>
+                            <p className="text-sm text-center text-muted-foreground">
+                                versão {APP_VERSION}
+                            </p>
+                        </div>
+                        {visible && showLoading && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className="mt-6"
+                            >
+                                <DualArc className="size-10 border-4 text-muted-foreground" />
+                            </motion.div>
+                        )}
                     </motion.div>
                 </motion.div>
             )}
