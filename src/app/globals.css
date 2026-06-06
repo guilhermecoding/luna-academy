@@ -63,6 +63,7 @@
 } */
 
 :root {
+  color-scheme: only light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -100,7 +101,12 @@
   --surface-border: oklch(49.261% 0.00006 271.152 / 0.4);
 }
 
+:root.light {
+  color-scheme: only light;
+}
+
 .dark {
+  color-scheme: only dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -137,9 +143,58 @@
   --surface-border: oklch(70.9% 0.00008 271.152 / 0.4);
 }
 
+/*
+ * Fallback antes do script: aplica tokens escuros via CSS puro quando o SO está em dark.
+ * O modificador "only dark" impede o Chrome Android de forçar inversão automática.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: only dark;
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+    --primary-theme: oklch(62.3% 0.214 259.815);
+    --surface: oklch(0.269 0 0 / 0.6);
+    --surface-border: oklch(70.9% 0.00008 271.152 / 0.4);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply bg-background;
+    forced-color-adjust: none;
   }
 
   body {

@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeColorSchemeSync } from "@/components/theme-color-scheme-sync";
 import { Suspense } from "react";
 
 /**
@@ -16,7 +17,15 @@ export default function Providers({
     children: React.ReactNode;
 }>) {
     return (
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            enableColorScheme={false}
+            disableTransitionOnChange
+            storageKey="theme"
+        >
+            <ThemeColorSchemeSync />
             <Suspense fallback={null}>
                 <SidebarProvider>
                     <TooltipProvider>
