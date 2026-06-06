@@ -6,10 +6,7 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 async function DegreeLayoutContent({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string; degree: string }>;
-}>) {
+}: LayoutProps<"/admin/[program]/matrizes/[degree]">) {
     const { program: programSlug, degree: degreeSlug } = await params;
 
     const degree = await getDegreeBySlug(programSlug, degreeSlug);
@@ -28,10 +25,7 @@ async function DegreeLayoutContent({
 export default function DegreeLayout({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string; degree: string }>;
-}>) {
+}: LayoutProps<"/admin/[program]/matrizes/[degree]">) {
     return (
         <Suspense fallback={<PageSkeleton />}>
             <DegreeLayoutContent params={params}>

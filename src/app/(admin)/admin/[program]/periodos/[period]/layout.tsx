@@ -6,10 +6,7 @@ import { Suspense } from "react";
 async function PeriodLayoutContent({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string; period: string }>;
-}>) {
+}: LayoutProps<"/admin/[program]/periodos/[period]">) {
     const { program: programSlug, period: periodSlug } = await params;
 
     const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
@@ -26,8 +23,7 @@ export default function PeriodLayout({
     params,
 }: Readonly<{
     children: React.ReactNode;
-    params: Promise<{ program: string; period: string }>;
-}>) {
+} & LayoutProps<"/admin/[program]/periodos/[period]">>) {
     return (
         <Suspense fallback={<PageSkeleton />}>
             <PeriodLayoutContent params={params}>

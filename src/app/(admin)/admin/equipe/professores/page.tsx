@@ -8,19 +8,21 @@ import { DataTable } from "../_components/data-table";
 import { getTeachers, getTeacherStats } from "@/services/users/teachers.service";
 import { columns } from "./_components/columns";
 import InfoBoxUsers from "../_components/info-box-users";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Professores",
 };
 
-export default async function TeachersPage({
+async function AdminTeachersPageContent({
     searchParams,
-}: {
-    searchParams: Promise<{ q?: string }>;
-}) {
+}: PageProps<"/admin/equipe/professores">) {
     const { q } = await searchParams;
+    const searchQuery = typeof q === "string" ? q : undefined;
+
     const [teachersList, teacherStats] = await Promise.all([
-        getTeachers(q),
+        getTeachers(searchQuery),
         getTeacherStats(),
     ]);
 
@@ -82,5 +84,16 @@ export default async function TeachersPage({
                 </div>
             </Section>
         </Page>
+    );
+}
+
+export default function AdminTeachersPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/equipe/professores">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminTeachersPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

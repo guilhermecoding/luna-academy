@@ -15,13 +15,11 @@ export const metadata: Metadata = {
 
 async function EditClassGroupContent({
     params,
-}: {
-    params: Promise<{ program: string; period: string; classGroup: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/editar">, "searchParams">) {
     const { program, period: periodSlug, classGroup: token } = await params;
-    
+
     const period = await getPeriodByProgramAndSlug(program, periodSlug);
-    
+
     if (!period) {
         notFound();
     }
@@ -61,9 +59,7 @@ async function EditClassGroupContent({
 
 export default function EditClassGroupPage({
     params,
-}: {
-    params: Promise<{ program: string; period: string; classGroup: string }>;
-}) {
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/editar">) {
     return (
         <Suspense fallback={<SkeletonForm />}>
             <EditClassGroupContent params={params} />

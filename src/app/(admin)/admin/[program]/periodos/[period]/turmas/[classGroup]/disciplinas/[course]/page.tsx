@@ -21,6 +21,8 @@ import { Shift, DayOfWeek } from "@/generated/prisma/enums";
 import { Metadata } from "next";
 import LessonCardList from "./_components/lesson-card-list";
 import { CreateLessonSheet } from "./_components/create-lesson-dialog";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -116,11 +118,9 @@ function generateUpcomingLessons(
     return upcoming;
 }
 
-export default async function CoursePage({
+async function AdminCoursePageContent({
     params,
-}: {
-    params: Promise<{ program: string; period: string; classGroup: string; course: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]">, "searchParams">) {
     const { program, period, classGroup: classGroupSlug, course: courseCode } = await params;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
@@ -259,5 +259,15 @@ export default async function CoursePage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminCoursePage({
+    params,
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminCoursePageContent params={params} />
+        </Suspense>
     );
 }

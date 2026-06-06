@@ -1,5 +1,6 @@
 import { ClassGroup, Prisma, Shift } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import { backfillAttendancesForStudents } from "@/services/lessons/lessons.service";
 import { cacheLife, cacheTag } from "next/cache";
 
 /**
@@ -347,6 +348,13 @@ export async function enrollStudentsInClassGroup(classGroupId: string, studentId
             skipDuplicates: true,
         });
 
+        const affectedLessonIds = await backfillAttendancesForStudents(
+            tx,
+            courseIds,
+            studentIds,
+            false,
+        );
+
         // 3. Atualizar o status dos alunos no período para ENROLLED
         await tx.studentPeriod.updateMany({
             where: {
@@ -358,7 +366,7 @@ export async function enrollStudentsInClassGroup(classGroupId: string, studentId
             },
         });
 
-        return { success: true, count: studentIds.length, classGroup };
+        return { success: true, count: studentIds.length, classGroup, courseIds, affectedLessonIds };
     });
 }
 
@@ -376,18 +384,10 @@ export async function unlinkStudentsFromClassGroup(classGroupId: string, student
         const courseIds = classGroup.courses.map((c) => c.id);
 
         if (courseIds.length === 0) {
-            return { success: true, count: 0 };
+            return { success: true, count: 0, courseIds: [] as string[] };
         }
 
-        // 1. Remover Presenças
-        await tx.attendance.deleteMany({
-            where: {
-                studentId: { in: studentIds },
-                lesson: { courseId: { in: courseIds } },
-            },
-        });
-
-        // 2. Remover Notas
+        // 1. Remover Notas
         await tx.activityGrade.deleteMany({
             where: {
                 studentId: { in: studentIds },
@@ -409,7 +409,7 @@ export async function unlinkStudentsFromClassGroup(classGroupId: string, student
             },
         });
 
-        // 3. Remover Matrículas
+        // 2. Remover Matrículas
         await tx.enrollment.deleteMany({
             where: {
                 studentId: { in: studentIds },
@@ -417,7 +417,7 @@ export async function unlinkStudentsFromClassGroup(classGroupId: string, student
             },
         });
 
-        // 4. Update status se não tiver mais nenhuma disciplina no periodo
+        // 3. Update status se não tiver mais nenhuma disciplina no periodo
         for (const studentId of studentIds) {
             const enrollmentsCount = await tx.enrollment.count({
                 where: {
@@ -434,6 +434,6 @@ export async function unlinkStudentsFromClassGroup(classGroupId: string, student
             }
         }
 
-        return { success: true };
+        return { success: true, courseIds };
     });
 }
