@@ -17,9 +17,7 @@ export const metadata: Metadata = {
 
 async function NewClassContent({
     params,
-}: {
-    params: Promise<{ program: string; period: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/novo">, "searchParams">) {
     const { program, period } = await params;
 
     const [periodData, programData] = await Promise.all([
@@ -71,8 +69,10 @@ async function NewClassContent({
 
 export default function NewClassPage({
     params,
-}: {
-    params: Promise<{ program: string; period: string }>;
-}) {
-    return <NewClassContent params={params} />;
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/novo">) {
+    return (
+        <Suspense fallback={<SkeletonForm />}>
+            <NewClassContent params={params} />
+        </Suspense>
+    );
 }

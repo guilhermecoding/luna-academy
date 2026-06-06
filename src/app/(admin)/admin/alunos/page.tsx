@@ -8,21 +8,22 @@ import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/columns";
 import { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button-link";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Alunos",
 };
 
-export default async function StudentsPage({
+async function AdminStudentsPageContent({
     searchParams,
-}: {
-    searchParams: Promise<{ q?: string }>;
-}) {
+}: PageProps<"/admin/alunos">) {
     const { q } = await searchParams;
+    const searchQuery = typeof q === "string" ? q : undefined;
 
     const [totalStudents, studentsList] = await Promise.all([
         getTotalStudentsCount(),
-        getStudentsList(q),
+        getStudentsList(searchQuery),
     ]);
 
     return (
@@ -40,15 +41,15 @@ export default async function StudentsPage({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
-                        <ButtonLink 
-                            className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid" 
+                        <ButtonLink
+                            className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
                             href="/admin/alunos/indicadores"
                         >
                             <IconChartBar className="size-5" />
                             Indicadores
                         </ButtonLink>
-                        <ButtonLink 
-                            className="w-full sm:w-auto" 
+                        <ButtonLink
+                            className="w-full sm:w-auto"
                             href="/admin/alunos/novo"
                         >
                             <IconPlus className="size-5 mr-1" />
@@ -70,8 +71,8 @@ export default async function StudentsPage({
 
             <Section className="mt-8">
                 <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-                    <DataTable 
-                        columns={columns} 
+                    <DataTable
+                        columns={columns}
                         data={studentsList}
                         title={
                             <h2 className="text-xl flex flex-row items-center gap-2 font-bold text-foreground">
@@ -83,5 +84,16 @@ export default async function StudentsPage({
                 </div>
             </Section>
         </Page>
+    );
+}
+
+export default function AdminStudentsPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/alunos">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminStudentsPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

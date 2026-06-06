@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Poppins, Silkscreen } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-script";
 import Providers from "@/provider/providers";
 import { Suspense } from "react";
 import { FeedBackToast } from "@/components/feedback-toast";
@@ -24,7 +25,11 @@ export const viewport: Viewport = {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
-    themeColor: "#ffffff",
+    colorScheme: "light dark",
+    themeColor: [
+        { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+        { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
+    ],
 };
 
 const APP_NAME = "LUNA ACADEMY";
@@ -71,6 +76,10 @@ export default function RootLayout({
             suppressHydrationWarning
         >
             <head>
+                <script
+                    suppressHydrationWarning
+                    dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+                />
                 <link rel="manifest" href="/manifest.webmanifest" />
             </head>
             <body>

@@ -10,22 +10,23 @@ import { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button-link";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Equipe",
 };
 
-export default async function UsersPage({
+async function AdminUsersPageContent({
     searchParams,
-}: {
-    searchParams: Promise<{ q?: string }>;
-}) {
+}: PageProps<"/admin/equipe">) {
     const { q } = await searchParams;
+    const searchQuery = typeof q === "string" ? q : undefined;
 
     const [session, userStats, usersList] = await Promise.all([
         auth.api.getSession({ headers: await headers() }),
         getUserStats(),
-        getUsersList(q),
+        getUsersList(searchQuery),
     ]);
     const currentUserId = session?.user?.id ?? null;
 
@@ -84,8 +85,8 @@ export default async function UsersPage({
 
             <Section className="mt-8">
                 <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-                    <DataTable 
-                        columns={columns} 
+                    <DataTable
+                        columns={columns}
                         data={usersList}
                         currentUserId={currentUserId}
                         title={
@@ -98,5 +99,16 @@ export default async function UsersPage({
                 </div>
             </Section>
         </Page>
+    );
+}
+
+export default function AdminUsersPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/equipe">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminUsersPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

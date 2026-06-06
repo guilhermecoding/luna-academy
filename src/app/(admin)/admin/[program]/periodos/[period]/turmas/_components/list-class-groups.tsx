@@ -36,8 +36,8 @@ const CLASS_GROUP_ACCENTS = [
 function ListClassGroupsSkeleton() {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="border border-surface-border rounded-2xl bg-surface p-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-2xl h-60 bg-surface p-6">
                     <div className="flex items-center gap-3 mb-4">
                         <Skeleton className="size-10 rounded-xl bg-muted-foreground/10" />
                         <div className="space-y-2 flex-1">

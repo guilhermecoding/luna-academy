@@ -10,6 +10,7 @@ import type { AttendanceWithStudent } from "@/services/lessons/lessons.service";
 import AvatarUsers from "@/components/avatar-users";
 import { calculateAge } from "@/lib/date-utils";
 import { motion } from "motion/react";
+import { Badge } from "@/components/ui/badge";
 
 interface AttendanceTableProps {
     attendances: AttendanceWithStudent[];
@@ -221,10 +222,20 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
                                                 />
                                             </div>
                                             <div className="px-4 sm:px-6 py-3 flex-1 pointer-events-none">
-                                                <div className="flex flex-col">
-                                                    <span className="font-semibold text-foreground capitalize">
-                                                        {attendance.student.name.toLowerCase()}
-                                                    </span>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <span className="font-semibold text-foreground capitalize">
+                                                            {attendance.student.name.toLowerCase()}
+                                                        </span>
+                                                        {attendance.isUnlinked && (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="text-[10px] uppercase tracking-wider text-muted-foreground border-muted-foreground/30"
+                                                            >
+                                                                Desvinculado
+                                                            </Badge>
+                                                        )}
+                                                    </div>
                                                     <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                                                         Matrícula: {attendance.student.lunaId || "—"}
                                                     </span>

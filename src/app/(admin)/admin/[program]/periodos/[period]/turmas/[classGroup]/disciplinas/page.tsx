@@ -9,16 +9,16 @@ import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-gr
 import { getStudentCountByClassGroupId } from "@/services/students/students.service";
 import { notFound } from "next/navigation";
 import ListDisciplines from "../../_components/list-disciplines";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Disciplinas da Turma",
 };
 
-export default async function TurmaDisciplinasPage({
+async function AdminClassGroupCoursesPageContent({
     params,
-}: {
-    params: Promise<{ program: string; period: string; classGroup: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas">, "searchParams">) {
     const { program, period, classGroup: classGroupSlug } = await params;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
@@ -62,5 +62,15 @@ export default async function TurmaDisciplinasPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminClassGroupCoursesPage({
+    params,
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminClassGroupCoursesPageContent params={params} />
+        </Suspense>
     );
 }

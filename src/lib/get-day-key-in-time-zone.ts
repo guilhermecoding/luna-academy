@@ -17,8 +17,53 @@
  * @param timeZone Timezone IANA (ex.: "America/Sao_Paulo", "UTC").
  * @returns Chave numerica YYYYMMDD.
  */
-const rawTimeZone = process.env.NEXT_PUBLIC_APP_TIMEZONE || process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-export const APP_TIMEZONE = rawTimeZone.startsWith(":") ? rawTimeZone.slice(1) : rawTimeZone;
+export const DEFAULT_APP_TIMEZONE = "America/Sao_Paulo";
+
+function normalizeTimeZoneCandidate(value: string | undefined): string | undefined {
+    if (!value) {
+        return undefined;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return undefined;
+    }
+
+    return trimmed.startsWith(":") ? trimmed.slice(1) : trimmed;
+}
+
+function isValidTimeZone(timeZone: string): boolean {
+    try {
+        Intl.DateTimeFormat("en-US", { timeZone }).format(new Date());
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function resolveAppTimezone(): string {
+    const candidates = [
+        normalizeTimeZoneCandidate(process.env.NEXT_PUBLIC_APP_TIMEZONE),
+        normalizeTimeZoneCandidate(process.env.TZ),
+        normalizeTimeZoneCandidate(Intl.DateTimeFormat().resolvedOptions().timeZone),
+    ].filter((timeZone): timeZone is string => Boolean(timeZone));
+
+    for (const timeZone of candidates) {
+        if (isValidTimeZone(timeZone)) {
+            return timeZone;
+        }
+
+        console.warn(`[timezone] Valor inválido ignorado: "${timeZone}".`);
+    }
+
+    console.warn(
+        `[timezone] Nenhum timezone válido encontrado. Usando fallback: "${DEFAULT_APP_TIMEZONE}".`,
+    );
+
+    return DEFAULT_APP_TIMEZONE;
+}
+
+export const APP_TIMEZONE = resolveAppTimezone();
 
 export default function getDayKeyInTimeZone(date: Date, timeZone: string = APP_TIMEZONE): number {
     const parts = new Intl.DateTimeFormat("en-CA", {

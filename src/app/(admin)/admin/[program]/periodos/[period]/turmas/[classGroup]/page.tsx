@@ -14,20 +14,21 @@ import { Shift } from "@/generated/prisma/enums";
 import { DataTableClassStudents } from "./_components/data-table-class-students";
 import { classGroupStudentsColumns } from "../../alunos/_components/columns-period";
 import { AddStudentsToClassSheet } from "./_components/add-students-to-class-sheet";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Detalhes da Turma",
 };
 
-export default async function ClassPage({
+async function AdminClassPageContent({
     params,
     searchParams,
-}: {
-    params: Promise<{ program: string; period: string; classGroup: string }>;
-    searchParams: Promise<{ q?: string }>;
-}) {
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]">) {
     const { program, period, classGroup: classGroupSlug } = await params;
     const { q } = await searchParams;
+
+    const searchQuery = typeof q === "string" ? q : undefined;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
     if (!periodData) {
@@ -42,7 +43,7 @@ export default async function ClassPage({
     const [studentCount, disciplinesCount, studentsList] = await Promise.all([
         getStudentCountByClassGroupId(classGroupData.id),
         Promise.resolve(classGroupData.courses.length),
-        getStudentsByClassGroupList(classGroupData.id, q),
+        getStudentsByClassGroupList(classGroupData.id, searchQuery),
     ]);
 
     const shiftMap: Record<Shift, string> = {
@@ -133,5 +134,16 @@ export default async function ClassPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminClassPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminClassPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

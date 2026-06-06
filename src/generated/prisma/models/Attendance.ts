@@ -207,6 +207,7 @@ export type AttendanceOrderByWithRelationInput = {
 
 export type AttendanceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  lessonId_studentId?: Prisma.AttendanceLessonIdStudentIdCompoundUniqueInput
   AND?: Prisma.AttendanceWhereInput | Prisma.AttendanceWhereInput[]
   OR?: Prisma.AttendanceWhereInput[]
   NOT?: Prisma.AttendanceWhereInput | Prisma.AttendanceWhereInput[]
@@ -217,7 +218,7 @@ export type AttendanceWhereUniqueInput = Prisma.AtLeast<{
   observation?: Prisma.StringNullableFilter<"Attendance"> | string | null
   lesson?: Prisma.XOR<Prisma.LessonScalarRelationFilter, Prisma.LessonWhereInput>
   student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
-}, "id">
+}, "id" | "lessonId_studentId">
 
 export type AttendanceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -312,6 +313,11 @@ export type AttendanceListRelationFilter = {
 
 export type AttendanceOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type AttendanceLessonIdStudentIdCompoundUniqueInput = {
+  lessonId: string
+  studentId: string
 }
 
 export type AttendanceCountOrderByAggregateInput = {

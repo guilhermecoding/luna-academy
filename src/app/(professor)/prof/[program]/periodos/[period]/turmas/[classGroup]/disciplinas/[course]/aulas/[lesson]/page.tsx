@@ -24,6 +24,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { formatAttendanceUpdatedLabel } from "@/lib/format-date";
 
 export const metadata: Metadata = {
     title: "Registro de Presença",
@@ -79,7 +80,7 @@ async function ProfLessonPageContent({
     if (!lesson || lesson.course.id !== courseData.id) notFound();
 
     const [attendances, stats] = await Promise.all([
-        getAttendancesByLessonId(lessonId),
+        getAttendancesByLessonId(lessonId, courseData.id),
         getAttendanceStatsByLessonId(lessonId),
     ]);
 
@@ -97,20 +98,7 @@ async function ProfLessonPageContent({
                             description={`${formatWeekDay(lesson.date)} • ${formatDate(lesson.date)} — ${courseData.name}`}
                         />
                         {lesson.attendanceUpdatedAt && (() => {
-                            const date = new Date(lesson.attendanceUpdatedAt);
-                            const now = new Date();
-                            const yesterday = new Date();
-                            yesterday.setDate(now.getDate() - 1);
-
-                            const isToday = date.toLocaleDateString("pt-BR") === now.toLocaleDateString("pt-BR");
-                            const isYesterday = date.toLocaleDateString("pt-BR") === yesterday.toLocaleDateString("pt-BR");
-
-                            const timeStr = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(date);
-                            const dateStr = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(date);
-
-                            let label = `CHAMADA REALIZADA EM ${dateStr} ÀS ${timeStr}`;
-                            if (isToday) label = `CHAMADA REALIZADA HOJE ÀS ${timeStr}`;
-                            if (isYesterday) label = `CHAMADA REALIZADA ONTEM ÀS ${timeStr}`;
+                            const label = formatAttendanceUpdatedLabel(new Date(lesson.attendanceUpdatedAt));
 
                             return (
                                 <div className="inline-flex items-center gap-2 px-3 py-1 mt-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] sm:text-xs font-bold animate-in fade-in zoom-in duration-500 uppercase tracking-wider">

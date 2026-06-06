@@ -14,9 +14,7 @@ export const metadata: Metadata = {
 
 async function EditTimeSlotContent({
     params,
-}: {
-    params: Promise<{ program: string; id: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/horarios/[id]/editar">, "searchParams">) {
     const { program, id } = await params;
     const timeSlot = await getTimeSlotById(id);
 
@@ -48,8 +46,10 @@ async function EditTimeSlotContent({
 
 export default function EditTimeSlotPage({
     params,
-}: {
-    params: Promise<{ program: string; id: string }>;
-}) {
-    return <EditTimeSlotContent params={params} />;
+}: PageProps<"/admin/[program]/horarios/[id]/editar">) {
+    return (
+        <Suspense fallback={<SkeletonForm />}>
+            <EditTimeSlotContent params={params} />
+        </Suspense>
+    );
 }

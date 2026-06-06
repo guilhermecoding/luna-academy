@@ -10,20 +10,22 @@ import { columns } from "./_components/columns";
 import InfoBoxUsers from "../_components/info-box-users";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Administradores",
 };
 
-export default async function AdministratorsPage({
+async function AdminAdministratorsPageContent({
     searchParams,
-}: {
-    searchParams: Promise<{ q?: string }>;
-}) {
+}: PageProps<"/admin/equipe/administradores">) {
     const { q } = await searchParams;
+    const searchQuery = typeof q === "string" ? q : undefined;
+
     const [session, adminsList, adminStats] = await Promise.all([
         auth.api.getSession({ headers: await headers() }),
-        getAdmins(q),
+        getAdmins(searchQuery),
         getAdminStats(),
     ]);
     const currentUserId = session?.user?.id ?? null;
@@ -87,5 +89,16 @@ export default async function AdministratorsPage({
                 </div>
             </Section>
         </Page>
+    );
+}
+
+export default function AdminAdministratorsPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/equipe/administradores">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminAdministratorsPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

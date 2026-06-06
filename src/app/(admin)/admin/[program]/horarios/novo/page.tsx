@@ -12,9 +12,7 @@ export const metadata: Metadata = {
 
 export default async function NewTimeSlotPage({
     params,
-}: {
-    params: Promise<{ program: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/horarios/novo">, "searchParams">) {
     const { program } = await params;
 
     return (

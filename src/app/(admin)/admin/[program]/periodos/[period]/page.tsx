@@ -11,16 +11,17 @@ import { Metadata } from "next";
 import InfoBoxPeriod from "luna-edu/src/app/(admin)/admin/[program]/periodos/[period]/_components/info-box-period";
 import ClassGroupsPreview from "./_components/class-groups-preview";
 import SubPeriodsPreview from "./_components/sub-periods-preview";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Período Letivo",
 };
 
-export default async function PeriodPage({
+
+async function AdminPeriodPageContent({
     params,
-}: {
-    params: Promise<{ program: string; period: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]">, "searchParams">) {
     const { program, period } = await params;
     const periodData = await getPeriodByProgramAndSlug(program, period);
 
@@ -116,5 +117,15 @@ export default async function PeriodPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminPeriodPage({
+    params,
+}: PageProps<"/admin/[program]/periodos/[period]">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminPeriodPageContent params={params} />
+        </Suspense>
     );
 }

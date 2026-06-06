@@ -46,9 +46,18 @@ interface SADAccessTableProps {
 }
 
 const formatAccessTime = (date: Date) => {
-    const hours = new Date(date).getHours().toString().padStart(2, "0");
-    const minutes = new Date(date).getMinutes().toString().padStart(2, "0");
-    return `visto em ${hours}h${minutes}`;
+    const accessedAt = new Date(date);
+    const dateStr = new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    }).format(accessedAt);
+    const timeStr = new Intl.DateTimeFormat("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(accessedAt);
+
+    return `visto em ${dateStr} às ${timeStr}`;
 };
 
 const columns: ColumnDef<SADAccessItem>[] = [
@@ -117,10 +126,10 @@ export function SADAccessTable({ data, currentFilter }: SADAccessTableProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
     const [searchInput, setSearchInput] = useState("");
     const [globalFilter, setGlobalFilter] = useState("");
-    
+
     // Estado local para o filtro de status (para resposta instantânea)
     const [activeFilter, setActiveFilter] = useState<string | undefined>(currentFilter);
 

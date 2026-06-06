@@ -6,10 +6,7 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 async function MatrizesLayoutContent({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode
-    params: Promise<{ program: string }>
-}>) {
+}: LayoutProps<"/admin/[program]/matrizes">) {
     const { program: programSlug } = await params;
 
     const program = await getProgramBySlug(programSlug);
@@ -28,10 +25,7 @@ async function MatrizesLayoutContent({
 export default function MatrizesLayout({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string }>
-}>) {
+}: LayoutProps<"/admin/[program]/matrizes">) {
     return (
         <Suspense fallback={<PageSkeleton />}>
             <MatrizesLayoutContent params={params}>

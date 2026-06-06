@@ -6,10 +6,7 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 async function ProgramLayoutContent({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode
-    params: Promise<{ program: string }>
-}>) {
+}: LayoutProps<"/admin/[program]">) {
     const { program: programSlug } = await params;
 
     const program = await getProgramBySlug(programSlug);
@@ -28,10 +25,7 @@ async function ProgramLayoutContent({
 export default function ProgramLayout({
     children,
     params,
-}: Readonly<{
-    children: React.ReactNode;
-    params: Promise<{ program: string }>
-}>) {
+}: LayoutProps<"/admin/[program]">) {
     return (
         <Suspense fallback={<PageSkeleton />}>
             <ProgramLayoutContent params={params}>

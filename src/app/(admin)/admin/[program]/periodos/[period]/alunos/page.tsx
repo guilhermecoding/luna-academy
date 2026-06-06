@@ -10,20 +10,21 @@ import { DataTablePeriodStudents } from "./_components/data-table-period-student
 import { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button-link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Alunos do Período",
 };
 
-export default async function PeriodStudentsPage({
+async function AdminPeriodStudentsPageContent({
     params,
     searchParams,
-}: {
-    params: Promise<{ program: string; period: string }>;
-    searchParams: Promise<{ q?: string }>;
-}) {
+}: PageProps<"/admin/[program]/periodos/[period]/alunos">) {
     const { program, period } = await params;
     const { q } = await searchParams;
+
+    const searchQuery = typeof q === "string" ? q : undefined;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
 
@@ -33,7 +34,7 @@ export default async function PeriodStudentsPage({
 
     const [totalStudents, studentsList, classGroups] = await Promise.all([
         getTotalStudentsCountByPeriodId(periodData.id),
-        getStudentsByPeriodList(periodData.id, q),
+        getStudentsByPeriodList(periodData.id, searchQuery),
         getClassGroupsByPeriodId(periodData.id),
     ]);
 
@@ -98,5 +99,16 @@ export default async function PeriodStudentsPage({
                 </div>
             </Section>
         </Page>
+    );
+}
+
+export default function AdminPeriodStudentsPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/[program]/periodos/[period]/alunos">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminPeriodStudentsPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

@@ -14,9 +14,7 @@ export const metadata: Metadata = {
 
 export default async function RoomsPage({
     params,
-}: {
-    params: Promise<{ campus: string }>;
-}) {
+}: PageProps<"/admin/instituicoes/[campus]/salas">) {
     const { campus } = await params;
     const campusData = await getCampusBySlug(campus);
 

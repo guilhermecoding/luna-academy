@@ -351,7 +351,7 @@ export async function enrollStudentsInClassGroupAction(studentIds: string[], cla
         }
 
         const { enrollStudentsInClassGroup } = await import("@/services/class-groups/class-groups.service");
-        await enrollStudentsInClassGroup(classGroupId, studentIds);
+        const result = await enrollStudentsInClassGroup(classGroupId, studentIds);
 
         updateTag(`period:${periodId}:students-list`);
         updateTag(`period:${periodId}:students-count`);
@@ -359,6 +359,13 @@ export async function enrollStudentsInClassGroupAction(studentIds: string[], cla
         updateTag(`period:${periodId}:class-groups`);
         updateTag(`class-group:${classGroupId}:students-list`);
         updateTag(`class-group:${classGroupId}:students-count`);
+
+        for (const lessonId of result.affectedLessonIds) {
+            updateTag(`lesson:${lessonId}:attendances`);
+        }
+        for (const courseId of result.courseIds) {
+            updateTag(`course:${courseId}:lessons`);
+        }
 
         return { success: true };
     } catch (error) {
@@ -400,7 +407,8 @@ export async function unlinkStudentsFromClassGroupAction(studentIds: string[], c
         }
 
         const { unlinkStudentsFromClassGroup } = await import("@/services/class-groups/class-groups.service");
-        await unlinkStudentsFromClassGroup(classGroupId, studentIds);
+        const { getLessonIdsByCourseIds } = await import("@/services/lessons/lessons.service");
+        const result = await unlinkStudentsFromClassGroup(classGroupId, studentIds);
 
         updateTag(`period:${periodId}:students-list`);
         updateTag(`period:${periodId}:students-count`);
@@ -408,6 +416,11 @@ export async function unlinkStudentsFromClassGroupAction(studentIds: string[], c
         updateTag(`period:${periodId}:class-groups`);
         updateTag(`class-group:${classGroupId}:students-list`);
         updateTag(`class-group:${classGroupId}:students-count`);
+
+        const lessonIds = await getLessonIdsByCourseIds(result.courseIds);
+        for (const lessonId of lessonIds) {
+            updateTag(`lesson:${lessonId}:attendances`);
+        }
 
         return { success: true };
     } catch (error) {
