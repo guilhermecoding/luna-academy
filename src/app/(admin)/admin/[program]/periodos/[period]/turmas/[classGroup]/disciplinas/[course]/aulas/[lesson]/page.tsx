@@ -20,6 +20,8 @@ import {
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { AttendanceTable } from "./_components/attendance-table";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Registro de Presença",
@@ -41,11 +43,9 @@ function formatWeekDay(date: Date) {
     }).format(new Date(date));
 }
 
-export default async function LessonPage({
+async function AdminLessonPageContent({
     params,
-}: {
-    params: Promise<{ program: string; period: string; classGroup: string; course: string; lesson: string }>;
-}) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]/aulas/[lesson]">, "searchParams">) {
     const {
         program,
         period,
@@ -147,5 +147,15 @@ export default async function LessonPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminLessonPage({
+    params,
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]/aulas/[lesson]">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminLessonPageContent params={params} />
+        </Suspense>
     );
 }

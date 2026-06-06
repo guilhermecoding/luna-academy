@@ -9,12 +9,13 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ListClassGroups from "./_components/list-class-groups";
 import TeacherFilter from "./_components/teacher-filter";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Gerenciar Classes",
 };
 
-export default async function ClassGroupsPage({
+async function AdminClassGroupsPageContent({
     params,
     searchParams,
 }: {
@@ -65,5 +66,16 @@ export default async function ClassGroupsPage({
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminClassGroupsPage({
+    params,
+    searchParams,
+}: PageProps<"/admin/[program]/periodos/[period]/turmas">) {
+    return (
+        <Suspense fallback={null}>
+            <AdminClassGroupsPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }

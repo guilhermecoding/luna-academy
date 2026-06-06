@@ -8,23 +8,25 @@ import { SADAccessTable } from "./_components/sad-access-table";
 import { IconReportSearch, IconUsers, IconCheck, IconClock } from "@tabler/icons-react";
 import InfoBoxPeriod from "../_components/info-box-period";
 import { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "SAD - Acessos ao Portal",
     description: "Monitore quem já visualizou o resultado no ciclo.",
 };
 
-interface SADPageProps {
-    params: Promise<{
-        program: string;
-        period: string;
-    }>;
+interface SADPageProps
+    extends Omit<PageProps<"/admin/[program]/periodos/[period]/sad">, "searchParams"> {
     searchParams: Promise<{
         filter?: "VIEWED" | "NOT_VIEWED";
     }>;
 }
 
-export default async function SADPage({ params, searchParams }: SADPageProps) {
+async function AdminSADPageContent({
+    params,
+    searchParams,
+}: SADPageProps) {
     const { program, period: periodSlug } = await params;
     const { filter } = await searchParams;
 
@@ -80,5 +82,13 @@ export default async function SADPage({ params, searchParams }: SADPageProps) {
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function AdminSADPage({ params, searchParams }: SADPageProps) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminSADPageContent params={params} searchParams={searchParams} />
+        </Suspense>
     );
 }
