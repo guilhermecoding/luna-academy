@@ -126,7 +126,7 @@ export function SADAccessTable({ data, currentFilter }: SADAccessTableProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const [_, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
     const [searchInput, setSearchInput] = useState("");
     const [globalFilter, setGlobalFilter] = useState("");
 
