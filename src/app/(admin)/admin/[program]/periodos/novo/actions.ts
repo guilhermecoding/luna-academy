@@ -1,13 +1,13 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createPeriod } from "@/services/periods/periods.service";
 import { revalidatePath, updateTag } from "next/cache";
 import { ZodError } from "zod";
 import { createPeriodSchema, type CreatePeriodInput } from "./schema";
 
 export async function createPeriodAction(programSlug: string, data: CreatePeriodInput) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

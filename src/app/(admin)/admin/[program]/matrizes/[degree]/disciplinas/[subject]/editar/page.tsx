@@ -8,6 +8,7 @@ import { getSubjectByCode } from "@/services/subjects/subjects.service";
 import { notFound } from "next/navigation";
 import { getDegreeBySlug } from "@/services/degrees/degrees.service";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Disciplina",
@@ -27,6 +28,7 @@ export default async function EditSubjectPage({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/matrizes/${degree}/disciplinas`}>
         <Page>
             <Section>
                 <BaseForm
@@ -47,5 +49,6 @@ export default async function EditSubjectPage({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

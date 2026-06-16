@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateCourse, getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
 import { deleteCourse } from "@/services/courses/courses.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
@@ -63,7 +63,7 @@ export async function updateCourseAction(
     courseCode: string,
     data: CourseUpdateInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     let redirectClassGroupId: string | undefined;
@@ -140,7 +140,7 @@ export async function deleteCourseAction(
     courseCode: string,
     confirmationName: string,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     let redirectClassGroupId: string | undefined;
@@ -205,7 +205,7 @@ export async function updateClassGroupAction(
     classGroupSlug: string,
     data: EditClassGroupInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -257,7 +257,7 @@ export async function deleteClassGroupAction(
     classGroupSlug: string,
     confirmationName: string,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

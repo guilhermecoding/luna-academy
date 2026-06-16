@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createClassGroup } from "@/services/class-groups/class-groups.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { ZodError } from "zod";
@@ -13,7 +13,7 @@ export async function createClassAction(
     periodSlug: string,
     data: ClassGroupInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

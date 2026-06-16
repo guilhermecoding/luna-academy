@@ -5,7 +5,8 @@ import SidebarAdminBase from "./_components/sidebar-admin/sidebar-admin-base";
 import { adminMenus } from "../_config/menus/admin-menus";
 import { Suspense } from "react";
 import SidebarAndPageSkeleton from "@/components/skeletons/sidebar-and-page-skeleton";
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import { WriteAccessProvider } from "@/components/write-access-provider";
 
 export const metadata: Metadata = {
     title: {
@@ -28,12 +29,16 @@ async function AdminLayoutContent({
         redirect("/entrar");
     }
 
+    const canWrite = userCanWrite(authResult.session.user);
+
     return (
-        <Suspense fallback={<SidebarAndPageSkeleton />}>
-            <SidebarAdminBase menus={adminMenus}>
-                {children}
-            </SidebarAdminBase>
-        </Suspense>
+        <WriteAccessProvider canWrite={canWrite}>
+            <Suspense fallback={<SidebarAndPageSkeleton />}>
+                <SidebarAdminBase menus={adminMenus}>
+                    {children}
+                </SidebarAdminBase>
+            </Suspense>
+        </WriteAccessProvider>
     );
 }
 

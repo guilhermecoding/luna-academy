@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-
+import { SYSTEM_ROLE } from "@/@types/system-role.type";
+import { getReadOnlyRedirectPath, isReadOnlyWriteRoute, isSelfMemberEditPath } from "@/lib/read-only-routes";
 export async function proxy(request: NextRequest) {
     // Chama o banco diretamente via Better Auth (sem round-trip HTTP)
     // Lê o cookie de sessão a partir dos headers da requisição
@@ -32,6 +33,14 @@ export async function proxy(request: NextRequest) {
     // Rotas /prof: exclusivo para professores
     if (path.startsWith("/prof") && !user.isTeacher) {
         return NextResponse.redirect(new URL("/entrar", request.url));
+    }
+
+    if (
+        user.systemRole === SYSTEM_ROLE.READ_ONLY &&
+        isReadOnlyWriteRoute(path) &&
+        !isSelfMemberEditPath(path, user.id)
+    ) {
+        return NextResponse.redirect(new URL(getReadOnlyRedirectPath(path), request.url));
     }
 
     return NextResponse.next();

@@ -9,6 +9,7 @@ import ListSubjects from "./_components/list-subjects";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import InfoBox from "./_components/info-box";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Grade Curricular",
@@ -17,6 +18,10 @@ export const metadata: Metadata = {
 async function DegreeDashboardPageContent({
     params,
 }: Omit<PageProps<"/admin/[program]/matrizes/[degree]">, "searchParams">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program: programSlug, degree: degreeSlug } = await params;
     const degreeData = await getDegreeBySlug(programSlug, degreeSlug);
 
@@ -40,10 +45,12 @@ async function DegreeDashboardPageContent({
                         </div>
                     </div>
                     <div className="flex flex-1 justify-end items-center">
-                        <ButtonLink className="w-full sm:w-auto" href={`/admin/${programSlug}/matrizes/${degreeSlug}/disciplinas/novo`}>
-                            <IconCirclePlusFilled className="size-5" />
-                            Adicionar Disciplina
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${programSlug}/matrizes/${degreeSlug}/disciplinas/novo`}>
+                                <IconCirclePlusFilled className="size-5" />
+                                Adicionar Disciplina
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

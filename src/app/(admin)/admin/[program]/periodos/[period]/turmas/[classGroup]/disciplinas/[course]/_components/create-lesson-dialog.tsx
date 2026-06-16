@@ -26,6 +26,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { IconPlus, IconLoader2, IconCalendarEvent, IconClock } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { createLessonAction } from "../actions";
+import { useCanWrite } from "@/components/write-access-provider";
 
 type ScheduleOption = {
     id: string;
@@ -63,6 +64,7 @@ export function CreateLessonSheet({
     courseCode,
     schedules,
 }: CreateLessonSheetProps) {
+    const canWrite = useCanWrite();
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -115,6 +117,10 @@ export function CreateLessonSheet({
             setIsSubmitting(false);
         }
     };
+
+    if (!canWrite) {
+        return null;
+    }
 
     return (
         <Sheet open={open} onOpenChange={handleOpenChange}>

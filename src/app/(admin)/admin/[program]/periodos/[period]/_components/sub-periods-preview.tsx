@@ -3,6 +3,7 @@
 import { IconCalendarEventFilled, IconCaretRight, IconChevronLeft, IconChevronRight, IconCodeAsterisk, IconLock, IconLockOpen } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useCanWrite } from "@/components/write-access-provider";
 
 type PreviewSubPeriod = {
     id: string;
@@ -26,6 +27,7 @@ export default function SubPeriodsPreview({
     programSlug,
     periodSlug,
 }: SubPeriodsPreviewProps) {
+    const canWrite = useCanWrite();
     const scrollRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
 
@@ -111,12 +113,10 @@ export default function SubPeriodsPreview({
                         <div className="flex gap-4 pb-1">
                             {subPeriods.map((subPeriod) => {
                                 const isClosed = !!subPeriod.closedAt;
-                                return (
-                                    <Link
-                                        href={`/admin/${programSlug}/periodos/${periodSlug}/etapas/${subPeriod.slug}/editar`}
-                                        key={subPeriod.id}
-                                        className="w-64 sm:w-72 rounded-3xl border border-surface-border bg-surface p-4 flex flex-col gap-3 hover:border-primary/60 hover:bg-surface/50 transition-colors"
-                                    >
+                                const cardClassName = "w-64 sm:w-72 rounded-3xl border border-surface-border bg-surface p-4 flex flex-col gap-3 hover:border-primary/60 hover:bg-surface/50 transition-colors";
+
+                                const cardContent = (
+                                    <>
                                         <div className="min-w-0">
                                             <p className="text-lg font-bold truncate">{subPeriod.name}</p>
                                             <p className="text-xs flex flex-row items-center gap-1 font-mono font-bold uppercase text-muted-foreground truncate">
@@ -138,7 +138,25 @@ export default function SubPeriodsPreview({
                                                 {isClosed ? "Fechado" : "Aberto"}
                                             </span>
                                         </div>
-                                    </Link>
+                                    </>
+                                );
+
+                                if (canWrite) {
+                                    return (
+                                        <Link
+                                            href={`/admin/${programSlug}/periodos/${periodSlug}/etapas/${subPeriod.slug}/editar`}
+                                            key={subPeriod.id}
+                                            className={cardClassName}
+                                        >
+                                            {cardContent}
+                                        </Link>
+                                    );
+                                }
+
+                                return (
+                                    <div key={subPeriod.id} className={cardClassName}>
+                                        {cardContent}
+                                    </div>
                                 );
                             })}
 

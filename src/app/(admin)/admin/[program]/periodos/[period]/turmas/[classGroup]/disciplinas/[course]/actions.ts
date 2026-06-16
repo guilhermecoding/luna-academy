@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateTag } from "next/cache";
 import prisma from "@/lib/prisma";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
@@ -42,7 +42,7 @@ export async function createLessonAction(
     courseCode: string,
     data: CreateLessonInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -97,7 +97,7 @@ export async function updateLessonAction(
     courseCode: string,
     data: UpdateLessonInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -151,7 +151,7 @@ export async function deleteLessonAction(
     courseCode: string,
     lessonId: string,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -178,7 +178,7 @@ export async function bulkUpdateAttendanceAction(
     lessonId: string,
     data: BulkUpdateAttendanceInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

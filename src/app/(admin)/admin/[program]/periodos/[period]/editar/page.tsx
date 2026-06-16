@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { EditPeriodForm } from "./_components/edit-period-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Período",
@@ -25,6 +26,7 @@ async function EditPeriodPageContent({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/periodos/${period}`}>
         <Page>
             <Section>
                 <BaseForm title="Editar Período" description="Atualize os dados do período letivo">
@@ -43,6 +45,7 @@ async function EditPeriodPageContent({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }
 

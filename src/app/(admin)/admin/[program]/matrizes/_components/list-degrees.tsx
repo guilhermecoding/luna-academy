@@ -6,6 +6,7 @@ import { Degree } from "@/generated/prisma/client";
 import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CanWrite } from "@/components/can-write";
 
 function ListDegreesSkeleton() {
     return (
@@ -47,9 +48,11 @@ function EmptyListDegrees({ programSlug }: { programSlug: string }) {
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Você ainda não adicionou nenhuma matriz curricular para este programa. Comece criando a primeira.
             </p>
-            <ButtonLink href={`/admin/${programSlug}/matrizes/novo`}>
-                Criar Primeira Matriz
-            </ButtonLink>
+            <CanWrite>
+                <ButtonLink href={`/admin/${programSlug}/matrizes/novo`}>
+                    Criar Primeira Matriz
+                </ButtonLink>
+            </CanWrite>
         </div>
     );
 }
@@ -111,13 +114,15 @@ async function ListDegreesContent({
                     </div>
 
                     <div className="w-full flex items-center justify-between mt-6 pt-4 px-4 border-t">
-                        <Link
-                            href={`/admin/${programSlug}/matrizes/${degree.slug}/editar`}
-                            className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1 transition-colors"
-                        >
-                            <IconEdit className="size-4" />
-                            Editar
-                        </Link>
+                        <CanWrite>
+                            <Link
+                                href={`/admin/${programSlug}/matrizes/${degree.slug}/editar`}
+                                className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1 transition-colors"
+                            >
+                                <IconEdit className="size-4" />
+                                Editar
+                            </Link>
+                        </CanWrite>
 
                         <Separator orientation="vertical" className="h-6 border" />
 

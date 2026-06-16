@@ -10,6 +10,7 @@ import { getSubjectsByProgramSlug } from "@/services/subjects/subjects.service";
 import { getProgramBySlug } from "@/services/programs/programs.service";
 import { getDegreesByProgramId } from "@/services/degrees/degrees.service";
 import { notFound } from "next/navigation";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Nova Classe",
@@ -35,35 +36,37 @@ async function NewClassContent({
     ]);
 
     return (
-        <Page>
-            <Section>
-                <BaseForm
-                    title="Nova Classe"
-                    description={"Selecione a Matriz e a Série. O sistema criará automaticamente as disciplinas ofertadas."}
-                >
-                    <div className="mt-6">
-                        <Suspense fallback={<SkeletonForm />}>
-                            <CreateClassForm
-                                programSlug={program}
-                                periodSlug={period}
-                                degrees={degrees.map((d) => ({
-                                    id: d.id,
-                                    name: d.name,
-                                    slug: d.slug,
-                                }))}
-                                subjects={subjects.map((s) => ({
-                                    id: s.id,
-                                    name: s.name,
-                                    code: s.code,
-                                    basePeriod: s.basePeriod,
-                                    degreeId: s.degreeId,
-                                }))}
-                            />
-                        </Suspense>
-                    </div>
-                </BaseForm>
-            </Section>
-        </Page>
+        <WritePageGuard redirectTo={`/admin/${program}/periodos/${period}/turmas`}>
+            <Page>
+                <Section>
+                    <BaseForm
+                        title="Nova Classe"
+                        description={"Selecione a Matriz e a Série. O sistema criará automaticamente as disciplinas ofertadas."}
+                    >
+                        <div className="mt-6">
+                            <Suspense fallback={<SkeletonForm />}>
+                                <CreateClassForm
+                                    programSlug={program}
+                                    periodSlug={period}
+                                    degrees={degrees.map((d) => ({
+                                        id: d.id,
+                                        name: d.name,
+                                        slug: d.slug,
+                                    }))}
+                                    subjects={subjects.map((s) => ({
+                                        id: s.id,
+                                        name: s.name,
+                                        code: s.code,
+                                        basePeriod: s.basePeriod,
+                                        degreeId: s.degreeId,
+                                    }))}
+                                />
+                            </Suspense>
+                        </div>
+                    </BaseForm>
+                </Section>
+            </Page>
+        </WritePageGuard>
     );
 }
 

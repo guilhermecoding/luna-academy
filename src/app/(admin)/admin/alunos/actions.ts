@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateTag } from "next/cache";
 import { createStudentSchema, editStudentSchema, importStudentRowSchema, type CreateStudentData, type EditStudentData } from "./schema";
 import { createStudent, updateStudent } from "@/services/students/students.service";
@@ -8,7 +8,7 @@ import { Genre, Prisma } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export async function createStudentAction(data: CreateStudentData, periodId?: string, redirectPath: string = "/admin/alunos") {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -61,7 +61,7 @@ export async function createStudentAction(data: CreateStudentData, periodId?: st
 }
 
 export async function editStudentAction(id: string, data: EditStudentData) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -107,7 +107,7 @@ export async function editStudentAction(id: string, data: EditStudentData) {
 }
 
 export async function deleteStudentAction(studentId: string, adminPasswordConfirm: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -159,7 +159,7 @@ export type ImportResult = {
 };
 
 export async function importStudentsAction(formData: FormData): Promise<ImportResult> {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -279,7 +279,7 @@ export async function importStudentsAction(formData: FormData): Promise<ImportRe
 }
 
 export async function unlinkStudentsFromPeriodAction(studentIds: string[], periodId: string, adminPasswordConfirm: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -325,7 +325,7 @@ export async function unlinkStudentsFromPeriodAction(studentIds: string[], perio
 }
 
 export async function enrollStudentsInClassGroupAction(studentIds: string[], classGroupId: string, periodId: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -358,7 +358,7 @@ export async function enrollStudentsInClassGroupAction(studentIds: string[], cla
 }
 
 export async function unlinkStudentsFromClassGroupAction(studentIds: string[], classGroupId: string, periodId: string, adminPasswordConfirm: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

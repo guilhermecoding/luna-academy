@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createDegree } from "@/services/degrees/degrees.service";
 import { ZodError } from "zod";
 import { createDegreeSchema, type CreateDegreeInput } from "./schema";
@@ -8,7 +8,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { getProgramBySlug } from "@/services/programs/programs.service";
 
 export async function createDegreeAction(programSlug: string, data: CreateDegreeInput) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createTimeSlot, updateTimeSlot, deleteTimeSlot } from "@/services/schedules/schedules.service";
 import { getProgramBySlug } from "@/services/programs/programs.service";
 import { ZodError } from "zod";
@@ -12,7 +12,7 @@ export async function createTimeSlotAction(
     programSlug: string,
     data: TimeSlotInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -58,7 +58,7 @@ export async function editTimeSlotAction(
     programSlug: string,
     data: TimeSlotInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -90,7 +90,7 @@ export async function deleteTimeSlotAction(
     id: string,
     programSlug: string,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

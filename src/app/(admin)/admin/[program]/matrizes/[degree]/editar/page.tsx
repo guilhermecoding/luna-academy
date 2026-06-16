@@ -6,6 +6,7 @@ import { EditDegreeForm } from "./_components/edit-degree-form";
 import { Metadata } from "next";
 import { getDegreeBySlug } from "@/services/degrees/degrees.service";
 import { notFound } from "next/navigation";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Matriz Curricular",
@@ -22,6 +23,7 @@ export default async function EditDegreePage({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/matrizes/${degree}`}>
         <Page>
             <Section>
                 <BaseForm
@@ -41,5 +43,6 @@ export default async function EditDegreePage({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

@@ -26,6 +26,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { IconEdit, IconLoader2, IconCalendarEvent, IconTrash } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { updateLessonAction, deleteLessonAction, createLessonAction } from "../actions";
+import { useCanWrite } from "@/components/write-access-provider";
 
 export type ScheduleOption = {
     id: string;
@@ -51,6 +52,7 @@ interface EditLessonSheetProps {
         scheduleId?: string | null;
     };
     children: React.ReactNode;
+    canWrite?: boolean;
 }
 
 const dayOfWeekLabels: Record<string, string> = {
@@ -93,7 +95,10 @@ export function EditLessonSheet({
     schedules,
     lesson,
     children,
+    canWrite: canWriteProp,
 }: EditLessonSheetProps) {
+    const canWriteFromContext = useCanWrite();
+    const canWrite = canWriteProp ?? canWriteFromContext;
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,6 +201,10 @@ export function EditLessonSheet({
             setIsDeleting(false);
         }
     };
+
+    if (!canWrite) {
+        return null;
+    }
 
     return (
         <Sheet open={open} onOpenChange={handleOpenChange}>

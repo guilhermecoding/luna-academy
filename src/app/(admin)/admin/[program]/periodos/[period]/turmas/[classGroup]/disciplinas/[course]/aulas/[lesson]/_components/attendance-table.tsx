@@ -11,14 +11,23 @@ import AvatarUsers from "@/components/avatar-users";
 import { calculateAge } from "@/lib/date-utils";
 import { motion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
+import { useCanWrite } from "@/components/write-access-provider";
 
 interface AttendanceTableProps {
     attendances: AttendanceWithStudent[];
     courseId: string;
     lessonId: string;
+    canWrite?: boolean;
 }
 
-export function AttendanceTable({ attendances: initialAttendances, courseId, lessonId }: AttendanceTableProps) {
+export function AttendanceTable({
+    attendances: initialAttendances,
+    courseId,
+    lessonId,
+    canWrite: canWriteProp,
+}: AttendanceTableProps) {
+    const canWriteFromContext = useCanWrite();
+    const canWrite = canWriteProp ?? canWriteFromContext;
     const [attendances, setAttendances] = useState(initialAttendances);
     const [search, setSearch] = useState("");
     const [isPending, startTransition] = useTransition();
@@ -39,6 +48,7 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
     }, [attendances, search]);
 
     const togglePresence = useCallback((attendanceId: string, current: boolean) => {
+        if (!canWrite) return;
         setLocalChanges((prev) => ({ ...prev, [attendanceId]: !current }));
         setAttendances((prev) =>
             prev.map((a) =>
@@ -46,9 +56,10 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
             ),
         );
         setHasChanges(true);
-    }, []);
+    }, [canWrite]);
 
     const markAllPresent = useCallback(() => {
+        if (!canWrite) return;
         const changes: Record<string, boolean> = {};
         setAttendances((prev) =>
             prev.map((a) => {
@@ -60,9 +71,10 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
         );
         setLocalChanges((prev) => ({ ...prev, ...changes }));
         setHasChanges(true);
-    }, []);
+    }, [canWrite]);
 
     const markAllAbsent = useCallback(() => {
+        if (!canWrite) return;
         const changes: Record<string, boolean> = {};
         setAttendances((prev) =>
             prev.map((a) => {
@@ -74,7 +86,7 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
         );
         setLocalChanges((prev) => ({ ...prev, ...changes }));
         setHasChanges(true);
-    }, []);
+    }, [canWrite]);
 
     const saveChanges = useCallback(() => {
         const changedIds = Object.keys(localChanges);
@@ -113,28 +125,30 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
                         className="pl-9"
                     />
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={markAllPresent}
-                        className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                    >
-                        <IconCheck className="size-4 mr-1" />
-                        Todos Presentes
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={markAllAbsent}
-                        className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
-                    >
-                        <IconX className="size-4 mr-1" />
-                        Todos Ausentes
-                    </Button>
-                </div>
+                {canWrite && (
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={markAllPresent}
+                            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                        >
+                            <IconCheck className="size-4 mr-1" />
+                            Todos Presentes
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={markAllAbsent}
+                            className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
+                        >
+                            <IconX className="size-4 mr-1" />
+                            Todos Ausentes
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {/* Resumo */}
@@ -196,15 +210,17 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
                                         </div>
 
                                         <motion.div
-                                            className={`flex w-full items-center cursor-grab active:cursor-grabbing transition-colors relative z-10 
+                                            className={`flex w-full items-center relative z-10 
+                                                ${canWrite ? "cursor-grab active:cursor-grabbing" : "cursor-default"}
                                                 ${attendance.isPresent
                                                     ? "bg-emerald-50 dark:bg-[#0a2016] hover:bg-emerald-100 dark:hover:bg-[#102a1e]"
                                                     : "bg-red-50 dark:bg-[#200a0a] hover:bg-red-100 dark:hover:bg-[#2a1010]"
                                                 }`}
-                                            drag="x"
+                                            drag={canWrite ? "x" : false}
                                             dragConstraints={{ left: 0, right: 0 }}
                                             dragElastic={{ left: 0, right: 0.8 }}
                                             onDragEnd={(e, info) => {
+                                                if (!canWrite) return;
                                                 if (info.offset.x > 80) {
                                                     // Aguarda o snap-back terminar para mudar a cor
                                                     setTimeout(() => {
@@ -247,9 +263,11 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
                                                     onClick={() =>
                                                         togglePresence(attendance.id, attendance.isPresent)
                                                     }
+                                                    disabled={!canWrite}
                                                     className={`
                                                         inline-flex items-center gap-1.5 px-3 py-3 rounded-full text-xs font-semibold
-                                                        transition-all duration-150 cursor-pointer select-none
+                                                        transition-all duration-150 select-none
+                                                        ${!canWrite ? "cursor-default opacity-80" : "cursor-pointer"}
                                                         ${attendance.isPresent
                                                             ? "bg-emerald-300 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60"
                                                             : "bg-red-300 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"
@@ -273,7 +291,7 @@ export function AttendanceTable({ attendances: initialAttendances, courseId, les
             </div>
 
             {/* Botão Salvar fixo */}
-            {hasChanges && (
+            {canWrite && hasChanges && (
                 <div className="sticky bottom-6 flex justify-end animate-in slide-in-from-bottom-4 fade-in duration-300 z-50">
                     <Button
                         type="button"

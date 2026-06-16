@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
 import { getCampusBySlug } from "@/services/campuses/campuses.service";
 import { notFound } from "next/navigation";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Nova Sala",
@@ -23,6 +24,7 @@ export default async function NewRoomPage({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/instituicoes/${campus}/salas`}>
         <Page>
             <Section>
                 <BaseForm
@@ -37,5 +39,6 @@ export default async function NewRoomPage({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

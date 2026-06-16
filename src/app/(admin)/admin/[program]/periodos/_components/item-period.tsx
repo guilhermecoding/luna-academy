@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { IconCalendarFilled, IconDeviceAnalytics, IconDotsVerticalFilled, IconFileTextFilled, IconPencilFilled } from "@tabler/icons-react";
 import Link from "next/link";
+import { useCanWrite } from "@/components/write-access-provider";
 
 function Info({
     label,
@@ -50,6 +51,8 @@ export default function ItemPeriod({
     coursesCount: number;
     studentsCount: number;
 }) {
+    const canWrite = useCanWrite();
+
     return (
         <div className="w-full min-w-0 flex flex-row items-center bg-surface border border-surface-border p-4 rounded-4xl gap-3">
             {/* Status (Celular) e Conteúdo */}
@@ -98,12 +101,14 @@ export default function ItemPeriod({
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuItem asChild>
-                        <Link href={`/admin/${programSlug}/periodos/${periodSlug}/editar`} className="flex flex-row items-center gap-2 text-sm text-muted-foreground/90">
-                            <IconPencilFilled />
-                            <span>Editar</span>
-                        </Link>
-                    </DropdownMenuItem>
+                    {canWrite && (
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/${programSlug}/periodos/${periodSlug}/editar`} className="flex flex-row items-center gap-2 text-sm text-muted-foreground/90">
+                                <IconPencilFilled />
+                                <span>Editar</span>
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                         <Link href={`/admin/${programSlug}/periodos/${periodSlug}`} className="flex flex-row items-center gap-2 text-sm text-muted-foreground/90">
                             <IconFileTextFilled />

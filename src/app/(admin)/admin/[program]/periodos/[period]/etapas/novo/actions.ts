@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createSubPeriod } from "@/services/sub-periods/sub-periods.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { ZodError } from "zod";
@@ -12,7 +12,7 @@ export async function createSubPeriodAction(
     periodSlug: string,
     data: SubPeriodInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

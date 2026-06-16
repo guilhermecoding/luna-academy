@@ -4,6 +4,7 @@ import Section from "@/components/section";
 import { Suspense } from "react";
 import { CreateDegreeForm } from "./_components/create-degree-form";
 import { Metadata } from "next";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Nova Matriz Curricular",
@@ -15,6 +16,7 @@ export default async function NewDegreePage({
     const { program } = await params;
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/matrizes`}>
         <Page>
             <Section>
                 <BaseForm
@@ -29,5 +31,6 @@ export default async function NewDegreePage({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

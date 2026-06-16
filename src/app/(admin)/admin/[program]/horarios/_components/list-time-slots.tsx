@@ -5,6 +5,7 @@ import { IconClock, IconEdit } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { shiftLabels } from "../../periodos/[period]/turmas/schema";
 import Link from "next/link";
+import { useCanWrite } from "@/components/write-access-provider";
 
 interface TimeSlot {
     id: string;
@@ -20,6 +21,8 @@ interface ListTimeSlotsProps {
 }
 
 export default function ListTimeSlots({ timeSlots, programSlug }: ListTimeSlotsProps) {
+    const canWrite = useCanWrite();
+
     if (timeSlots.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-surface-border rounded-4xl bg-surface/30">
@@ -65,13 +68,15 @@ export default function ListTimeSlots({ timeSlots, programSlug }: ListTimeSlotsP
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" className="size-9 rounded-xl" asChild>
-                                            <Link href={`/admin/${programSlug}/horarios/${slot.id}/editar`}>
-                                                <IconEdit className="size-5 text-muted-foreground" />
-                                            </Link>
-                                        </Button>
-                                    </div>
+                                    {canWrite && (
+                                        <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                            <Button variant="ghost" size="icon" className="size-9 rounded-xl" asChild>
+                                                <Link href={`/admin/${programSlug}/horarios/${slot.id}/editar`}>
+                                                    <IconEdit className="size-5 text-muted-foreground" />
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             </Card>
                         ))}

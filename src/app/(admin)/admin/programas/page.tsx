@@ -5,12 +5,17 @@ import { IconCirclePlusFilled } from "@tabler/icons-react";
 import ListPrograms from "./_components/list-programs";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Metadata } from "next";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Programas",
 };
 
-export default function ProgramsPage() {
+export default async function ProgramsPage() {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     return (
         <Page>
             <Section>
@@ -22,10 +27,12 @@ export default function ProgramsPage() {
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href="/admin/programas/novo">
-                            <IconCirclePlusFilled className="size-5" />
-                            Criar Programa
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href="/admin/programas/novo">
+                                <IconCirclePlusFilled className="size-5" />
+                                Criar Programa
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

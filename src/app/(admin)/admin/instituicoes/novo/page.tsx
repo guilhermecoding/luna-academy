@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { CreateCampusForm } from "./_components/create-campus-form";
 import { Metadata } from "next";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Nova Instituição",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 
 export default function NewCampusPage() {
     return (
+        <WritePageGuard redirectTo="/admin/instituicoes">
         <Page>
             <Section>
                 <BaseForm
@@ -26,5 +28,6 @@ export default function NewCampusPage() {
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { isReadOnly, requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateUser } from "@/services/users/users.service";
 import { revalidatePath, updateTag } from "next/cache";
 import { headers } from "next/headers";
@@ -16,6 +16,13 @@ export async function editMemberAction(memberId: string, data: EditMemberInput) 
     const authResult = await requireAdmin();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
+    const actorId = authResult.session.user.id;
+    const isSelfEdit = actorId === memberId;
+
+    if (!isSelfEdit && isReadOnly(authResult.session.user)) {
+        return { success: false, error: "Acesso somente leitura." };
+    }
+
     try {
         const validatedData = editMemberSchema.parse(data);
         const cleanData = {
@@ -27,8 +34,7 @@ export async function editMemberAction(memberId: string, data: EditMemberInput) 
         const { password, confirmPassword, ...updateFields } = cleanData;
         void confirmPassword;
 
-        const actorId = authResult.session.user.id;
-        if (actorId === memberId) {
+        if (isSelfEdit) {
             const existingMember = await prisma.user.findUnique({
                 where: { id: memberId },
                 select: { isAdmin: true },
@@ -38,7 +44,19 @@ export async function editMemberAction(memberId: string, data: EditMemberInput) 
             }
         }
 
-        const { affectedGroups } = await updateUser(memberId, updateFields);
+        const fieldsToUpdate = isSelfEdit && isReadOnly(authResult.session.user)
+            ? {
+                name: updateFields.name,
+                email: updateFields.email,
+                cpf: updateFields.cpf,
+                phone: updateFields.phone,
+                birthDate: updateFields.birthDate,
+                genre: updateFields.genre,
+                ...(updateFields.isAdmin !== undefined ? { isAdmin: updateFields.isAdmin } : {}),
+            }
+            : updateFields;
+
+        const { affectedGroups } = await updateUser(memberId, fieldsToUpdate);
 
         // Invalida cache de todos os períodos e turmas onde o professor tinha aulas
         const affectedPeriodIds = new Set<string>();
@@ -157,7 +175,7 @@ export async function editMemberAction(memberId: string, data: EditMemberInput) 
 }
 
 export async function deleteMemberAction(memberId: string, adminPasswordConfirm: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

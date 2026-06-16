@@ -1,13 +1,13 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { deleteSubject, getSubjectById, updateSubject } from "@/services/subjects/subjects.service";
 import { ZodError } from "zod";
 import { revalidatePath, updateTag } from "next/cache";
 import { editSubjectSchema, type EditSubjectInput } from "./schema";
 
 export async function editSubjectAction(subjectId: string, programSlug: string, degreeSlug: string, degreeId: string, data: EditSubjectInput) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -65,7 +65,7 @@ export async function editSubjectAction(subjectId: string, programSlug: string, 
 }
 
 export async function deleteSubjectAction(subjectId: string, programSlug: string, degreeSlug: string, degreeId: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

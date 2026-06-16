@@ -8,6 +8,7 @@ import { getStudentById } from "@/services/students/students.service";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Aluno",
@@ -25,6 +26,7 @@ async function AdminEditStudentPageContent({
     }
 
     return (
+        <WritePageGuard redirectTo="/admin/alunos">
         <Page>
             <Section>
                 <div className="flex flex-row items-center gap-1 mb-3">
@@ -45,6 +47,7 @@ async function AdminEditStudentPageContent({
                 <EditStudentForm student={student} />
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }
 

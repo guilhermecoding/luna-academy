@@ -1,14 +1,14 @@
 import PulsingStatusIndicator from "@/components/pulsing-status-indicator";
 import TooltipText from "@/components/tooltip-text";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Progress } from "@/components/ui/progress";
-import { IconFileTextFilled, IconHelpHexagonFilled, IconPencilFilled } from "@tabler/icons-react";
+import { IconHelpHexagonFilled } from "@tabler/icons-react";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import getPeriodStatus, { isPeriodActiveByDay } from "@/lib/get-period-status";
 import { PeriodListItem } from "@/services/periods/periods.type";
 import formatDate, { formatDateShort } from "@/lib/format-date";
 import getDayKeyInTimeZone, { APP_TIMEZONE } from "@/lib/get-day-key-in-time-zone";
+import { CurrentPeriodActions } from "./current-period-actions";
 
 function Info({
     label,
@@ -125,23 +125,7 @@ async function CurrentPeriodContent({
                 <Progress value={progress} className="mt-2 bg-mauve-300" indicatorClassName="bg-primary-theme rounded-full" />
 
                 {/* Linha do link */}
-                <div className="flex flex-col-reverse sm:flex-row justify-end items-center mt-6 gap-4">
-                    <ButtonLink
-                        href={`/admin/${programSlug}/periodos/${current.slug}/editar`}
-                        variant="outline"
-                        className="bg-transparent text-muted-foreground w-full sm:w-auto"
-                    >
-                        <IconPencilFilled className="size-5" />
-                        Editar
-                    </ButtonLink>
-                    <ButtonLink
-                        href={`/admin/${programSlug}/periodos/${current.slug}`}
-                        className="w-full sm:w-auto"
-                    >
-                        <IconFileTextFilled className="size-5" />
-                        Detalhar
-                    </ButtonLink>
-                </div>
+                <CurrentPeriodActions programSlug={programSlug} periodSlug={current.slug} />
             </div>
         </div>
     );

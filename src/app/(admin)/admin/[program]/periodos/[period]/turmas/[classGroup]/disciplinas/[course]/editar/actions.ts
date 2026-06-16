@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { revalidatePath, updateTag } from "next/cache";
 import { DayOfWeek, Shift } from "@/generated/prisma/client";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
@@ -31,7 +31,7 @@ export async function editClassGroupCourseAction(
     courseCode: string,
     data: EditClassGroupCourseInput,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -117,7 +117,7 @@ export async function deleteClassGroupCourseAction(
     courseCode: string,
     confirmationName: string,
 ) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

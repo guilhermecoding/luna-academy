@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guards";
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { revalidatePath, updateTag } from "next/cache";
 import { ZodError, z } from "zod";
 import { deleteProgram, getProgramBySlug, updateProgram } from "@/services/programs/programs.service";
@@ -11,7 +11,7 @@ const deleteProgramSchema = z.object({
 });
 
 export async function editProgramAction(slug: string, data: EditProgramInput) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
@@ -55,7 +55,7 @@ export async function editProgramAction(slug: string, data: EditProgramInput) {
 }
 
 export async function deleteProgramAction(slug: string, confirmationName: string) {
-    const authResult = await requireAdmin();
+    const authResult = await requireAdminWrite();
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {

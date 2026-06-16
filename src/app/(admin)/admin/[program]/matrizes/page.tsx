@@ -6,6 +6,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Metadata } from "next";
 import ListDegrees from "./_components/list-degrees";
 import { getProgramBySlug } from "@/services/programs/programs.service";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Matrizes Curriculares",
@@ -14,6 +15,10 @@ export const metadata: Metadata = {
 export default async function DegreesPage({
     params,
 }: PageProps<"/admin/[program]/matrizes">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program: programSlug } = await params;
     const program = await getProgramBySlug(programSlug);
     if (!program) return null; // Fallback de segurança silencioso
@@ -29,10 +34,12 @@ export default async function DegreesPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href={`/admin/${programSlug}/matrizes/novo`}>
-                            <IconCirclePlusFilled className="size-5" />
-                            Criar Matriz Curricular
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${programSlug}/matrizes/novo`}>
+                                <IconCirclePlusFilled className="size-5" />
+                                Criar Matriz Curricular
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>
