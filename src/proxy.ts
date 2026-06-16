@@ -17,7 +17,7 @@ export async function proxy(request: NextRequest) {
     const { user } = session;
 
     if (!user.isActive) {
-        const response = NextResponse.redirect(new URL("/entrar?", request.url));
+        const response = NextResponse.redirect(new URL("/entrar?error=account_disabled", request.url));
         response.cookies.delete("better-auth.session_token");
         return response;
     }
@@ -38,5 +38,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/prof/:path*"],
+    matcher: ["/admin", "/admin/:path*", "/prof", "/prof/:path*"],
 };

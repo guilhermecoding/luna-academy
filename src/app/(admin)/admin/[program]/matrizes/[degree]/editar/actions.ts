@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { deleteDegree, updateDegree } from "@/services/degrees/degrees.service";
 import { ZodError } from "zod";
 import { type CreateDegreeInput } from "../../novo/schema";
@@ -9,6 +10,9 @@ import { revalidatePath, updateTag } from "next/cache";
 export type EditDegreeInput = Omit<CreateDegreeInput, "slug" | "programId">;
 
 export async function editDegreeAction(id: string, programSlug: string, degreeSlug: string, data: EditDegreeInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         await updateDegree(id, {
             name: data.name,
@@ -56,6 +60,9 @@ export async function editDegreeAction(id: string, programSlug: string, degreeSl
 }
 
 export async function deleteDegreeAction(id: string, programSlug: string) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         await deleteDegree(id);
 

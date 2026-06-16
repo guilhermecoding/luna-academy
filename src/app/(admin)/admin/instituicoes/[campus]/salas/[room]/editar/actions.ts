@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { updateRoom, deleteRoom, getRoomSlugById, getRoomUsageCacheRefs } from "@/services/rooms/rooms.service";
 import { ZodError } from "zod";
 import { roomUpdateSchema, type RoomUpdateInput } from "../../schema";
@@ -7,6 +8,9 @@ import { revalidatePath, updateTag } from "next/cache";
 import { RoomType } from "@/generated/prisma/client";
 
 export async function updateRoomAction(campusSlug: string, roomId: string, data: RoomUpdateInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = roomUpdateSchema.parse(data);
         const roomUsageRefs = await getRoomUsageCacheRefs(roomId);
@@ -58,6 +62,9 @@ export async function updateRoomAction(campusSlug: string, roomId: string, data:
 }
 
 export async function deleteRoomAction(campusSlug: string, roomId: string) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const roomUsageRefs = await getRoomUsageCacheRefs(roomId);
         await deleteRoom(roomId);

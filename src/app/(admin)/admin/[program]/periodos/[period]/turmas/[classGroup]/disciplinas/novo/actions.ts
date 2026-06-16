@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { revalidatePath, updateTag } from "next/cache";
 import { ZodError } from "zod";
 import { DayOfWeek } from "@/generated/prisma/client";
@@ -15,6 +16,9 @@ export async function createClassGroupSubjectAction(
     classGroupSlug: string,
     data: CreateClassGroupSubjectInput,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = createClassGroupSubjectSchema.parse(data);
 

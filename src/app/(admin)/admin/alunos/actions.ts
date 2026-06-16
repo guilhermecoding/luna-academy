@@ -1,22 +1,17 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { updateTag } from "next/cache";
 import { createStudentSchema, editStudentSchema, importStudentRowSchema, type CreateStudentData, type EditStudentData } from "./schema";
 import { createStudent, updateStudent } from "@/services/students/students.service";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { Genre, Prisma } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export async function createStudentAction(data: CreateStudentData, periodId?: string, redirectPath: string = "/admin/alunos") {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
-
-        if (!actorId) {
-            return { success: false, error: "Não autorizado" };
-        }
-
         const parsedData = createStudentSchema.parse(data);
 
         await createStudent({
@@ -66,14 +61,10 @@ export async function createStudentAction(data: CreateStudentData, periodId?: st
 }
 
 export async function editStudentAction(id: string, data: EditStudentData) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
-
-        if (!actorId) {
-            return { success: false, error: "Não autorizado" };
-        }
-
         const parsedData = editStudentSchema.parse(data);
 
         await updateStudent(id, {
@@ -116,13 +107,11 @@ export async function editStudentAction(id: string, data: EditStudentData) {
 }
 
 export async function deleteStudentAction(studentId: string, adminPasswordConfirm: string) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
-        if (!actorId) {
-            return { success: false, error: "Não autorizado" };
-        }
+    try {
+        const actorId = authResult.session.user.id;
 
         // Verify password
         const adminAccount = await prisma.account.findFirst({
@@ -170,12 +159,10 @@ export type ImportResult = {
 };
 
 export async function importStudentsAction(formData: FormData): Promise<ImportResult> {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) {
-            return { success: false, error: "Não autorizado" };
-        }
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const file = formData.get("file") as File | null;
         if (!file) {
             return { success: false, error: "Nenhum arquivo enviado." };
@@ -292,13 +279,11 @@ export async function importStudentsAction(formData: FormData): Promise<ImportRe
 }
 
 export async function unlinkStudentsFromPeriodAction(studentIds: string[], periodId: string, adminPasswordConfirm: string) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
-        if (!actorId) {
-            return { success: false, error: "Não autorizado" };
-        }
+    try {
+        const actorId = authResult.session.user.id;
 
         if (studentIds.length === 0) {
             return { success: false, error: "Nenhum aluno selecionado" };
@@ -340,12 +325,10 @@ export async function unlinkStudentsFromPeriodAction(studentIds: string[], perio
 }
 
 export async function enrollStudentsInClassGroupAction(studentIds: string[], classGroupId: string, periodId: string) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) {
-            return { success: false, error: "Não autorizado" };
-        }
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         if (studentIds.length === 0) {
             return { success: false, error: "Nenhum aluno selecionado" };
         }
@@ -375,13 +358,11 @@ export async function enrollStudentsInClassGroupAction(studentIds: string[], cla
 }
 
 export async function unlinkStudentsFromClassGroupAction(studentIds: string[], classGroupId: string, periodId: string, adminPasswordConfirm: string) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
-        if (!actorId) {
-            return { success: false, error: "Não autorizado" };
-        }
+    try {
+        const actorId = authResult.session.user.id;
 
         if (studentIds.length === 0) {
             return { success: false, error: "Nenhum aluno selecionado" };
@@ -430,12 +411,10 @@ export async function unlinkStudentsFromClassGroupAction(studentIds: string[], c
 }
 
 export async function getAvailableStudentsAction(periodId: string, classGroupId: string, query?: string, page: number = 1, limit: number = 20) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) {
-            return { success: false, error: "Não autorizado" };
-        }
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const { getAvailableStudentsForClassGroup } = await import("@/services/students/students.service");
         const { students, total } = await getAvailableStudentsForClassGroup(periodId, classGroupId, query, page, limit);
 
@@ -452,10 +431,10 @@ export async function getAvailableStudentsAction(periodId: string, classGroupId:
 }
 
 export async function findStudentsByListAction(identifiers: string[], periodId: string) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) return { success: false, error: "Não autorizado" };
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const cleanedIdentifiers = identifiers
             .map(id => id.trim())
             .filter(id => id.length > 0);

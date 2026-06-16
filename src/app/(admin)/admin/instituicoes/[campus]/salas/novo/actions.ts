@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { createRoom } from "@/services/rooms/rooms.service";
 import { getCampusBySlug } from "@/services/campuses/campuses.service";
 import { ZodError } from "zod";
@@ -8,6 +9,9 @@ import { revalidatePath, updateTag } from "next/cache";
 import { RoomType } from "@/generated/prisma/client";
 
 export async function createRoomAction(campusSlug: string, data: RoomInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = roomSchema.parse(data);
         const campus = await getCampusBySlug(campusSlug);

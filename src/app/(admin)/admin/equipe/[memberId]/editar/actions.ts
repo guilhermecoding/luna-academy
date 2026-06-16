@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { updateUser } from "@/services/users/users.service";
 import { revalidatePath, updateTag } from "next/cache";
 import { headers } from "next/headers";
@@ -12,6 +13,9 @@ import prisma from "@/lib/prisma";
 import { hashPassword } from "better-auth/crypto";
 
 export async function editMemberAction(memberId: string, data: EditMemberInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = editMemberSchema.parse(data);
         const cleanData = {
@@ -23,8 +27,7 @@ export async function editMemberAction(memberId: string, data: EditMemberInput) 
         const { password, confirmPassword, ...updateFields } = cleanData;
         void confirmPassword;
 
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
+        const actorId = authResult.session.user.id;
         if (actorId === memberId) {
             const existingMember = await prisma.user.findUnique({
                 where: { id: memberId },
@@ -154,13 +157,11 @@ export async function editMemberAction(memberId: string, data: EditMemberInput) 
 }
 
 export async function deleteMemberAction(memberId: string, adminPasswordConfirm: string) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const actorId = session?.user?.id;
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
-        if (!actorId) {
-            return { success: false, error: "Não autorizado" };
-        }
+    try {
+        const actorId = authResult.session.user.id;
 
         if (actorId === memberId) {
             return { success: false, error: "Você não pode excluir sua própria conta." };

@@ -1,11 +1,15 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { createProgram } from "@/services/programs/programs.service";
 import { ZodError } from "zod";
 import { createProgramSchema, type CreateProgramInput } from "./schema";
 import { revalidatePath, updateTag } from "next/cache";
 
 export async function createProgramAction(data: CreateProgramInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = createProgramSchema.parse(data);
         await createProgram(validatedData);

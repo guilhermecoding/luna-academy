@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { updateCourse, getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
 import { deleteCourse } from "@/services/courses/courses.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
@@ -62,6 +63,9 @@ export async function updateCourseAction(
     courseCode: string,
     data: CourseUpdateInput,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     let redirectClassGroupId: string | undefined;
     try {
         const validatedData = courseUpdateSchema.parse(data);
@@ -136,6 +140,9 @@ export async function deleteCourseAction(
     courseCode: string,
     confirmationName: string,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     let redirectClassGroupId: string | undefined;
     try {
         const validatedData = deleteCourseSchema.parse({ confirmationName });
@@ -198,6 +205,9 @@ export async function updateClassGroupAction(
     classGroupSlug: string,
     data: EditClassGroupInput,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = editClassGroupSchema.parse(data);
         const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
@@ -247,6 +257,9 @@ export async function deleteClassGroupAction(
     classGroupSlug: string,
     confirmationName: string,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = deleteClassGroupSchema.parse({ confirmationName });
         const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);

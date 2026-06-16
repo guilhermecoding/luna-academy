@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { createAdmin, promoteUserToAdmin } from "@/services/users/admins.service";
 import { revalidatePath, updateTag } from "next/cache";
 import { ZodError } from "zod";
@@ -7,6 +8,9 @@ import { Prisma } from "@/generated/prisma/client";
 import { createAdminSchema, promoteTeacherSchema, type CreateAdminInput, type PromoteTeacherInput } from "./schema";
 
 export async function createAdminAction(data: CreateAdminInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = createAdminSchema.parse(data);
         await createAdmin(validatedData);
@@ -67,6 +71,9 @@ export async function createAdminAction(data: CreateAdminInput) {
 }
 
 export async function promoteTeacherAction(data: PromoteTeacherInput) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = promoteTeacherSchema.parse(data);
         await promoteUserToAdmin(validatedData.teacherId, validatedData.systemRole);

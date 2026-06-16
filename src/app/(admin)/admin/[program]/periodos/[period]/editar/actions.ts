@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth-guards";
 import { revalidatePath, updateTag } from "next/cache";
 import { ZodError, z } from "zod";
 import {
@@ -18,6 +19,9 @@ export async function editPeriodAction(
     periodSlug: string,
     data: EditPeriodInput,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = editPeriodSchema.parse(data);
         await updatePeriod(programSlug, periodSlug, validatedData);
@@ -64,6 +68,9 @@ export async function deletePeriodAction(
     periodSlug: string,
     confirmationName: string,
 ) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = deletePeriodSchema.parse({ confirmationName });
         const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
