@@ -88,11 +88,11 @@ export function IntroSplash() {
                             </p>
                         </motion.div>
                         <div className="mt-6 flex flex-col items-center gap-2">
-                            <span className="flex flex-row items-center shrink-0 text-muted-foreground">
+                            <span className="flex text-sm md:text-base flex-row items-center shrink-0 text-muted-foreground">
                                 Feito com <IconHeartFilled className="size-7 shrink-0 px-1" /> por <strong>João Guilherme</strong>
                             </span>
                             <p className="text-sm text-center text-muted-foreground">
-                                versão {APP_VERSION}
+                                v{APP_VERSION}
                             </p>
                         </div>
                         {visible && showLoading && (
