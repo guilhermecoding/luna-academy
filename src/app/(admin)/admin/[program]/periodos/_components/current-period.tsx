@@ -104,7 +104,7 @@ async function CurrentPeriodContent({
 
             {/* Terceira linha */}
             <div className="mt-8 w-full @2xl/main:flex-row flex flex-col gap-y-4 justify-between">
-                <Info label="TURMAS" value={current._count.courses} />
+                <Info label="TURMAS" value={current._count.classGroups} />
                 <Info label="ALUNOS TOTAL" value={current._count.studentPeriods} info="Total de alunos vinculados a este período (Inscritos + Matriculados)" />
                 <Info label="ALUNOS MATRICULADOS" value={current.enrolledCount} info="Alunos vinculados em pelo menos uma turma deste período" />
                 <Info label="TÉRMINO" value={formatDateShort(current.endDate)} />

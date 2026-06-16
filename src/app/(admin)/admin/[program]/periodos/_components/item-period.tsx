@@ -39,7 +39,7 @@ export default function ItemPeriod({
     dateRange,
     statusLabel,
     statusVariant,
-    coursesCount,
+    classGroupsCount,
     studentsCount,
 }: {
     programSlug: string;
@@ -48,7 +48,7 @@ export default function ItemPeriod({
     dateRange: string;
     statusLabel: string;
     statusVariant: StaticStatusIndicatorProps["variant"];
-    coursesCount: number;
+    classGroupsCount: number;
     studentsCount: number;
 }) {
     const canWrite = useCanWrite();
@@ -80,7 +80,7 @@ export default function ItemPeriod({
 
                     {/* Infos */}
                     <div className="hidden @3xl/main:flex flex-row items-center">
-                        <Info label="TURMAS" value={coursesCount} />
+                        <Info label="TURMAS" value={classGroupsCount} />
 
                         <Separator orientation="vertical" className="mx-4" />
 

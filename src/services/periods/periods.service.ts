@@ -117,7 +117,7 @@ export async function getPeriodsByProgramSlug(
             completedAt: true,
             _count: {
                 select: {
-                    courses: true,
+                    classGroups: true,
                     studentPeriods: true,
                 },
             },
