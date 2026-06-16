@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { notFound } from "next/navigation";
 import ListSubPeriods from "./_components/list-sub-periods";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Etapas Avaliativas",
@@ -17,6 +18,10 @@ export default async function SubPeriodsPage({
 }: {
     params: Promise<{ program: string; period: string }>;
 }) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period } = await params;
     const periodData = await getPeriodByProgramAndSlug(program, period);
 
@@ -39,10 +44,12 @@ export default async function SubPeriodsPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/periodos/${period}/etapas/novo`}>
-                            <IconCirclePlusFilled className="size-5" />
-                            Adicionar Etapa
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/periodos/${period}/etapas/novo`}>
+                                <IconCirclePlusFilled className="size-5" />
+                                Adicionar Etapa
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

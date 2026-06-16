@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CanWrite } from "@/components/can-write";
 
 function ListCampusesSkeleton() {
     return (
@@ -64,9 +65,11 @@ function EmptyCampusesList() {
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Comece cadastrando sua primeira instituição ou campus para poder gerenciar as salas e turmas.
             </p>
-            <Link href="/admin/instituicoes/novo" className="text-primary hover:underline text-sm font-medium">
-                + Adicionar a primeira instituição
-            </Link>
+            <CanWrite>
+                <Link href="/admin/instituicoes/novo" className="text-primary hover:underline text-sm font-medium">
+                    + Adicionar a primeira instituição
+                </Link>
+            </CanWrite>
         </div>
     );
 }
@@ -109,13 +112,15 @@ async function ListCampusesContent() {
                     </div>
 
                     <div className="w-full flex items-center justify-between mt-6 pt-4 px-4 border-t">
-                        <Link
-                            href={`/admin/instituicoes/${campus.slug}/editar`}
-                            className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1 transition-colors"
-                        >
-                            <IconEdit className="size-4" />
-                            Editar
-                        </Link>
+                        <CanWrite>
+                            <Link
+                                href={`/admin/instituicoes/${campus.slug}/editar`}
+                                className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1 transition-colors"
+                            >
+                                <IconEdit className="size-4" />
+                                Editar
+                            </Link>
+                        </CanWrite>
 
                         <Separator orientation="vertical" className="h-6 border" />
 

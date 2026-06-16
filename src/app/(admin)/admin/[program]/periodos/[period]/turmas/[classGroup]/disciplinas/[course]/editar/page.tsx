@@ -12,6 +12,7 @@ import { getSubjectsByDegreeAndBasePeriod } from "@/services/subjects/subjects.s
 import { getAllRooms } from "@/services/rooms/rooms.service";
 import { getTeachers, getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
 import { EditClassGroupSubjectForm } from "./_components/edit-class-group-subject-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Disciplina da Turma",
@@ -58,44 +59,46 @@ async function EditClassGroupCourseContent({
     ]);
 
     return (
-        <Page>
-            <Section>
-                <BaseForm
-                    title="Editar Disciplina da Turma"
-                    description={`Atualize os dados da disciplina ${course.name}.`}
-                >
-                    <div className="mt-6">
-                        <EditClassGroupSubjectForm
-                            programSlug={program}
-                            periodSlug={periodSlug}
-                            classGroupSlug={classGroupSlug}
-                            courseCode={course.code}
-                            defaultValues={{
-                                name: course.name,
-                                code: course.code,
-                                subjectId: course.subjectId,
-                                shift: course.shift,
-                                roomId: course.roomId || "",
-                                schedules: course.schedules.map((schedule) => ({
-                                    dayOfWeek: schedule.dayOfWeek,
-                                    timeSlotId: schedule.timeSlotId,
-                                    teacherId: schedule.teacherId || "",
-                                    roomId: schedule.roomId || "",
-                                })),
-                            }}
-                            subjects={availableSubjects.map((subject) => ({
-                                id: subject.id,
-                                name: subject.name,
-                                code: subject.code,
-                            }))}
-                            rooms={rooms}
-                            timeSlots={timeSlots}
-                            teachers={teachers}
-                        />
-                    </div>
-                </BaseForm>
-            </Section>
-        </Page>
+        <WritePageGuard redirectTo={`/admin/${program}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${courseCode}`}>
+            <Page>
+                <Section>
+                    <BaseForm
+                        title="Editar Disciplina da Turma"
+                        description={`Atualize os dados da disciplina ${course.name}.`}
+                    >
+                        <div className="mt-6">
+                            <EditClassGroupSubjectForm
+                                programSlug={program}
+                                periodSlug={periodSlug}
+                                classGroupSlug={classGroupSlug}
+                                courseCode={course.code}
+                                defaultValues={{
+                                    name: course.name,
+                                    code: course.code,
+                                    subjectId: course.subjectId,
+                                    shift: course.shift,
+                                    roomId: course.roomId || "",
+                                    schedules: course.schedules.map((schedule) => ({
+                                        dayOfWeek: schedule.dayOfWeek,
+                                        timeSlotId: schedule.timeSlotId,
+                                        teacherId: schedule.teacherId || "",
+                                        roomId: schedule.roomId || "",
+                                    })),
+                                }}
+                                subjects={availableSubjects.map((subject) => ({
+                                    id: subject.id,
+                                    name: subject.name,
+                                    code: subject.code,
+                                }))}
+                                rooms={rooms}
+                                timeSlots={timeSlots}
+                                teachers={teachers}
+                            />
+                        </div>
+                    </BaseForm>
+                </Section>
+            </Page>
+        </WritePageGuard>
     );
 }
 

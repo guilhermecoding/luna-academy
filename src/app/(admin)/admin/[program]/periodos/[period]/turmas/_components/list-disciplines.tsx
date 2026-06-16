@@ -1,3 +1,5 @@
+"use client";
+
 import { IconSun, IconSunset2, IconMoon, IconCodeAsterisk, IconUsersGroup } from "@tabler/icons-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shift } from "@/generated/prisma/enums";
@@ -5,6 +7,7 @@ import { CourseActions } from "./course-actions";
 import { getAvatarColor, getInitials, hashString } from "@/lib/avatar-utils";
 import { CourseWithRelations } from "@/services/courses/courses.type";
 import Link from "next/link";
+import { useCanWrite } from "@/components/write-access-provider";
 
 const OCCUPANCY_COLORS = [
     { bar: "bg-green-500", text: "text-green-700 dark:text-green-400" },
@@ -268,7 +271,7 @@ export default function ListDisciplines({
     classGroupSlug,
     studentCount,
     baseUrl = "/admin",
-    showEditOption = true,
+    showEditOption,
 }: {
     courses: CourseWithRelations[];
     programSlug: string;
@@ -278,6 +281,9 @@ export default function ListDisciplines({
     baseUrl?: string;
     showEditOption?: boolean;
 }) {
+    const canWriteFromContext = useCanWrite();
+    const effectiveShowEditOption = showEditOption ?? canWriteFromContext;
+
     return (
         <ListDisciplinesContent
             courses={courses}
@@ -286,7 +292,7 @@ export default function ListDisciplines({
             classGroupSlug={classGroupSlug}
             studentCount={studentCount}
             baseUrl={baseUrl}
-            showEditOption={showEditOption}
+            showEditOption={effectiveShowEditOption}
         />
     );
 }

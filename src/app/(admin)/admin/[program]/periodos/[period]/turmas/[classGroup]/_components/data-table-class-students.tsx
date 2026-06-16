@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { unlinkStudentsFromClassGroupAction } from "@/app/(admin)/admin/alunos/actions";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useCanWrite } from "@/components/write-access-provider";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -31,7 +32,7 @@ interface DataTableProps<TData, TValue> {
     title?: React.ReactNode;
     periodId: string;
     classGroupId: string;
-    hideActionsAndSelect?: boolean;
+    canWrite?: boolean;
 }
 
 export function DataTableClassStudents<TData, TValue>({
@@ -40,8 +41,10 @@ export function DataTableClassStudents<TData, TValue>({
     title,
     periodId,
     classGroupId,
-    hideActionsAndSelect = false,
+    canWrite: canWriteProp,
 }: DataTableProps<TData, TValue>) {
+    const canWriteFromContext = useCanWrite();
+    const canWrite = canWriteProp ?? canWriteFromContext;
     const [rowSelection, setRowSelection] = useState({});
     const [isPending, startTransition] = useTransition();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,9 +55,9 @@ export function DataTableClassStudents<TData, TValue>({
     const searchParams = useSearchParams();
     const [query, setQuery] = useState(searchParams.get("q") || "");
 
-    const filteredColumns = hideActionsAndSelect
-        ? columns.filter((col) => col.id !== "actions" && col.id !== "select")
-        : columns;
+    const filteredColumns = canWrite
+        ? columns
+        : columns.filter((col) => col.id !== "actions" && col.id !== "select");
 
     const table = useReactTable({
         data,
@@ -128,7 +131,7 @@ export function DataTableClassStudents<TData, TValue>({
                             className="border-none bg-transparent shadow-none outline-none focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                     </div>
-                    {hasSelection && (
+                    {canWrite && hasSelection && (
                         <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto animate-in fade-in zoom-in duration-200">
                             <Button
                                 variant="destructive"

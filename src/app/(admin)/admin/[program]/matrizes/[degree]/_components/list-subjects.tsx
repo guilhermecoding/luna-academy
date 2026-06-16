@@ -2,6 +2,7 @@ import { getSubjectsByDegreeId } from "@/services/subjects/subjects.service";
 import { IconBooks, IconPencil } from "@tabler/icons-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { CanWrite } from "@/components/can-write";
 
 function EmptySubjectsList({
     programSlug,
@@ -17,9 +18,11 @@ function EmptySubjectsList({
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 A primeira etapa para utilizar o sistema é preencher a estrutura curricular das matrizes com as disciplinas teóricas (Cálculo I, Português, etc).
             </p>
-            <Link href={`/admin/${programSlug}/matrizes/${degreeSlug}/disciplinas/novo`} className="text-primary hover:underline text-sm font-medium">
-                + Adicionar a primeira disciplina
-            </Link>
+            <CanWrite>
+                <Link href={`/admin/${programSlug}/matrizes/${degreeSlug}/disciplinas/novo`} className="text-primary hover:underline text-sm font-medium">
+                    + Adicionar a primeira disciplina
+                </Link>
+            </CanWrite>
         </div>
     );
 }
@@ -78,13 +81,15 @@ async function ListSubjectsContent({
                                 {subject.basePeriod ? `${subject.basePeriod}º Período` : "Não atribuível"}
                             </td>
                             <td className="px-6 py-4 text-right">
-                                <Link
-                                    href={`/admin/${programSlug}/matrizes/${degreeSlug}/disciplinas/${subject.code}/editar`}
-                                    className="p-2 inline-flex rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground transition-colors"
-                                    title="Editar disciplina"
-                                >
-                                    <IconPencil className="size-4" />
-                                </Link>
+                                <CanWrite>
+                                    <Link
+                                        href={`/admin/${programSlug}/matrizes/${degreeSlug}/disciplinas/${subject.code}/editar`}
+                                        className="p-2 inline-flex rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground transition-colors"
+                                        title="Editar disciplina"
+                                    >
+                                        <IconPencil className="size-4" />
+                                    </Link>
+                                </CanWrite>
                             </td>
                         </tr>
                     ))}

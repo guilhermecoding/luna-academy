@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { EditProgramForm } from "./_components/edit-program-form";
 import SkeletonForm from "../../../../../../components/skeletons/skeleton-form";
 import { Suspense } from "react";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ async function EditProgramPageContent({ params }: Omit<PageProps<"/admin/program
     }
 
     return (
+        <WritePageGuard redirectTo="/admin/programas">
         <Page>
             <Section>
                 <BaseForm title="Editar Programa" description="Atualize os dados do programa">
@@ -37,6 +39,7 @@ async function EditProgramPageContent({ params }: Omit<PageProps<"/admin/program
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }
 

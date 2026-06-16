@@ -8,6 +8,7 @@ import SkeletonForm from "@/components/skeletons/skeleton-form";
 import { getCampusBySlug } from "@/services/campuses/campuses.service";
 import { getRoomBySlug } from "@/services/rooms/rooms.service";
 import { notFound } from "next/navigation";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Sala",
@@ -28,6 +29,7 @@ async function EditRoomContent({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/instituicoes/${campus}/salas`}>
         <Page>
             <Section>
                 <BaseForm
@@ -42,6 +44,7 @@ async function EditRoomContent({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }
 

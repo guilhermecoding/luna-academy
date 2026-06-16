@@ -4,6 +4,7 @@ import { IconCalendarEvent, IconClock, IconPencil } from "@tabler/icons-react";
 import type { LessonListItem } from "@/services/lessons/lessons.service";
 import { EditLessonSheet, type ScheduleOption } from "./edit-lesson-dialog";
 import Link from "next/link";
+import { useCanWrite } from "@/components/write-access-provider";
 
 interface UpcomingLesson {
     date: string; // YYYY-MM-DD
@@ -24,6 +25,7 @@ interface LessonCardListProps {
     classGroupSlug: string;
     courseCode: string;
     schedules: ScheduleOption[];
+    canWrite?: boolean;
 }
 
 function formatDate(date: Date | string) {
@@ -73,8 +75,10 @@ function mergeAndSort(lessons: LessonListItem[], upcoming: UpcomingLesson[]): Me
 }
 
 export default function LessonCardList({
-    lessons, upcomingLessons, basePath, programSlug, periodSlug, classGroupSlug, courseCode, schedules,
+    lessons, upcomingLessons, basePath, programSlug, periodSlug, classGroupSlug, courseCode, schedules, canWrite: canWriteProp,
 }: LessonCardListProps) {
+    const canWriteFromContext = useCanWrite();
+    const canWrite = canWriteProp ?? canWriteFromContext;
     const items = mergeAndSort(lessons, upcomingLessons);
 
     if (items.length === 0) {
@@ -157,27 +161,29 @@ export default function LessonCardList({
                         </div>
                     </Link>
 
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-auto">
-                        <EditLessonSheet
-                            programSlug={programSlug}
-                            periodSlug={periodSlug}
-                            classGroupSlug={classGroupSlug}
-                            courseCode={courseCode}
-                            schedules={schedules}
-                            lesson={{
-                                id: lesson.id,
-                                date: lesson.date,
-                                topic: lesson.topic,
-                                scheduleId: lesson.scheduleId,
-                            }}
-                        >
-                            <button
-                                className="p-2 rounded-full text-muted-foreground hover:text-primary transition-colors focus:outline-none sm:bg-transparent"
+                    {canWrite && (
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-auto">
+                            <EditLessonSheet
+                                programSlug={programSlug}
+                                periodSlug={periodSlug}
+                                classGroupSlug={classGroupSlug}
+                                courseCode={courseCode}
+                                schedules={schedules}
+                                lesson={{
+                                    id: lesson.id,
+                                    date: lesson.date,
+                                    topic: lesson.topic,
+                                    scheduleId: lesson.scheduleId,
+                                }}
                             >
-                                <IconPencil className="size-4" />
-                            </button>
-                        </EditLessonSheet>
-                    </div>
+                                <button
+                                    className="p-2 rounded-full text-muted-foreground hover:text-primary transition-colors focus:outline-none sm:bg-transparent"
+                                >
+                                    <IconPencil className="size-4" />
+                                </button>
+                            </EditLessonSheet>
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -218,28 +224,30 @@ export default function LessonCardList({
                     </div>
                 </div>
 
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <EditLessonSheet
-                        programSlug={programSlug}
-                        periodSlug={periodSlug}
-                        classGroupSlug={classGroupSlug}
-                        courseCode={courseCode}
-                        schedules={schedules}
-                        lesson={{
-                            id: "", // Empty ID signifies creation from upcoming
-                            date: upcoming.date,
-                            topic: "Aula prevista",
-                            scheduleId: upcoming.scheduleId,
-                        }}
-                    >
-                        <button
-                            className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors focus:outline-none bg-surface/50 sm:bg-transparent"
-                            title="Registrar esta aula"
+                {canWrite && (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <EditLessonSheet
+                            programSlug={programSlug}
+                            periodSlug={periodSlug}
+                            classGroupSlug={classGroupSlug}
+                            courseCode={courseCode}
+                            schedules={schedules}
+                            lesson={{
+                                id: "",
+                                date: upcoming.date,
+                                topic: "Aula prevista",
+                                scheduleId: upcoming.scheduleId,
+                            }}
                         >
-                            <IconPencil className="size-4" />
-                        </button>
-                    </EditLessonSheet>
-                </div>
+                            <button
+                                className="p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors focus:outline-none bg-surface/50 sm:bg-transparent"
+                                title="Registrar esta aula"
+                            >
+                                <IconPencil className="size-4" />
+                            </button>
+                        </EditLessonSheet>
+                    </div>
+                )}
             </div>
         );
     };

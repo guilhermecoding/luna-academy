@@ -4,6 +4,7 @@ import Section from "@/components/section";
 import { Suspense } from "react";
 import { CreatePeriodForm } from "./_components/create-period-form";
 import { Metadata } from "next";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Novo Período",
@@ -15,6 +16,7 @@ export default async function NewPeriodPage({
     const { program } = await params;
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/periodos`}>
         <Page>
             <Section>
                 <BaseForm
@@ -29,5 +31,6 @@ export default async function NewPeriodPage({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

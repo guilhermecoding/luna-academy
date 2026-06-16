@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { CreateSubjectForm } from "./_components/create-subject-form";
 import { Metadata } from "next";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Nova Disciplina Teórica",
@@ -16,6 +17,7 @@ export default async function NewSubjectPage({
     const { program, degree } = await params;
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/matrizes/${degree}/disciplinas`}>
         <Page>
             <Section>
                 <BaseForm
@@ -30,5 +32,6 @@ export default async function NewSubjectPage({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

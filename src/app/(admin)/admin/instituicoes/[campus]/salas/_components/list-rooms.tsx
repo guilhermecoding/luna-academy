@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RoomType } from "@/generated/prisma/enums";
+import { CanWrite } from "@/components/can-write";
 
 function roomType(type: RoomType) {
     switch (type) {
@@ -71,9 +72,11 @@ function EmptyRoomsList({ campusSlug }: { campusSlug: string }) {
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Comece cadastrando as salas disponíveis neste local.
             </p>
-            <Link href={`/admin/instituicoes/${campusSlug}/salas/novo`} className="text-primary hover:underline text-sm font-medium">
-                + Adicionar a primeira sala
-            </Link>
+            <CanWrite>
+                <Link href={`/admin/instituicoes/${campusSlug}/salas/novo`} className="text-primary hover:underline text-sm font-medium">
+                    + Adicionar a primeira sala
+                </Link>
+            </CanWrite>
         </div>
     );
 }
@@ -135,15 +138,17 @@ async function ListRoomsContent({ campusSlug }: { campusSlug: string }) {
                             </td>
                             <td className="px-4 sm:px-6 py-4">
                                 <div className="flex flex-row items-center justify-center sm:justify-end gap-1 sm:gap-2">
-                                    <Link
-                                        href={`/admin/instituicoes/${campusSlug}/salas/${room.slug}/editar`}
-                                        className="p-2 inline-flex rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground transition-colors shrink-0"
-                                        title="Editar sala"
-                                    >
-                                        <IconEdit className="size-4 sm:size-5" />
-                                    </Link>
+                                    <CanWrite>
+                                        <Link
+                                            href={`/admin/instituicoes/${campusSlug}/salas/${room.slug}/editar`}
+                                            className="p-2 inline-flex rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground transition-colors shrink-0"
+                                            title="Editar sala"
+                                        >
+                                            <IconEdit className="size-4 sm:size-5" />
+                                        </Link>
 
-                                    <Separator orientation="vertical" className="h-4 bg-surface-border block mt-2.5" />
+                                        <Separator orientation="vertical" className="h-4 bg-surface-border block mt-2.5" />
+                                    </CanWrite>
 
                                     <Link
                                         href={`/admin/instituicoes/${campusSlug}/salas/${room.slug}/editar`}

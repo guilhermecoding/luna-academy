@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IconDotsVertical, IconEdit, IconEye } from "@tabler/icons-react";
 import Link from "next/link";
+import { useCanWrite } from "@/components/write-access-provider";
 
 interface CourseActionsProps {
     programSlug: string;
@@ -19,7 +20,10 @@ interface CourseActionsProps {
     showEditOption?: boolean;
 }
 
-export function CourseActions({ programSlug, periodSlug, classGroupSlug, courseCode, baseUrl = "/admin", showEditOption = true }: CourseActionsProps) {
+export function CourseActions({ programSlug, periodSlug, classGroupSlug, courseCode, baseUrl = "/admin", showEditOption }: CourseActionsProps) {
+    const canWriteFromContext = useCanWrite();
+    const effectiveShowEditOption = showEditOption ?? canWriteFromContext;
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -41,7 +45,7 @@ export function CourseActions({ programSlug, periodSlug, classGroupSlug, courseC
                         <span className="font-medium">Detalhar</span>
                     </Link>
                 </DropdownMenuItem>
-                {showEditOption && (
+                {effectiveShowEditOption && (
                     <DropdownMenuItem asChild>
                         <Link
                             href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${courseCode}/editar`}

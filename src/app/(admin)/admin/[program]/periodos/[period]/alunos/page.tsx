@@ -12,6 +12,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Alunos do Período",
@@ -21,6 +22,10 @@ async function AdminPeriodStudentsPageContent({
     params,
     searchParams,
 }: PageProps<"/admin/[program]/periodos/[period]/alunos">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period } = await params;
     const { q } = await searchParams;
 
@@ -60,13 +65,15 @@ async function AdminPeriodStudentsPageContent({
                             <IconChartBar className="size-5 mr-1" />
                             Indicadores
                         </ButtonLink>
-                        <ButtonLink
-                            className="w-full sm:w-auto h-11"
-                            href={`/admin/alunos/novo?periodId=${periodData.id}&redirect=/admin/${program}/periodos/${period}/alunos`}
-                        >
-                            <IconPlus className="size-5 mr-1" />
-                            Novo Aluno
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink
+                                className="w-full sm:w-auto h-11"
+                                href={`/admin/alunos/novo?periodId=${periodData.id}&redirect=/admin/${program}/periodos/${period}/alunos`}
+                            >
+                                <IconPlus className="size-5 mr-1" />
+                                Novo Aluno
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

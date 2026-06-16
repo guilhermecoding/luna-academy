@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import ListClassGroups from "./_components/list-class-groups";
 import TeacherFilter from "./_components/teacher-filter";
 import { Suspense } from "react";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Gerenciar Classes",
@@ -21,6 +22,10 @@ async function AdminClassGroupsPageContent({
 }: {
     searchParams: Promise<{ teacherId?: string }>;
 } & Omit<PageProps<"/admin/[program]/periodos/[period]/turmas">, "searchParams">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period } = await params;
     const { teacherId } = await searchParams;
 
@@ -49,10 +54,12 @@ async function AdminClassGroupsPageContent({
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 items-end">
                         <TeacherFilter teachers={teachers} currentTeacherId={teacherId} />
-                        <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/periodos/${period}/turmas/novo`}>
-                            <IconCirclePlusFilled className="size-5" />
-                            Criar Turma
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/periodos/${period}/turmas/novo`}>
+                                <IconCirclePlusFilled className="size-5" />
+                                Criar Turma
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

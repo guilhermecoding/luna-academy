@@ -1,8 +1,7 @@
 "use server";
 
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateTag } from "next/cache";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
@@ -43,10 +42,10 @@ export async function createLessonAction(
     courseCode: string,
     data: CreateLessonInput,
 ) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) return { success: false, error: "Não autorizado" };
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const validated = createLessonSchema.parse(data);
 
         const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
@@ -98,10 +97,10 @@ export async function updateLessonAction(
     courseCode: string,
     data: UpdateLessonInput,
 ) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) return { success: false, error: "Não autorizado" };
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const validated = updateLessonSchema.parse(data);
 
         const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
@@ -152,10 +151,10 @@ export async function deleteLessonAction(
     courseCode: string,
     lessonId: string,
 ) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) return { success: false, error: "Não autorizado" };
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
         if ("error" in resolved) return { success: false, error: resolved.error };
 
@@ -179,10 +178,10 @@ export async function bulkUpdateAttendanceAction(
     lessonId: string,
     data: BulkUpdateAttendanceInput,
 ) {
-    try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session?.user?.id) return { success: false, error: "Não autorizado" };
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
 
+    try {
         const validated = bulkUpdateAttendanceSchema.parse(data);
 
         await bulkUpdateAttendance(

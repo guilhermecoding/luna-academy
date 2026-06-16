@@ -7,6 +7,7 @@ import { IconCalendarPlus } from "@tabler/icons-react";
 import type { Metadata } from "next";
 import CurrentPeriod from "./_components/current-period";
 import ListOthersPeriods from "./_components/list-others-periods";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Períodos Letivos",
@@ -15,6 +16,10 @@ export const metadata: Metadata = {
 export default async function PeriodsPage({
     params,
 }: PageProps<"/admin/[program]/periodos">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program } = await params;
 
     const periods = getPeriodsByProgramSlug(program);
@@ -30,10 +35,12 @@ export default async function PeriodsPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink href={`/admin/${program}/periodos/novo`} className="w-full sm:w-auto">
-                            <IconCalendarPlus className="size-5" />
-                            <span className="text-base mt-0.5">Adicionar Período</span>
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink href={`/admin/${program}/periodos/novo`} className="w-full sm:w-auto">
+                                <IconCalendarPlus className="size-5" />
+                                <span className="text-base mt-0.5">Adicionar Período</span>
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

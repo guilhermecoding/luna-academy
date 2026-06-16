@@ -15,6 +15,7 @@ import type { UserGenre } from "@/generated/prisma/client";
 import { useRouter } from "next/navigation";
 import { maskCPF, maskPhone, unmask } from "@/lib/masks";
 import ImportStudentsTab from "./import-students-tab";
+import { useCanWrite } from "@/components/write-access-provider";
 
 export default function CreateStudentForm({
     periodId,
@@ -28,6 +29,7 @@ export default function CreateStudentForm({
     onSuccess?: () => void;
 } = {}) {
     const router = useRouter();
+    const canWrite = useCanWrite();
     const [mode, setMode] = useState<"single" | "bulk">("single");
 
     const form = useForm<CreateStudentInput, unknown, CreateStudentData>({
@@ -95,17 +97,19 @@ export default function CreateStudentForm({
                 >
                     Adicionar Aluno Unicamente
                 </Button>
-                <Button
-                    type="button"
-                    variant={mode === "bulk" ? "default" : "ghost"}
-                    onClick={() => setMode("bulk")}
-                    className="rounded-xl sm:rounded-3xl w-full sm:w-auto"
-                >
-                    Importação em Massa
-                </Button>
+                {canWrite && (
+                    <Button
+                        type="button"
+                        variant={mode === "bulk" ? "default" : "ghost"}
+                        onClick={() => setMode("bulk")}
+                        className="rounded-xl sm:rounded-3xl w-full sm:w-auto"
+                    >
+                        Importação em Massa
+                    </Button>
+                )}
             </div>
 
-            {mode === "single" ? (
+            {mode === "single" || !canWrite ? (
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                     {errors.root?.message && (
                         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900 text-sm">

@@ -1,5 +1,6 @@
 "use server";
 
+import { requireTeacher } from "@/lib/auth-guards";
 import { updateUser } from "@/services/users/users.service";
 import { revalidatePath, updateTag } from "next/cache";
 import { headers } from "next/headers";
@@ -12,14 +13,12 @@ import prisma from "@/lib/prisma";
 import { hashPassword } from "better-auth/crypto";
 
 export async function editProfileAction(data: EditProfileInput) {
+    const authResult = await requireTeacher();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
+    const memberId = authResult.session.user.id;
+
     try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const memberId = session?.user?.id;
-
-        if (!memberId || !session.user.isTeacher) {
-            return { success: false, error: "Não autorizado." };
-        }
-
         const validatedData = editProfileSchema.parse(data);
         const cleanData = {
             ...validatedData,
