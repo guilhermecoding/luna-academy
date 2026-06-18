@@ -153,6 +153,7 @@ function ListDisciplinesContent({
                         const enrolled = studentCount;
                         const roomCapacity = course.room ? Number(course.room.capacity) : 0;
                         const occupancyPct = roomCapacity > 0 ? Math.min((enrolled / roomCapacity) * 100, 100) : 0;
+                        const overbookingPct = roomCapacity > 0 ? Math.max((enrolled - roomCapacity) / roomCapacity * 100, 0) : 0;
                         const roomColor = course.room ? getOccupancyColor(course.room.name) : null;
 
                         return (
@@ -228,7 +229,7 @@ function ListDisciplinesContent({
                                                         <span className="text-base text-muted-foreground px-0.5">/</span>
                                                         <span className="text-sm text-muted-foreground">{roomCapacity}</span>
                                                     </span>
-                                                    <span className="text-muted-foreground">({Math.round(occupancyPct)}%)</span>
+                                                    <span className="text-muted-foreground">({Math.round(occupancyPct)}% {overbookingPct > 0 ? ` + ${Math.round(overbookingPct)}% overbooking` : ""})</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-primary/10 dark:bg-muted rounded-full overflow-hidden">
                                                     <div
