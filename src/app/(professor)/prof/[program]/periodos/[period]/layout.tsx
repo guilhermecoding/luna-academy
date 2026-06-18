@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-async function PeriodLayoutContent({
+async function TeacherPeriodLayoutContent({
     children,
     params,
 }: Readonly<{
@@ -17,7 +17,7 @@ async function PeriodLayoutContent({
 
     const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
 
-    if (!period) {
+    if (!period || period.completedAt) {
         return notFound();
     }
 
@@ -40,7 +40,7 @@ async function PeriodLayoutContent({
     return <>{children}</>;
 }
 
-export default function PeriodTeacherLayout({
+export default function TeacherPeriodLayout({
     children,
     params,
 }: Readonly<{
@@ -49,9 +49,9 @@ export default function PeriodTeacherLayout({
 }>) {
     return (
         <Suspense fallback={<PageSkeleton />}>
-            <PeriodLayoutContent params={params}>
+            <TeacherPeriodLayoutContent params={params}>
                 {children}
-            </PeriodLayoutContent>
+            </TeacherPeriodLayoutContent>
         </Suspense>
     );
 }

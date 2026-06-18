@@ -5,7 +5,7 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-async function ProgramLayoutContent({
+async function TeacherProgramLayoutContent({
     children,
     params,
 }: Readonly<{
@@ -43,7 +43,7 @@ async function ProgramLayoutContent({
     );
 }
 
-export default function ProgramLayout({
+export default function TeacherProgramLayout({
     children,
     params,
 }: Readonly<{
@@ -52,9 +52,9 @@ export default function ProgramLayout({
 }>) {
     return (
         <Suspense fallback={<PageSkeleton />}>
-            <ProgramLayoutContent params={params}>
+            <TeacherProgramLayoutContent params={params}>
                 {children}
-            </ProgramLayoutContent>
+            </TeacherProgramLayoutContent>
         </Suspense>
     );
 }
