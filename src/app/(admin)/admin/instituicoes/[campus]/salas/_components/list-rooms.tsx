@@ -94,10 +94,10 @@ async function ListRoomsContent({ campusSlug }: { campusSlug: string }) {
 
                 <thead className="bg-primary/5 text-muted-foreground uppercase text-[10px] sm:text-xs">
                     <tr>
-                        <th className="px-4 sm:px-6 py-4 font-medium min-w-[180px]">Sala / Laboratório</th>
-                        <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-[120px]">Capacidade</th>
-                        <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-[120px]">Bloco / Prédio</th>
-                        <th className="px-4 sm:px-6 py-4 font-medium text-center whitespace-nowrap min-w-[140px]">Ações</th>
+                        <th className="px-4 sm:px-6 py-4 font-medium min-w-45">Sala / Laboratório</th>
+                        <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-30">Capacidade</th>
+                        <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-30">Bloco / Prédio</th>
+                        <th className="px-4 sm:px-6 py-4 font-medium text-center whitespace-nowrap min-w-35">Ações</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-surface-border">
