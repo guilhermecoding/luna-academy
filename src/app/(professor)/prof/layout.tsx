@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     },
 };
 
-async function ProfLayoutContent({
+async function TeacherLayoutContent({
     children,
 }: Readonly<{
     children: React.ReactNode;
@@ -42,10 +42,10 @@ async function ProfLayoutContent({
     );
 }
 
-export default function ProfLayout({
+export default function TeacherLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    return <ProfLayoutContent>{children}</ProfLayoutContent>;
+    return <TeacherLayoutContent>{children}</TeacherLayoutContent>;
 }

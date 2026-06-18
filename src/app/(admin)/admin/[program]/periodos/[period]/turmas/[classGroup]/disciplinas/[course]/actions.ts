@@ -1,11 +1,11 @@
 "use server";
 
-import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateTag } from "next/cache";
 import prisma from "@/lib/prisma";
-import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
-import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
-import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
+import {
+    requireCourseMutationAccess,
+    requireLessonAttendanceMutationAccess,
+} from "@/lib/teacher-period-guards";
 import {
     createLesson,
     deleteLesson,
@@ -22,19 +22,6 @@ import {
 } from "./schema";
 import { ZodError } from "zod";
 
-async function resolveCourseBySlugs(programSlug: string, periodSlug: string, classGroupSlug: string, courseCode: string) {
-    const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
-    if (!period) return { error: "Período não encontrado." };
-
-    const classGroup = await getClassGroupByPeriodIdAndSlug(period.id, classGroupSlug);
-    if (!classGroup) return { error: "Turma não encontrada." };
-
-    const course = await getCourseByPeriodIdAndCode(period.id, courseCode);
-    if (!course || course.classGroupId !== classGroup.id) return { error: "Disciplina não encontrada." };
-
-    return { period, classGroup, course };
-}
-
 export async function createLessonAction(
     programSlug: string,
     periodSlug: string,
@@ -42,16 +29,18 @@ export async function createLessonAction(
     courseCode: string,
     data: CreateLessonInput,
 ) {
-    const authResult = await requireAdminWrite();
+    const authResult = await requireCourseMutationAccess(
+        programSlug,
+        periodSlug,
+        classGroupSlug,
+        courseCode,
+    );
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
         const validated = createLessonSchema.parse(data);
 
-        const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
-        if ("error" in resolved) return { success: false, error: resolved.error };
-
-        const { course } = resolved;
+        const { course } = authResult.resolved;
         const lessonDate = new Date(validated.date + "T00:00:00");
 
         // Validar colisão: mesma disciplina + mesma data + mesmo timeSlot
@@ -97,16 +86,18 @@ export async function updateLessonAction(
     courseCode: string,
     data: UpdateLessonInput,
 ) {
-    const authResult = await requireAdminWrite();
+    const authResult = await requireCourseMutationAccess(
+        programSlug,
+        periodSlug,
+        classGroupSlug,
+        courseCode,
+    );
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
         const validated = updateLessonSchema.parse(data);
 
-        const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
-        if ("error" in resolved) return { success: false, error: resolved.error };
-
-        const { course } = resolved;
+        const { course } = authResult.resolved;
         const lessonDate = new Date(validated.date + "T00:00:00");
 
         // Validar colisão: mesma disciplina + mesma data + mesmo timeSlot, mas ignorando a própria aula
@@ -151,14 +142,16 @@ export async function deleteLessonAction(
     courseCode: string,
     lessonId: string,
 ) {
-    const authResult = await requireAdminWrite();
+    const authResult = await requireCourseMutationAccess(
+        programSlug,
+        periodSlug,
+        classGroupSlug,
+        courseCode,
+    );
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
-        const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
-        if ("error" in resolved) return { success: false, error: resolved.error };
-
-        const { course } = resolved;
+        const { course } = authResult.resolved;
 
         await deleteLesson(lessonId);
 
@@ -178,7 +171,7 @@ export async function bulkUpdateAttendanceAction(
     lessonId: string,
     data: BulkUpdateAttendanceInput,
 ) {
-    const authResult = await requireAdminWrite();
+    const authResult = await requireLessonAttendanceMutationAccess(courseId, lessonId);
     if (!authResult.ok) return { success: false, error: authResult.error };
 
     try {
