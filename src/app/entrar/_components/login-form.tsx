@@ -96,10 +96,10 @@ export default function LoginForm() {
             const sessionBody = sessionRes.ok ? await sessionRes.json() : null;
             const user =
                 sessionBody &&
-                typeof sessionBody === "object" &&
-                "user" in sessionBody &&
-                sessionBody.user &&
-                typeof sessionBody.user === "object"
+                    typeof sessionBody === "object" &&
+                    "user" in sessionBody &&
+                    sessionBody.user &&
+                    typeof sessionBody.user === "object"
                     ? (sessionBody.user as SessionUserLogin)
                     : null;
 
@@ -128,7 +128,7 @@ export default function LoginForm() {
             }
 
             const firstName = user.name?.trim().split(" ")[0] || "usuário";
-            toast.success(`Bem vindo(a) de volta, ${firstName}!`);
+            toast.message(`Bem vindo(a) de volta, ${firstName}!`);
 
             router.push(activeTab === "admin" ? "/admin" : "/prof");
             router.refresh();
