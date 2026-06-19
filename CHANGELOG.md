@@ -5,6 +5,24 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [v1.3.0 -> v1.3.1] - 2026-06-19
+
+### Adicionado
+
+- Variáveis de ambiente para o administrador inicial do seed (`ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_CPF`, `ADMIN_PHONE`, `ADMIN_BIRTH_DATE`, `ADMIN_BIO`, `ADMIN_LUNA_ID`) em `.env.example`, com instruções de formatação
+- Componentes de esqueleto para carregamento: `ButtonSkeleton`, `TimeSlotSkeleton` e export de `ListDegreesSkeleton`
+- Estados de carregamento com `Suspense` nas páginas de horários e matrizes curriculares do painel admin
+
+### Alterado
+
+- Script de seed (`prisma/seed.ts`) passa a exigir exclusivamente variáveis de ambiente para criar o administrador inicial
+- Dependência `better-auth` atualizada de `1.6.2` para `1.6.11`
+
+### Refatoração
+
+- Validação de variáveis obrigatórias e de data de nascimento no seed antes da criação do administrador
+- Páginas de horários e matrizes divididas em conteúdo assíncrono com fallback de skeleton
+
 ## [1.3.0] - 2026-06-18
 
 ### Adicionado
