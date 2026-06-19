@@ -14,6 +14,7 @@ export type ItemMenuSidebarAdmin = {
             url: string;
             visibleOnPaths?: string[];
             hiddenOnPaths?: string[];
+            requiresWrite?: boolean;
         }[];
     }[]
 }

@@ -5,6 +5,7 @@ import { NavUser } from "@/components/nav-user";
 import { ItemMenuSidebarAdmin } from "@/@types/item-menu-sidebar.type";
 
 import { usePathname, useParams } from "next/navigation";
+import { useCanWrite } from "@/components/write-access-provider";
 
 function injectParams(url: string, params: Record<string, string | string[] | undefined>): string | null {
     let finalUrl = url;
@@ -23,6 +24,7 @@ function injectParams(url: string, params: Record<string, string | string[] | un
 export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }) {
     const pathname = usePathname();
     const params = useParams();
+    const canWrite = useCanWrite();
 
     const filteredMenus = menus.map(group => {
         // Filtragem dos itens de nível superior
@@ -37,6 +39,7 @@ export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }
             let validSubItems: typeof item.items;
             if (item.items) {
                 validSubItems = item.items.reduce((subAcc: NonNullable<typeof item.items>, subItem) => {
+                    if (!canWrite && subItem.requiresWrite) return subAcc;
                     if (subItem.hiddenOnPaths?.some(p => new RegExp(p).test(pathname))) return subAcc;
                     if (subItem.visibleOnPaths && !subItem.visibleOnPaths.some(p => new RegExp(p).test(pathname))) return subAcc;
 

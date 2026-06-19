@@ -1,6 +1,8 @@
 "use server";
 
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { revalidatePath, updateTag } from "next/cache";
+import prisma from "@/lib/prisma";
 import { ZodError, z } from "zod";
 import {
     deletePeriod,
@@ -13,11 +15,39 @@ const deletePeriodSchema = z.object({
     confirmationName: z.string().min(1, "Digite o nome do período para confirmar"),
 });
 
+async function revalidateTeacherPeriodAccess(programSlug: string, periodSlug: string) {
+    const teachersInPeriod = await prisma.schedule.findMany({
+        where: {
+            teacherId: { not: null },
+            course: {
+                period: {
+                    program: { slug: programSlug },
+                    slug: periodSlug,
+                },
+            },
+        },
+        select: { teacherId: true },
+        distinct: ["teacherId"],
+    });
+
+    for (const { teacherId } of teachersInPeriod) {
+        if (teacherId) {
+            updateTag(`teacher-periods-${programSlug}-${teacherId}`);
+        }
+    }
+
+    revalidatePath(`/prof/${programSlug}/periodos`);
+    revalidatePath(`/prof/${programSlug}/periodos/${periodSlug}`);
+}
+
 export async function editPeriodAction(
     programSlug: string,
     periodSlug: string,
     data: EditPeriodInput,
 ) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = editPeriodSchema.parse(data);
         await updatePeriod(programSlug, periodSlug, validatedData);
@@ -25,6 +55,7 @@ export async function editPeriodAction(
         updateTag(`program:${programSlug}`);
         updateTag(`program-periods:${programSlug}`);
         updateTag(`period:${programSlug}:${periodSlug}`);
+        await revalidateTeacherPeriodAccess(programSlug, periodSlug);
         revalidatePath(`/admin/${programSlug}/periodos`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/editar`);
     } catch (error) {
@@ -64,6 +95,9 @@ export async function deletePeriodAction(
     periodSlug: string,
     confirmationName: string,
 ) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = deletePeriodSchema.parse({ confirmationName });
         const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
@@ -87,6 +121,7 @@ export async function deletePeriodAction(
         updateTag(`program:${programSlug}`);
         updateTag(`program-periods:${programSlug}`);
         updateTag(`period:${programSlug}:${periodSlug}`);
+        await revalidateTeacherPeriodAccess(programSlug, periodSlug);
         revalidatePath(`/admin/${programSlug}/periodos`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/editar`);
     } catch (error) {

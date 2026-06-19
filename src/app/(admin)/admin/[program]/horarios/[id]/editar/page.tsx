@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
 import { getTimeSlotById } from "@/services/schedules/schedules.service";
 import { notFound } from "next/navigation";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Horário",
@@ -23,24 +24,26 @@ async function EditTimeSlotContent({
     }
 
     return (
-        <Page>
-            <Section>
-                <BaseForm
-                    title="Editar Horário"
-                    description={`Atualize as informações do horário ${timeSlot.name}.`}
-                >
-                    <div className="mt-6">
-                        <Suspense fallback={<SkeletonForm />}>
-                            <EditTimeSlotForm
-                                programSlug={program}
-                                timeSlotId={id}
-                                initialData={timeSlot}
-                            />
-                        </Suspense>
-                    </div>
-                </BaseForm>
-            </Section>
-        </Page>
+        <WritePageGuard redirectTo={`/admin/${program}/horarios`}>
+            <Page>
+                <Section>
+                    <BaseForm
+                        title="Editar Horário"
+                        description={`Atualize as informações do horário ${timeSlot.name}.`}
+                    >
+                        <div className="mt-6">
+                            <Suspense fallback={<SkeletonForm />}>
+                                <EditTimeSlotForm
+                                    programSlug={program}
+                                    timeSlotId={id}
+                                    initialData={timeSlot}
+                                />
+                            </Suspense>
+                        </div>
+                    </BaseForm>
+                </Section>
+            </Page>
+        </WritePageGuard>
     );
 }
 

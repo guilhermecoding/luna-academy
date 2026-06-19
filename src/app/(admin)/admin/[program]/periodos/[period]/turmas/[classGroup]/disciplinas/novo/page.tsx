@@ -11,6 +11,7 @@ import { getSubjectsByDegreeAndBasePeriod } from "@/services/subjects/subjects.s
 import { getAllRooms } from "@/services/rooms/rooms.service";
 import { getTeachers, getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
 import { CreateClassGroupSubjectForm } from "./_components/create-class-group-subject-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Adicionar Disciplina na Turma",
@@ -43,38 +44,40 @@ async function NewClassGroupSubjectContent({
     ]);
 
     return (
-        <Page>
-            <Section>
-                <BaseForm
-                    title="Adicionar Disciplina na Turma"
-                    description={`Selecione uma disciplina curricular para ofertar na turma ${classGroup.name}.`}
-                >
-                    <div className="mt-6">
-                        <Suspense fallback={<SkeletonForm />}>
-                            <CreateClassGroupSubjectForm
-                                programSlug={program}
-                                periodSlug={periodSlug}
-                                classGroupSlug={classGroupSlug}
-                                classGroup={{
-                                    id: classGroup.id,
-                                    name: classGroup.name,
-                                    slug: classGroup.slug,
-                                    shift: classGroup.shift,
-                                }}
-                                subjects={availableSubjects.map((subject) => ({
-                                    id: subject.id,
-                                    name: subject.name,
-                                    code: subject.code,
-                                }))}
-                                rooms={rooms}
-                                timeSlots={timeSlots}
-                                teachers={teachers}
-                            />
-                        </Suspense>
-                    </div>
-                </BaseForm>
-            </Section>
-        </Page>
+        <WritePageGuard redirectTo={`/admin/${program}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas`}>
+            <Page>
+                <Section>
+                    <BaseForm
+                        title="Adicionar Disciplina na Turma"
+                        description={`Selecione uma disciplina curricular para ofertar na turma ${classGroup.name}.`}
+                    >
+                        <div className="mt-6">
+                            <Suspense fallback={<SkeletonForm />}>
+                                <CreateClassGroupSubjectForm
+                                    programSlug={program}
+                                    periodSlug={periodSlug}
+                                    classGroupSlug={classGroupSlug}
+                                    classGroup={{
+                                        id: classGroup.id,
+                                        name: classGroup.name,
+                                        slug: classGroup.slug,
+                                        shift: classGroup.shift,
+                                    }}
+                                    subjects={availableSubjects.map((subject) => ({
+                                        id: subject.id,
+                                        name: subject.name,
+                                        code: subject.code,
+                                    }))}
+                                    rooms={rooms}
+                                    timeSlots={timeSlots}
+                                    teachers={teachers}
+                                />
+                            </Suspense>
+                        </div>
+                    </BaseForm>
+                </Section>
+            </Page>
+        </WritePageGuard>
     );
 }
 

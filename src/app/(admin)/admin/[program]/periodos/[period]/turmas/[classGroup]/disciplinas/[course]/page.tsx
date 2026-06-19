@@ -23,6 +23,7 @@ import LessonCardList from "./_components/lesson-card-list";
 import { CreateLessonSheet } from "./_components/create-lesson-dialog";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { Suspense } from "react";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -121,6 +122,10 @@ function generateUpcomingLessons(
 async function AdminCoursePageContent({
     params,
 }: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas/[course]">, "searchParams">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period, classGroup: classGroupSlug, course: courseCode } = await params;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
@@ -185,13 +190,15 @@ async function AdminCoursePageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
-                        <ButtonLink
-                            className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
-                            href={`${basePath}/editar`}
-                        >
-                            <IconPencil className="size-5" />
-                            Editar Disciplina
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink
+                                className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
+                                href={`${basePath}/editar`}
+                            >
+                                <IconPencil className="size-5" />
+                                Editar Disciplina
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>
@@ -238,13 +245,15 @@ async function AdminCoursePageContent({
                             )}
                         </div>
                     </div>
-                    <CreateLessonSheet
-                        programSlug={program}
-                        periodSlug={period}
-                        classGroupSlug={classGroupSlug}
-                        courseCode={courseCode}
-                        schedules={scheduleOptions}
-                    />
+                    {canWrite && (
+                        <CreateLessonSheet
+                            programSlug={program}
+                            periodSlug={period}
+                            classGroupSlug={classGroupSlug}
+                            courseCode={courseCode}
+                            schedules={scheduleOptions}
+                        />
+                    )}
                 </div>
 
                 <LessonCardList
@@ -256,6 +265,7 @@ async function AdminCoursePageContent({
                     classGroupSlug={classGroupSlug}
                     courseCode={courseCode}
                     schedules={scheduleOptions}
+                    canWrite={canWrite}
                 />
             </Section>
         </Page>

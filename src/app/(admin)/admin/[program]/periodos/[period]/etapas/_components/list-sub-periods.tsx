@@ -3,6 +3,7 @@ import { IconCalendarEvent, IconEdit, IconLock, IconLockOpen } from "@tabler/ico
 import Link from "next/link";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CanWrite } from "@/components/can-write";
 
 function ListSubPeriodsSkeleton() {
     return (
@@ -31,12 +32,14 @@ function EmptySubPeriodsList({ programSlug, periodSlug }: { programSlug: string;
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Etapas avaliativas dividem o período letivo em bimestres ou trimestres para controle de notas e fechamentos parciais.
             </p>
-            <Link
-                href={`/admin/${programSlug}/periodos/${periodSlug}/etapas/novo`}
-                className="text-primary hover:underline text-sm font-medium"
-            >
-                + Criar a primeira etapa
-            </Link>
+            <CanWrite>
+                <Link
+                    href={`/admin/${programSlug}/periodos/${periodSlug}/etapas/novo`}
+                    className="text-primary hover:underline text-sm font-medium"
+                >
+                    + Criar a primeira etapa
+                </Link>
+            </CanWrite>
         </div>
     );
 }
@@ -107,13 +110,15 @@ async function ListSubPeriodsContent({
                         </div>
 
                         <div className="flex justify-end mt-auto">
-                            <Link
-                                href={`/admin/${programSlug}/periodos/${periodSlug}/etapas/${sp.slug}/editar`}
-                                className="text-primary hover:text-primary/80 text-xs font-bold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-primary/5"
-                            >
-                                <IconEdit className="size-3.5" />
-                                Editar
-                            </Link>
+                            <CanWrite>
+                                <Link
+                                    href={`/admin/${programSlug}/periodos/${periodSlug}/etapas/${sp.slug}/editar`}
+                                    className="text-primary hover:text-primary/80 text-xs font-bold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-primary/5"
+                                >
+                                    <IconEdit className="size-3.5" />
+                                    Editar
+                                </Link>
+                            </CanWrite>
                         </div>
                     </div>
                 );

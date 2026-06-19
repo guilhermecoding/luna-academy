@@ -11,7 +11,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 isActive: false,
                 hiddenOnPaths: ["^/admin/programas"],
                 items: [
-                    { title: "Novo Horário", url: "/admin/[program]/horarios/novo" },
+                    { title: "Novo Horário", url: "/admin/[program]/horarios/novo", requiresWrite: true },
                 ],
             },
             {
@@ -21,7 +21,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 isActive: false,
                 hiddenOnPaths: ["^/admin/programas"],
                 items: [
-                    { title: "Nova Matriz", url: "/admin/[program]/matrizes/novo" },
+                    { title: "Nova Matriz", url: "/admin/[program]/matrizes/novo", requiresWrite: true },
                 ],
             },
             {
@@ -31,7 +31,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 isActive: false,
                 hiddenOnPaths: ["^/admin/programas"],
                 items: [
-                    { title: "Novo Período", url: "/admin/[program]/periodos/novo" },
+                    { title: "Novo Período", url: "/admin/[program]/periodos/novo", requiresWrite: true },
                 ],
             },
             {
@@ -40,7 +40,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 icon: "backpack",
                 isActive: false,
                 items: [
-                    { title: "Criar Programa", url: "/admin/programas/novo" },
+                    { title: "Criar Programa", url: "/admin/programas/novo", requiresWrite: true },
                 ],
             },
             {
@@ -49,7 +49,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 icon: "book",
                 isActive: false,
                 items: [
-                    { title: "Nova Turma", url: "/admin/[program]/periodos/[period]/turmas/novo" },
+                    { title: "Nova Turma", url: "/admin/[program]/periodos/[period]/turmas/novo", requiresWrite: true },
                 ],
             },
         ],
@@ -63,7 +63,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 icon: "school",
                 isActive: false,
                 items: [
-                    { title: "Adicionar Aluno", url: "/admin/alunos/novo" },
+                    { title: "Adicionar Aluno", url: "/admin/alunos/novo", requiresWrite: true },
                     { title: "Listar Alunos deste Período", url: "/admin/[program]/periodos/[period]/alunos" },
                     { title: "Todos os alunos", url: "/admin/alunos" },
                 ],
@@ -84,7 +84,7 @@ export const adminMenus: ItemMenuSidebarAdmin[] = [
                 icon: "building-estate",
                 isActive: false,
                 items: [
-                    { title: "Adicionar Instituição", url: "/admin/instituicoes/novo" },
+                    { title: "Adicionar Instituição", url: "/admin/instituicoes/novo", requiresWrite: true },
                 ],
             },
         ],

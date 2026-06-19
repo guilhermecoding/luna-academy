@@ -4,12 +4,12 @@ import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
 import { getStudentsList, getTotalStudentsCount } from "@/services/students/students.service";
 import InfoBoxStudents from "./_components/info-box-students";
-import { DataTable } from "./_components/data-table";
-import { columns } from "./_components/columns";
+import { StudentsTable } from "./_components/students-table";
 import { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Alunos",
@@ -18,6 +18,10 @@ export const metadata: Metadata = {
 async function AdminStudentsPageContent({
     searchParams,
 }: PageProps<"/admin/alunos">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { q } = await searchParams;
     const searchQuery = typeof q === "string" ? q : undefined;
 
@@ -48,13 +52,15 @@ async function AdminStudentsPageContent({
                             <IconChartBar className="size-5" />
                             Indicadores
                         </ButtonLink>
-                        <ButtonLink
-                            className="w-full sm:w-auto"
-                            href="/admin/alunos/novo"
-                        >
-                            <IconPlus className="size-5 mr-1" />
-                            Novo Aluno
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink
+                                className="w-full sm:w-auto"
+                                href="/admin/alunos/novo"
+                            >
+                                <IconPlus className="size-5 mr-1" />
+                                Novo Aluno
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>
@@ -71,8 +77,7 @@ async function AdminStudentsPageContent({
 
             <Section className="mt-8">
                 <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-                    <DataTable
-                        columns={columns}
+                    <StudentsTable
                         data={studentsList}
                         title={
                             <h2 className="text-xl flex flex-row items-center gap-2 font-bold text-foreground">

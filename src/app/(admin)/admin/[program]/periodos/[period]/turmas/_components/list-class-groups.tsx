@@ -5,6 +5,7 @@ import { IconBook, IconChevronRight, IconClock, IconCodeAsterisk, IconSchool, Ic
 import Link from "next/link";
 import { Suspense } from "react";
 import { shiftLabels } from "../schema";
+import { CanWrite } from "@/components/can-write";
 
 const CLASS_GROUP_ACCENTS = [
     {
@@ -71,14 +72,16 @@ function EmptyClassGroupsList({
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Crie uma classe selecionando a Matriz e a Série. O sistema criará automaticamente as disciplinas ofertadas.
             </p>
-            {showCreateOption ? (
-                <Link
-                    href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/novo`}
-                    className="text-primary hover:underline text-sm font-medium"
-                >
-                    + Criar a primeira classe
-                </Link>
-            ) : null}
+            {showCreateOption !== false && (
+                <CanWrite>
+                    <Link
+                        href={`${baseUrl}/${programSlug}/periodos/${periodSlug}/turmas/novo`}
+                        className="text-primary hover:underline text-sm font-medium"
+                    >
+                        + Criar a primeira classe
+                    </Link>
+                </CanWrite>
+            )}
         </div>
     );
 }

@@ -4,6 +4,7 @@ import Section from "@/components/section";
 import { Metadata } from "next";
 import { CreateProgramForm } from "./_components/create-program-form";
 import { Suspense } from "react";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Criar Programa",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default function NewProgramPage() {
     return (
+        <WritePageGuard redirectTo="/admin/programas">
         <Page>
             <Section>
                 <BaseForm
@@ -25,5 +27,6 @@ export default function NewProgramPage() {
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }

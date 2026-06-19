@@ -1,11 +1,15 @@
 "use server";
 
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createCampus } from "@/services/campuses/campuses.service";
 import { ZodError } from "zod";
 import { createCampusSchema, type CreateCampusInput } from "./schema";
 import { revalidatePath, updateTag } from "next/cache";
 
 export async function createCampusAction(data: CreateCampusInput) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = createCampusSchema.parse(data);
         await createCampus(validatedData);

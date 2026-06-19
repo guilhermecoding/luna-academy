@@ -1,11 +1,15 @@
 "use server";
 
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { updateCampus, deleteCampus, getCampusSlugById } from "@/services/campuses/campuses.service";
 import { ZodError } from "zod";
 import { editCampusSchema, type EditCampusInput } from "./schema";
 import { revalidatePath, updateTag } from "next/cache";
 
 export async function editCampusAction(id: string, data: EditCampusInput) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = editCampusSchema.parse(data);
         await updateCampus(id, validatedData);
@@ -49,6 +53,9 @@ export async function editCampusAction(id: string, data: EditCampusInput) {
 }
 
 export async function deleteCampusAction(id: string) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         await deleteCampus(id);
 

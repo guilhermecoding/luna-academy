@@ -8,6 +8,7 @@ import SkeletonForm from "@/components/skeletons/skeleton-form";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { notFound } from "next/navigation";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Turma",
@@ -30,6 +31,7 @@ async function EditClassGroupContent({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/${program}/periodos/${periodSlug}/turmas/${classGroup.slug}`}>
         <Page>
             <Section>
                 <BaseForm
@@ -54,6 +56,7 @@ async function EditClassGroupContent({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }
 

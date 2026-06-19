@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin, requireAdminWrite } from "@/lib/auth-guards";
 import { createSubject } from "@/services/subjects/subjects.service";
 import { ZodError } from "zod";
 import { createSubjectSchema, type CreateSubjectInput } from "./schema";
@@ -7,6 +8,9 @@ import { revalidatePath, updateTag } from "next/cache";
 import { getDegreeBySlug } from "@/services/degrees/degrees.service";
 
 export async function createSubjectAction(programSlug: string, degreeSlug: string, data: CreateSubjectInput) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
     try {
         const validatedData = createSubjectSchema.parse(data);
         const degree = await getDegreeBySlug(programSlug, degreeSlug);

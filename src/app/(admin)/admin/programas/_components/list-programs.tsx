@@ -6,6 +6,7 @@ import { IconBlocks, IconExternalLinkFilled, IconPencilFilled } from "@tabler/ic
 import Link from "next/link";
 import { headers } from "next/headers";
 import { Suspense } from "react";
+import { CanWrite } from "@/components/can-write";
 
 function ListProgramsSkeleton() {
     return (
@@ -25,9 +26,11 @@ function EmptyList() {
             <p className="text-muted-foreground mt-2 max-w-sm mb-6">
                 Programas de aprendizado organizam períodos, matrizes curriculares e disciplinas. Comece criando o primeiro programa.
             </p>
-            <Link href="/admin/programas/novo" className="text-primary hover:underline text-sm font-medium">
-                + Adicionar o primeiro programa
-            </Link>
+            <CanWrite>
+                <Link href="/admin/programas/novo" className="text-primary hover:underline text-sm font-medium">
+                    + Adicionar o primeiro programa
+                </Link>
+            </CanWrite>
         </div>
     );
 }
@@ -51,10 +54,12 @@ function ProgramItem({
             </div>
             <Separator className="my-1" />
             <div className="flex flex-row justify-between items-center px-4 shrink-0">
-                <Link href={`/admin/programas/${programa.slug}/editar`} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                    <IconPencilFilled className="size-3.5" />
-                    <span>Editar</span>
-                </Link>
+                <CanWrite>
+                    <Link href={`/admin/programas/${programa.slug}/editar`} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
+                        <IconPencilFilled className="size-3.5" />
+                        <span>Editar</span>
+                    </Link>
+                </CanWrite>
                 <Separator orientation="vertical" />
                 <Link href={`/admin/${programa.slug}/periodos`} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                     <IconExternalLinkFilled className="size-3.5" />

@@ -5,12 +5,17 @@ import { IconBuildingEstate, IconCirclePlusFilled } from "@tabler/icons-react";
 import ListCampuses from "./_components/list-campuses";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Metadata } from "next";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Instituições",
 };
 
-export default function CampusesPage() {
+export default async function CampusesPage() {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     return (
         <Page>
             <Section>
@@ -26,10 +31,12 @@ export default function CampusesPage() {
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href="/admin/instituicoes/novo">
-                            <IconCirclePlusFilled className="size-5" />
-                            Adicionar Instituição
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href="/admin/instituicoes/novo">
+                                <IconCirclePlusFilled className="size-5" />
+                                Adicionar Instituição
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

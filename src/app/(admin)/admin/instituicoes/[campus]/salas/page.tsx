@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { getCampusBySlug } from "@/services/campuses/campuses.service";
 import { notFound } from "next/navigation";
 import ListRooms from "./_components/list-rooms";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Gerenciar Salas",
@@ -15,6 +16,10 @@ export const metadata: Metadata = {
 export default async function RoomsPage({
     params,
 }: PageProps<"/admin/instituicoes/[campus]/salas">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { campus } = await params;
     const campusData = await getCampusBySlug(campus);
 
@@ -37,10 +42,12 @@ export default async function RoomsPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href={`/admin/instituicoes/${campus}/salas/novo`}>
-                            <IconCirclePlusFilled className="size-5" />
-                            Adicionar Sala
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href={`/admin/instituicoes/${campus}/salas/novo`}>
+                                <IconCirclePlusFilled className="size-5" />
+                                Adicionar Sala
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

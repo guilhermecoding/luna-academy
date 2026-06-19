@@ -15,7 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { useEffect, useLayoutEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useLayoutEffect, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconSearch, IconUserMinus, IconLoader2, IconAlertTriangle, IconUserPlus, IconSchool, IconChevronRight } from "@tabler/icons-react";
@@ -26,7 +26,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { ClassGroup } from "@/generated/prisma/client";
 import { StudentPeriodListItem } from "@/services/students/students.service";
-import { createPeriodStudentColumns } from "./columns-period";
+import { usePeriodStudentColumns } from "./columns-period";
+import { useCanWrite } from "@/components/write-access-provider";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import Link from "next/link";
 
@@ -62,13 +63,10 @@ export function DataTablePeriodStudents({
     const searchParams = useSearchParams();
     const [query, setQuery] = useState(searchParams.get("q") || "");
 
-    const columns = useMemo(
-        () =>
-            createPeriodStudentColumns({
-                onTurmasClick: setTurmasSheetStudent,
-            }),
-        [],
-    );
+    const canWrite = useCanWrite();
+    const columns = usePeriodStudentColumns({
+        onTurmasClick: setTurmasSheetStudent,
+    });
 
     // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table + React Compiler
     const table = useReactTable({
@@ -222,7 +220,7 @@ export function DataTablePeriodStudents({
                             className="border-none bg-transparent shadow-none outline-none focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                     </div>
-                    {hasSelection && (
+                    {canWrite && hasSelection && (
                         <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto animate-in fade-in zoom-in duration-200">
                             <Button
                                 size="sm"

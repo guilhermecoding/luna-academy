@@ -23,9 +23,11 @@ import { deleteMemberAction } from "../actions";
 export default function EditMemberForm({
     member,
     isEditingSelf,
+    canWrite = true,
 }: {
     member: User;
     isEditingSelf: boolean;
+    canWrite?: boolean;
 }) {
     const lockSelfAdmin = isEditingSelf && member.isAdmin;
     const router = useRouter();
@@ -266,7 +268,7 @@ export default function EditMemberForm({
                         />
                         {errors.genre && <p className="text-sm text-red-600">{errors.genre.message}</p>}
                     </div>
-                    {!isEditingSelf && <div className="flex flex-col gap-2">
+                    {!isEditingSelf && canWrite && <div className="flex flex-col gap-2">
                         <Label htmlFor="systemRole">Nível de Acesso *</Label>
                         <Controller
                             control={control}
@@ -285,7 +287,7 @@ export default function EditMemberForm({
                         />
                         {errors.systemRole && <p className="text-sm text-red-600">{errors.systemRole.message}</p>}
                     </div>}
-                    {!isEditingSelf && <div className="flex flex-col gap-2">
+                    {!isEditingSelf && canWrite && <div className="flex flex-col gap-2">
                         <Label htmlFor="isActive">Acesso ao Sistema *</Label>
                         <Controller
                             control={control}
@@ -414,6 +416,7 @@ export default function EditMemberForm({
                     </DialogContent>
                 </Dialog>
 
+                {canWrite && (
                 <div className="flex flex-col gap-6 p-6 bg-background rounded-2xl border border-surface-border">
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1">
@@ -486,6 +489,7 @@ export default function EditMemberForm({
                         </div>
                     </div>
                 </div>
+                )}
 
                 <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row mt-4 border-t">
                     <Button
@@ -502,7 +506,7 @@ export default function EditMemberForm({
                     </Button>
                 </div>
 
-                {!isEditingSelf && (
+                {!isEditingSelf && canWrite && (
                     <div className="border border-destructive/25 bg-destructive/5 rounded-2xl p-4 sm:p-5 space-y-4 mt-6">
                         <div>
                             <div className="flex flex-row items-center gap-2">

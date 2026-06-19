@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { getCampusBySlug } from "@/services/campuses/campuses.service";
 import { notFound } from "next/navigation";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
+import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
     title: "Editar Instituição",
@@ -24,6 +25,7 @@ async function EditCampusContent({
     }
 
     return (
+        <WritePageGuard redirectTo={`/admin/instituicoes/${campus}`}>
         <Page>
             <Section>
                 <BaseForm
@@ -40,6 +42,7 @@ async function EditCampusContent({
                 </BaseForm>
             </Section>
         </Page>
+        </WritePageGuard>
     );
 }
 

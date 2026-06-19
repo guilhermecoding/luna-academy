@@ -5,7 +5,7 @@ export type PeriodListItem = Pick<
     "id" | "name" | "slug" | "startDate" | "endDate" | "completedAt"
 > & {
     _count: {
-        courses: number;
+        classGroups: number;
         studentPeriods: number;
     };
     enrolledCount: number;

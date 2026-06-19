@@ -11,6 +11,7 @@ import { notFound } from "next/navigation";
 import ListDisciplines from "../../_components/list-disciplines";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Disciplinas da Turma",
@@ -19,6 +20,10 @@ export const metadata: Metadata = {
 async function AdminClassGroupCoursesPageContent({
     params,
 }: Omit<PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/disciplinas">, "searchParams">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period, classGroup: classGroupSlug } = await params;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
@@ -42,13 +47,15 @@ async function AdminClassGroupCoursesPageContent({
                     description={`${classGroup.degree.name} • ${classGroup.basePeriod}ª Série • ${classGroup.shift === "MORNING" ? "Manhã" : classGroup.shift === "AFTERNOON" ? "Tarde" : "Noite"}`}
                 />
                 <div className="flex justify-end mt-4">
-                    <ButtonLink
-                        href={`/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/novo`}
-                        className="w-full sm:w-auto"
-                    >
-                        <IconCirclePlusFilled className="size-5" />
-                        Adicionar Disciplina
-                    </ButtonLink>
+                    {canWrite && (
+                        <ButtonLink
+                            href={`/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/novo`}
+                            className="w-full sm:w-auto"
+                        >
+                            <IconCirclePlusFilled className="size-5" />
+                            Adicionar Disciplina
+                        </ButtonLink>
+                    )}
                 </div>
             </Section>
 

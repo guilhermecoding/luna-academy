@@ -1,3 +1,5 @@
+"use client";
+
 import { IconSun, IconSunset2, IconMoon, IconCodeAsterisk, IconUsersGroup } from "@tabler/icons-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shift } from "@/generated/prisma/enums";
@@ -5,6 +7,7 @@ import { CourseActions } from "./course-actions";
 import { getAvatarColor, getInitials, hashString } from "@/lib/avatar-utils";
 import { CourseWithRelations } from "@/services/courses/courses.type";
 import Link from "next/link";
+import { useCanWrite } from "@/components/write-access-provider";
 
 const OCCUPANCY_COLORS = [
     { bar: "bg-green-500", text: "text-green-700 dark:text-green-400" },
@@ -150,6 +153,7 @@ function ListDisciplinesContent({
                         const enrolled = studentCount;
                         const roomCapacity = course.room ? Number(course.room.capacity) : 0;
                         const occupancyPct = roomCapacity > 0 ? Math.min((enrolled / roomCapacity) * 100, 100) : 0;
+                        const overbookingPct = roomCapacity > 0 ? Math.max((enrolled - roomCapacity) / roomCapacity * 100, 0) : 0;
                         const roomColor = course.room ? getOccupancyColor(course.room.name) : null;
 
                         return (
@@ -225,7 +229,7 @@ function ListDisciplinesContent({
                                                         <span className="text-base text-muted-foreground px-0.5">/</span>
                                                         <span className="text-sm text-muted-foreground">{roomCapacity}</span>
                                                     </span>
-                                                    <span className="text-muted-foreground">({Math.round(occupancyPct)}%)</span>
+                                                    <span className="text-muted-foreground">({Math.round(occupancyPct)}% {overbookingPct > 0 ? ` + ${Math.round(overbookingPct)}% overbooking` : ""})</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-primary/10 dark:bg-muted rounded-full overflow-hidden">
                                                     <div
@@ -268,7 +272,7 @@ export default function ListDisciplines({
     classGroupSlug,
     studentCount,
     baseUrl = "/admin",
-    showEditOption = true,
+    showEditOption,
 }: {
     courses: CourseWithRelations[];
     programSlug: string;
@@ -278,6 +282,9 @@ export default function ListDisciplines({
     baseUrl?: string;
     showEditOption?: boolean;
 }) {
+    const canWriteFromContext = useCanWrite();
+    const effectiveShowEditOption = showEditOption ?? canWriteFromContext;
+
     return (
         <ListDisciplinesContent
             courses={courses}
@@ -286,7 +293,7 @@ export default function ListDisciplines({
             classGroupSlug={classGroupSlug}
             studentCount={studentCount}
             baseUrl={baseUrl}
-            showEditOption={showEditOption}
+            showEditOption={effectiveShowEditOption}
         />
     );
 }

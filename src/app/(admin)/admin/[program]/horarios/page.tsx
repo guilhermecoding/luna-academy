@@ -6,6 +6,7 @@ import { IconCirclePlusFilled, IconClock } from "@tabler/icons-react";
 import { Metadata } from "next";
 import { getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
 import ListTimeSlots from "./_components/list-time-slots";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Configurar Horários",
@@ -14,6 +15,10 @@ export const metadata: Metadata = {
 export default async function TimeSlotsPage({
     params,
 }: PageProps<"/admin/[program]/horarios">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program } = await params;
     const timeSlots = await getTimeSlotsByProgramSlug(program);
 
@@ -32,10 +37,12 @@ export default async function TimeSlotsPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/horarios/novo`}>
-                            <IconCirclePlusFilled className="size-5" />
-                            Adicionar Horário
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/horarios/novo`}>
+                                <IconCirclePlusFilled className="size-5" />
+                                Adicionar Horário
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

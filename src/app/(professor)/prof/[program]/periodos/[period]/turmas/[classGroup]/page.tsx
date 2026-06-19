@@ -10,8 +10,7 @@ import InfoBoxPeriod from "@/app/(admin)/admin/[program]/periodos/[period]/_comp
 import ListDisciplines from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/_components/list-disciplines";
 import { Metadata } from "next";
 import { Shift } from "@/generated/prisma/enums";
-import { DataTableClassStudents } from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/[classGroup]/_components/data-table-class-students";
-import { classGroupStudentsColumns } from "@/app/(admin)/admin/[program]/periodos/[period]/alunos/_components/columns-period";
+import { ClassGroupStudentsTable } from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/[classGroup]/_components/class-group-students-table";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Suspense } from "react";
@@ -132,12 +131,10 @@ async function ProfClassPageContent({
                     <h2 className="text-xl font-bold text-foreground">Alunos Matriculados</h2>
                 </div>
 
-                <DataTableClassStudents
-                    columns={classGroupStudentsColumns}
+                <ClassGroupStudentsTable
                     data={studentsList}
                     periodId={periodData.id}
                     classGroupId={classGroupData.id}
-                    hideActionsAndSelect={true}
                 />
             </Section>
         </Page>

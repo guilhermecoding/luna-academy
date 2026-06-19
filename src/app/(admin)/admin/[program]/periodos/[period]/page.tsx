@@ -13,6 +13,7 @@ import ClassGroupsPreview from "./_components/class-groups-preview";
 import SubPeriodsPreview from "./_components/sub-periods-preview";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Período Letivo",
@@ -22,6 +23,10 @@ export const metadata: Metadata = {
 async function AdminPeriodPageContent({
     params,
 }: Omit<PageProps<"/admin/[program]/periodos/[period]">, "searchParams">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period } = await params;
     const periodData = await getPeriodByProgramAndSlug(program, period);
 
@@ -62,10 +67,12 @@ async function AdminPeriodPageContent({
                             <IconSchool className="size-5 mr-2" />
                             Alunos
                         </ButtonLink>
-                        <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/editar`}>
-                            <IconPencil className="size-5 mr-2" />
-                            Editar Período
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/editar`}>
+                                <IconPencil className="size-5 mr-2" />
+                                Editar Período
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>

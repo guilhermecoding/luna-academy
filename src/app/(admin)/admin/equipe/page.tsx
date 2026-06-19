@@ -4,14 +4,12 @@ import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
 import { getUserStats, getUsersList } from "@/services/users/users.service";
 import InfoBoxUsers from "./_components/info-box-users";
-import { DataTable } from "./_components/data-table";
-import { columns } from "./_components/columns";
+import { TeamTable } from "./_components/team-table";
 import { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button-link";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Equipe",
@@ -20,15 +18,17 @@ export const metadata: Metadata = {
 async function AdminUsersPageContent({
     searchParams,
 }: PageProps<"/admin/equipe">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+
     const { q } = await searchParams;
     const searchQuery = typeof q === "string" ? q : undefined;
 
-    const [session, userStats, usersList] = await Promise.all([
-        auth.api.getSession({ headers: await headers() }),
+    const [userStats, usersList] = await Promise.all([
         getUserStats(),
         getUsersList(searchQuery),
     ]);
-    const currentUserId = session?.user?.id ?? null;
+    const currentUserId = authResult.session.user.id;
 
     return (
         <Page>
@@ -85,8 +85,7 @@ async function AdminUsersPageContent({
 
             <Section className="mt-8">
                 <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-                    <DataTable
-                        columns={columns}
+                    <TeamTable
                         data={usersList}
                         currentUserId={currentUserId}
                         title={

@@ -11,11 +11,11 @@ import InfoBoxPeriod from "../../_components/info-box-period";
 import ListDisciplines from "../_components/list-disciplines";
 import { Metadata } from "next";
 import { Shift } from "@/generated/prisma/enums";
-import { DataTableClassStudents } from "./_components/data-table-class-students";
-import { classGroupStudentsColumns } from "../../alunos/_components/columns-period";
+import { ClassGroupStudentsTable } from "./_components/class-group-students-table";
 import { AddStudentsToClassSheet } from "./_components/add-students-to-class-sheet";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Detalhes da Turma",
@@ -25,6 +25,10 @@ async function AdminClassPageContent({
     params,
     searchParams,
 }: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { program, period, classGroup: classGroupSlug } = await params;
     const { q } = await searchParams;
 
@@ -67,15 +71,19 @@ async function AdminClassPageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid" href={`/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/editar`}>
-                            <IconPencil className="size-5" />
-                            Editar Turma
-                        </ButtonLink>
-                        <AddStudentsToClassSheet
-                            periodId={periodData.id}
-                            classGroupId={classGroupData.id}
-                            classGroupName={classGroupData.name}
-                        />
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid" href={`/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/editar`}>
+                                <IconPencil className="size-5" />
+                                Editar Turma
+                            </ButtonLink>
+                        )}
+                        {canWrite && (
+                            <AddStudentsToClassSheet
+                                periodId={periodData.id}
+                                classGroupId={classGroupData.id}
+                                classGroupName={classGroupData.name}
+                            />
+                        )}
                     </div>
                 </div>
             </Section>
@@ -126,8 +134,7 @@ async function AdminClassPageContent({
                     <h2 className="text-xl font-bold text-foreground">Alunos Matriculados</h2>
                 </div>
 
-                <DataTableClassStudents
-                    columns={classGroupStudentsColumns}
+                <ClassGroupStudentsTable
                     data={studentsList}
                     periodId={periodData.id}
                     classGroupId={classGroupData.id}

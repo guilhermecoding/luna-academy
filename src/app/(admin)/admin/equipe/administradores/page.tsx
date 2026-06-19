@@ -4,14 +4,14 @@ import { IconUserShield, IconPlus, IconUserCheck, IconUserX } from "@tabler/icon
 import { Metadata } from "next";
 import TitlePage from "@/components/title-page";
 import { ButtonLink } from "@/components/ui/button-link";
-import { DataTable } from "../_components/data-table";
+import { AdminsTable } from "./_components/admins-table";
 import { getAdmins, getAdminStats } from "@/services/users/admins.service";
-import { columns } from "./_components/columns";
 import InfoBoxUsers from "../_components/info-box-users";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 
 export const metadata: Metadata = {
     title: "Administradores",
@@ -20,6 +20,10 @@ export const metadata: Metadata = {
 async function AdminAdministratorsPageContent({
     searchParams,
 }: PageProps<"/admin/equipe/administradores">) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return null;
+    const canWrite = userCanWrite(authResult.session.user);
+
     const { q } = await searchParams;
     const searchQuery = typeof q === "string" ? q : undefined;
 
@@ -45,10 +49,12 @@ async function AdminAdministratorsPageContent({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        <ButtonLink className="w-full sm:w-auto" href="/admin/equipe/administradores/novo">
-                            <IconPlus className="size-4" />
-                            Adicionar Administrador
-                        </ButtonLink>
+                        {canWrite && (
+                            <ButtonLink className="w-full sm:w-auto" href="/admin/equipe/administradores/novo">
+                                <IconPlus className="size-4" />
+                                Adicionar Administrador
+                            </ButtonLink>
+                        )}
                     </div>
                 </div>
             </Section>
@@ -76,8 +82,7 @@ async function AdminAdministratorsPageContent({
 
             <Section className="mt-8">
                 <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-                    <DataTable
-                        columns={columns}
+                    <AdminsTable
                         data={adminsList}
                         currentUserId={currentUserId}
                         title={
