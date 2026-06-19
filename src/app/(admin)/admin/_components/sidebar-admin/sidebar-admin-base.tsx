@@ -39,7 +39,9 @@ export default function SidebarAdminBase({
                         <DynamicBreadcrumb />
                     </div>
                 </header>
-                {children}
+                <div className="flex min-w-0 w-full flex-1 flex-col">
+                    {children}
+                </div>
             </SidebarInset>
         </>
     );
