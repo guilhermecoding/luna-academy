@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeColorSchemeSync } from "@/components/theme-color-scheme-sync";
 import { Suspense } from "react";
+import NextTopLoader from "nextjs-toploader";
 
 /**
  * Componente de Providers para fornecer contextos globais.
@@ -26,6 +27,14 @@ export default function Providers({
             storageKey="theme"
         >
             <ThemeColorSchemeSync />
+            <NextTopLoader
+                color="#432DD7"
+                height={4}
+                showSpinner={false}
+                easing="ease"
+                speed={200}
+                shadow="0 0 10px #432DD7,0 0 5px #432DD7"
+            />
             <Suspense fallback={null}>
                 <SidebarProvider>
                     <TooltipProvider>
