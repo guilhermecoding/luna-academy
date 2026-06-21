@@ -4,7 +4,6 @@ import { headers, cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getProgramsForTeacher } from "@/services/programs/programs.service";
 import { IconBook } from "@tabler/icons-react";
-import { DualArc } from "@/components/dual-arc";
 import TeacherHomeRedirectClient from "./_components/teacher-redirect-client";
 
 const ACTIVE_PROGRAM_COOKIE_NAME = "active_program_slug";
@@ -47,13 +46,7 @@ async function TeacherHomeRedirect() {
 
 export default function TeacherHomePage() {
     return (
-        <Suspense
-            fallback={
-                <div className="flex min-h-screen w-full items-center justify-center bg-background">
-                    <DualArc className="size-12 text-primary" />
-                </div>
-            }
-        >
+        <Suspense fallback={null}>
             <TeacherHomeRedirect />
         </Suspense>
     );
