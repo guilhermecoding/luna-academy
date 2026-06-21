@@ -3,13 +3,24 @@ import Page from "@/components/page";
 import Section from "@/components/section";
 import { IconAlertSquareRounded, IconCalendar } from "@tabler/icons-react";
 import TitlePage from "@/components/title-page";
-import StudentsCountFlipCard from "./_components/students-period-count-flip-card";
+import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
+import { notFound } from "next/navigation";
+import StudentsPeriodCountFlipCard from "./_components/students-period-count-flip-card";
 
 export const metadata: Metadata = {
     title: "Indicadores Gerais do Período",
 };
 
-export default function AdminPeriodIndicatorsPage() {
+export default async function AdminPeriodIndicatorsPage({
+    params,
+}: PageProps<"/admin/[program]/periodos/[period]">) {
+    const { program, period } = await params;
+    const periodData = await getPeriodByProgramAndSlug(program, period);
+
+    if (!periodData) {
+        notFound();
+    }
+
     return (
         <Page>
             <Section>
@@ -27,7 +38,7 @@ export default function AdminPeriodIndicatorsPage() {
             </Section>
 
             <Section className="mt-8">
-                <StudentsCountFlipCard />
+                <StudentsPeriodCountFlipCard periodId={periodData.id} />
             </Section>
         </Page>
     );
