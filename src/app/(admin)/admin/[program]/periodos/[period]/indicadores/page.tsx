@@ -5,6 +5,6 @@ export const metadata: Metadata = {
     title: "Indicadores Gerais do Período",
 };
 
-export default function AdminPeriodStudentsIndicatorsPage() {
+export default function AdminPeriodIndicatorsPage() {
     return <BuildFeaturePage />;
 }
