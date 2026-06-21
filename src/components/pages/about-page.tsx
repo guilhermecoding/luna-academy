@@ -84,7 +84,7 @@ export default function AboutPage() {
                     <div className="flex flex-col">
                         <span className="text-sm text-muted-foreground">Agradecimentos:</span>
                         <span className="text-base font-medium italic">
-                            &quot;Primeiramente, agradeço a Deus por me dar a oportunidade de criar este projeto.
+                            &quot;Primeiramente, agradeço a <strong>Deus</strong> por me dar a oportunidade de criar este projeto.
                             <br />
                             Agradeço a minha mãe, por me apoiar em todos os momentos, aos meus amigos que apoiaram no desenvolvimento deste projeto
                             e a todos aqueles que acreditam no meu trabalho e usam este projeto.
