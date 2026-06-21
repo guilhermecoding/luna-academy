@@ -3,6 +3,7 @@ import Page from "@/components/page";
 import Section from "@/components/section";
 import { IconAlertSquareRounded, IconCalendar } from "@tabler/icons-react";
 import TitlePage from "@/components/title-page";
+import StudentsCountFlipCard from "./_components/students-period-count-flip-card";
 
 export const metadata: Metadata = {
     title: "Indicadores Gerais do Período",
@@ -23,6 +24,10 @@ export default function AdminPeriodIndicatorsPage() {
                         Gráficos em dispositivos móveis podem ser limitados. Verifique em um dispositivo maior para uma melhor visualização.
                     </p>
                 </div>
+            </Section>
+
+            <Section className="mt-8">
+                <StudentsCountFlipCard />
             </Section>
         </Page>
     );
