@@ -63,7 +63,7 @@ interface EnrolledResponse {
     student: {
         name: string;
         phone: string;
-        school: string;
+        originSchool: string | null;
     };
     period: {
         name: string;
@@ -82,7 +82,7 @@ interface WaitingResponse {
     student: {
         name: string;
         phone: string;
-        school: string;
+        originSchool: string | null;
     };
     period: {
         name: string;
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                 id: true,
                 name: true,
                 studentPhone: true,
-                school: true,
+                originSchool: true,
             },
         });
 
@@ -278,7 +278,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                     student: {
                         name: student.name,
                         phone: student.studentPhone,
-                        school: student.school,
+                        originSchool: student.originSchool,
                     },
                     period: {
                         name: period.name,
@@ -372,7 +372,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             student: {
                 name: student.name,
                 phone: student.studentPhone,
-                school: student.school,
+                originSchool: student.originSchool,
             },
             period: {
                 name: period.name,

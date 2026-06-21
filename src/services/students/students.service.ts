@@ -72,7 +72,7 @@ export async function getStudentsByClassGroupList(classGroupId: string, query?: 
             studentPhone: true,
             birthDate: true,
             genre: true,
-            school: true,
+            originSchool: true,
         },
         orderBy: {
             name: "asc",
@@ -131,7 +131,7 @@ export async function getStudentsList(query?: string) {
             studentPhone: true,
             birthDate: true,
             genre: true,
-            school: true,
+            originSchool: true,
         },
         orderBy: {
             name: "asc",
@@ -198,7 +198,7 @@ export async function getAvailableStudentsForClassGroup(
                 studentPhone: true,
                 birthDate: true,
                 genre: true,
-                school: true,
+                originSchool: true,
             },
             orderBy: {
                 name: "asc" as const,
@@ -273,7 +273,7 @@ export async function getStudentsByPeriodList(periodId: string, query?: string) 
                     studentPhone: true,
                     birthDate: true,
                     genre: true,
-                    school: true,
+                    originSchool: true,
                     enrollments: {
                         where: {
                             course: {
@@ -393,7 +393,7 @@ export type BulkStudentInput = {
     genre: "MALE" | "FEMALE" | "NON_BINARY" | "PREFER_NOT_TO_SAY";
     studentPhone: string;
     parentPhone?: string | null;
-    school: string;
+    originSchool?: string | null;
 };
 
 const BATCH_SIZE = 100;
@@ -486,7 +486,7 @@ export async function bulkUpsertStudents(students: BulkStudentInput[], periodId?
                         parentPhone: student.parentPhone || null,
                         birthDate: student.birthDate,
                         genre: student.genre,
-                        school: student.school,
+                        originSchool: student.originSchool || null,
                     },
                     select: { id: true },
                 });
@@ -532,7 +532,7 @@ export async function bulkUpsertStudents(students: BulkStudentInput[], periodId?
                             parentPhone: student.parentPhone || null,
                             birthDate: student.birthDate,
                             genre: student.genre,
-                            school: student.school,
+                            originSchool: student.originSchool || null,
                             lunaId: student.lunaId,
                         },
                         select: { id: true },

@@ -22,7 +22,7 @@ export async function createStudentAction(data: CreateStudentData, periodId?: st
             parentPhone: parsedData.parentPhone || null,
             birthDate: parsedData.birthDate,
             genre: parsedData.genre,
-            school: parsedData.school,
+            originSchool: parsedData.originSchool || null,
         }, periodId);
 
         updateTag("students-list");
@@ -75,7 +75,7 @@ export async function editStudentAction(id: string, data: EditStudentData) {
             parentPhone: parsedData.parentPhone || null,
             birthDate: parsedData.birthDate,
             genre: parsedData.genre,
-            school: parsedData.school,
+            originSchool: parsedData.originSchool || null,
         });
 
         updateTag("students-list");
@@ -193,7 +193,7 @@ export async function importStudentsAction(formData: FormData): Promise<ImportRe
             genre: Genre;
             studentPhone: string;
             parentPhone?: string | null;
-            school: string;
+            originSchool?: string | null;
         };
         const validStudents: BulkStudentInput[] = [];
         const skipped: { row: number; errors: string[] }[] = [];
@@ -243,7 +243,7 @@ export async function importStudentsAction(formData: FormData): Promise<ImportRe
                 genre: parseGenre(parsed.data.genero),
                 studentPhone: parsed.data.celular_aluno,
                 parentPhone: parsed.data.celular_responsavel || null,
-                school: parsed.data.escola_origem,
+                originSchool: parsed.data.escola_origem || null,
             });
         }
 

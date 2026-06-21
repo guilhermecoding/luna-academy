@@ -327,7 +327,7 @@ export const StudentScalarFieldEnum = {
   parentPhone: 'parentPhone',
   cpf: 'cpf',
   email: 'email',
-  school: 'school',
+  originSchool: 'originSchool',
   genre: 'genre',
   lunaId: 'lunaId'
 } as const
