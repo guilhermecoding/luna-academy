@@ -100,7 +100,13 @@ function StudentsAgeRangeBarChart() {
                         />
                     }
                 />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                <Bar
+                    dataKey="count"
+                    radius={[6, 6, 0, 0]}
+                    isAnimationActive
+                    animationDuration={800}
+                    animationBegin={0}
+                >
                     {chartData.map((entry) => (
                         <Cell key={entry.range} fill={entry.fill} />
                     ))}

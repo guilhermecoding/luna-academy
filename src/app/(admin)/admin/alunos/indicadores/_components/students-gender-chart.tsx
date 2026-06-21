@@ -80,6 +80,9 @@ function StudentsGenderPieChart() {
                     nameKey="genre"
                     innerRadius="45%"
                     strokeWidth={2}
+                    isAnimationActive
+                    animationDuration={800}
+                    animationBegin={0}
                 />
                 <ChartLegend
                     content={<ChartLegendContent nameKey="genre" />}

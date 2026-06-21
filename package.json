@@ -8,6 +8,7 @@
     "build:local": "next build",
     "postinstall": "prisma generate",
     "start": "next start",
+    "analyze": "next experimental-analyze",
     "lint": "eslint",
     "seed": "pnpm exec tsx prisma/seed.ts",
     "db:seed": "pnpm seed",
