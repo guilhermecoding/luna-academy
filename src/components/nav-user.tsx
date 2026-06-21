@@ -189,7 +189,7 @@ export function NavUser({ baseUrl = "/admin" }: { baseUrl?: string }) {
                     onClick={closeMobileSidebar}
                   >
                     <IconUser className="size-4" />
-                    Perfil
+                    Meu Perfil
                   </Link>
                 </DropdownMenuItem>
               ) : (

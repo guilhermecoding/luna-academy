@@ -201,3 +201,20 @@
     @apply bg-background text-foreground font-poppins;
   }
 }
+
+/* Oculta o botão nativo de revelar senha do browser (Edge/Chrome) */
+.password-input-native-toggle-hidden::-ms-reveal,
+.password-input-native-toggle-hidden::-ms-clear {
+  display: none;
+}
+
+.password-input-native-toggle-hidden::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+.password-input-native-toggle-hidden::-webkit-textfield-decoration-container {
+  display: none;
+}

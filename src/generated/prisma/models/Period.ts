@@ -33,7 +33,6 @@ export type PeriodMinAggregateOutputType = {
   programId: string | null
   completedAt: Date | null
   slug: string | null
-  canonicalCode: string | null
 }
 
 export type PeriodMaxAggregateOutputType = {
@@ -45,7 +44,6 @@ export type PeriodMaxAggregateOutputType = {
   programId: string | null
   completedAt: Date | null
   slug: string | null
-  canonicalCode: string | null
 }
 
 export type PeriodCountAggregateOutputType = {
@@ -57,7 +55,6 @@ export type PeriodCountAggregateOutputType = {
   programId: number
   completedAt: number
   slug: number
-  canonicalCode: number
   _all: number
 }
 
@@ -71,7 +68,6 @@ export type PeriodMinAggregateInputType = {
   programId?: true
   completedAt?: true
   slug?: true
-  canonicalCode?: true
 }
 
 export type PeriodMaxAggregateInputType = {
@@ -83,7 +79,6 @@ export type PeriodMaxAggregateInputType = {
   programId?: true
   completedAt?: true
   slug?: true
-  canonicalCode?: true
 }
 
 export type PeriodCountAggregateInputType = {
@@ -95,7 +90,6 @@ export type PeriodCountAggregateInputType = {
   programId?: true
   completedAt?: true
   slug?: true
-  canonicalCode?: true
   _all?: true
 }
 
@@ -180,7 +174,6 @@ export type PeriodGroupByOutputType = {
   programId: string
   completedAt: Date | null
   slug: string
-  canonicalCode: string | null
   _count: PeriodCountAggregateOutputType | null
   _min: PeriodMinAggregateOutputType | null
   _max: PeriodMaxAggregateOutputType | null
@@ -213,7 +206,6 @@ export type PeriodWhereInput = {
   programId?: Prisma.UuidFilter<"Period"> | string
   completedAt?: Prisma.DateTimeNullableFilter<"Period"> | Date | string | null
   slug?: Prisma.StringFilter<"Period"> | string
-  canonicalCode?: Prisma.UuidNullableFilter<"Period"> | string | null
   classGroups?: Prisma.ClassGroupListRelationFilter
   courses?: Prisma.CourseListRelationFilter
   program?: Prisma.XOR<Prisma.ProgramScalarRelationFilter, Prisma.ProgramWhereInput>
@@ -230,7 +222,6 @@ export type PeriodOrderByWithRelationInput = {
   programId?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
-  canonicalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   classGroups?: Prisma.ClassGroupOrderByRelationAggregateInput
   courses?: Prisma.CourseOrderByRelationAggregateInput
   program?: Prisma.ProgramOrderByWithRelationInput
@@ -240,7 +231,6 @@ export type PeriodOrderByWithRelationInput = {
 
 export type PeriodWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  canonicalCode?: string
   programId_slug?: Prisma.PeriodProgramIdSlugCompoundUniqueInput
   AND?: Prisma.PeriodWhereInput | Prisma.PeriodWhereInput[]
   OR?: Prisma.PeriodWhereInput[]
@@ -257,7 +247,7 @@ export type PeriodWhereUniqueInput = Prisma.AtLeast<{
   program?: Prisma.XOR<Prisma.ProgramScalarRelationFilter, Prisma.ProgramWhereInput>
   studentPeriods?: Prisma.StudentPeriodListRelationFilter
   subPeriods?: Prisma.SubPeriodListRelationFilter
-}, "id" | "canonicalCode" | "programId_slug">
+}, "id" | "programId_slug">
 
 export type PeriodOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -268,7 +258,6 @@ export type PeriodOrderByWithAggregationInput = {
   programId?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
-  canonicalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PeriodCountOrderByAggregateInput
   _max?: Prisma.PeriodMaxOrderByAggregateInput
   _min?: Prisma.PeriodMinOrderByAggregateInput
@@ -286,7 +275,6 @@ export type PeriodScalarWhereWithAggregatesInput = {
   programId?: Prisma.UuidWithAggregatesFilter<"Period"> | string
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Period"> | Date | string | null
   slug?: Prisma.StringWithAggregatesFilter<"Period"> | string
-  canonicalCode?: Prisma.UuidNullableWithAggregatesFilter<"Period"> | string | null
 }
 
 export type PeriodCreateInput = {
@@ -297,7 +285,6 @@ export type PeriodCreateInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseCreateNestedManyWithoutPeriodInput
   program: Prisma.ProgramCreateNestedOneWithoutPeriodsInput
@@ -314,7 +301,6 @@ export type PeriodUncheckedCreateInput = {
   programId: string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupUncheckedCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutPeriodInput
   studentPeriods?: Prisma.StudentPeriodUncheckedCreateNestedManyWithoutPeriodInput
@@ -329,7 +315,6 @@ export type PeriodUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUpdateManyWithoutPeriodNestedInput
   program?: Prisma.ProgramUpdateOneRequiredWithoutPeriodsNestedInput
@@ -346,7 +331,6 @@ export type PeriodUncheckedUpdateInput = {
   programId?: Prisma.StringFieldUpdateOperationsInput | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUncheckedUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutPeriodNestedInput
   studentPeriods?: Prisma.StudentPeriodUncheckedUpdateManyWithoutPeriodNestedInput
@@ -362,7 +346,6 @@ export type PeriodCreateManyInput = {
   programId: string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
 }
 
 export type PeriodUpdateManyMutationInput = {
@@ -373,7 +356,6 @@ export type PeriodUpdateManyMutationInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PeriodUncheckedUpdateManyInput = {
@@ -385,7 +367,6 @@ export type PeriodUncheckedUpdateManyInput = {
   programId?: Prisma.StringFieldUpdateOperationsInput | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PeriodListRelationFilter = {
@@ -412,7 +393,6 @@ export type PeriodCountOrderByAggregateInput = {
   programId?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  canonicalCode?: Prisma.SortOrder
 }
 
 export type PeriodMaxOrderByAggregateInput = {
@@ -424,7 +404,6 @@ export type PeriodMaxOrderByAggregateInput = {
   programId?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  canonicalCode?: Prisma.SortOrder
 }
 
 export type PeriodMinOrderByAggregateInput = {
@@ -436,7 +415,6 @@ export type PeriodMinOrderByAggregateInput = {
   programId?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  canonicalCode?: Prisma.SortOrder
 }
 
 export type PeriodScalarRelationFilter = {
@@ -550,7 +528,6 @@ export type PeriodCreateWithoutProgramInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseCreateNestedManyWithoutPeriodInput
   studentPeriods?: Prisma.StudentPeriodCreateNestedManyWithoutPeriodInput
@@ -565,7 +542,6 @@ export type PeriodUncheckedCreateWithoutProgramInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupUncheckedCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutPeriodInput
   studentPeriods?: Prisma.StudentPeriodUncheckedCreateNestedManyWithoutPeriodInput
@@ -610,7 +586,6 @@ export type PeriodScalarWhereInput = {
   programId?: Prisma.UuidFilter<"Period"> | string
   completedAt?: Prisma.DateTimeNullableFilter<"Period"> | Date | string | null
   slug?: Prisma.StringFilter<"Period"> | string
-  canonicalCode?: Prisma.UuidNullableFilter<"Period"> | string | null
 }
 
 export type PeriodCreateWithoutSubPeriodsInput = {
@@ -621,7 +596,6 @@ export type PeriodCreateWithoutSubPeriodsInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseCreateNestedManyWithoutPeriodInput
   program: Prisma.ProgramCreateNestedOneWithoutPeriodsInput
@@ -637,7 +611,6 @@ export type PeriodUncheckedCreateWithoutSubPeriodsInput = {
   programId: string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupUncheckedCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutPeriodInput
   studentPeriods?: Prisma.StudentPeriodUncheckedCreateNestedManyWithoutPeriodInput
@@ -667,7 +640,6 @@ export type PeriodUpdateWithoutSubPeriodsInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUpdateManyWithoutPeriodNestedInput
   program?: Prisma.ProgramUpdateOneRequiredWithoutPeriodsNestedInput
@@ -683,7 +655,6 @@ export type PeriodUncheckedUpdateWithoutSubPeriodsInput = {
   programId?: Prisma.StringFieldUpdateOperationsInput | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUncheckedUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutPeriodNestedInput
   studentPeriods?: Prisma.StudentPeriodUncheckedUpdateManyWithoutPeriodNestedInput
@@ -697,7 +668,6 @@ export type PeriodCreateWithoutClassGroupsInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   courses?: Prisma.CourseCreateNestedManyWithoutPeriodInput
   program: Prisma.ProgramCreateNestedOneWithoutPeriodsInput
   studentPeriods?: Prisma.StudentPeriodCreateNestedManyWithoutPeriodInput
@@ -713,7 +683,6 @@ export type PeriodUncheckedCreateWithoutClassGroupsInput = {
   programId: string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutPeriodInput
   studentPeriods?: Prisma.StudentPeriodUncheckedCreateNestedManyWithoutPeriodInput
   subPeriods?: Prisma.SubPeriodUncheckedCreateNestedManyWithoutPeriodInput
@@ -743,7 +712,6 @@ export type PeriodUpdateWithoutClassGroupsInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   courses?: Prisma.CourseUpdateManyWithoutPeriodNestedInput
   program?: Prisma.ProgramUpdateOneRequiredWithoutPeriodsNestedInput
   studentPeriods?: Prisma.StudentPeriodUpdateManyWithoutPeriodNestedInput
@@ -759,7 +727,6 @@ export type PeriodUncheckedUpdateWithoutClassGroupsInput = {
   programId?: Prisma.StringFieldUpdateOperationsInput | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   courses?: Prisma.CourseUncheckedUpdateManyWithoutPeriodNestedInput
   studentPeriods?: Prisma.StudentPeriodUncheckedUpdateManyWithoutPeriodNestedInput
   subPeriods?: Prisma.SubPeriodUncheckedUpdateManyWithoutPeriodNestedInput
@@ -773,7 +740,6 @@ export type PeriodCreateWithoutCoursesInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupCreateNestedManyWithoutPeriodInput
   program: Prisma.ProgramCreateNestedOneWithoutPeriodsInput
   studentPeriods?: Prisma.StudentPeriodCreateNestedManyWithoutPeriodInput
@@ -789,7 +755,6 @@ export type PeriodUncheckedCreateWithoutCoursesInput = {
   programId: string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupUncheckedCreateNestedManyWithoutPeriodInput
   studentPeriods?: Prisma.StudentPeriodUncheckedCreateNestedManyWithoutPeriodInput
   subPeriods?: Prisma.SubPeriodUncheckedCreateNestedManyWithoutPeriodInput
@@ -819,7 +784,6 @@ export type PeriodUpdateWithoutCoursesInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUpdateManyWithoutPeriodNestedInput
   program?: Prisma.ProgramUpdateOneRequiredWithoutPeriodsNestedInput
   studentPeriods?: Prisma.StudentPeriodUpdateManyWithoutPeriodNestedInput
@@ -835,7 +799,6 @@ export type PeriodUncheckedUpdateWithoutCoursesInput = {
   programId?: Prisma.StringFieldUpdateOperationsInput | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUncheckedUpdateManyWithoutPeriodNestedInput
   studentPeriods?: Prisma.StudentPeriodUncheckedUpdateManyWithoutPeriodNestedInput
   subPeriods?: Prisma.SubPeriodUncheckedUpdateManyWithoutPeriodNestedInput
@@ -849,7 +812,6 @@ export type PeriodCreateWithoutStudentPeriodsInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseCreateNestedManyWithoutPeriodInput
   program: Prisma.ProgramCreateNestedOneWithoutPeriodsInput
@@ -865,7 +827,6 @@ export type PeriodUncheckedCreateWithoutStudentPeriodsInput = {
   programId: string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
   classGroups?: Prisma.ClassGroupUncheckedCreateNestedManyWithoutPeriodInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutPeriodInput
   subPeriods?: Prisma.SubPeriodUncheckedCreateNestedManyWithoutPeriodInput
@@ -895,7 +856,6 @@ export type PeriodUpdateWithoutStudentPeriodsInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUpdateManyWithoutPeriodNestedInput
   program?: Prisma.ProgramUpdateOneRequiredWithoutPeriodsNestedInput
@@ -911,7 +871,6 @@ export type PeriodUncheckedUpdateWithoutStudentPeriodsInput = {
   programId?: Prisma.StringFieldUpdateOperationsInput | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUncheckedUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutPeriodNestedInput
   subPeriods?: Prisma.SubPeriodUncheckedUpdateManyWithoutPeriodNestedInput
@@ -925,7 +884,6 @@ export type PeriodCreateManyProgramInput = {
   endDate: Date | string
   completedAt?: Date | string | null
   slug: string
-  canonicalCode?: string | null
 }
 
 export type PeriodUpdateWithoutProgramInput = {
@@ -936,7 +894,6 @@ export type PeriodUpdateWithoutProgramInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUpdateManyWithoutPeriodNestedInput
   studentPeriods?: Prisma.StudentPeriodUpdateManyWithoutPeriodNestedInput
@@ -951,7 +908,6 @@ export type PeriodUncheckedUpdateWithoutProgramInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classGroups?: Prisma.ClassGroupUncheckedUpdateManyWithoutPeriodNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutPeriodNestedInput
   studentPeriods?: Prisma.StudentPeriodUncheckedUpdateManyWithoutPeriodNestedInput
@@ -966,7 +922,6 @@ export type PeriodUncheckedUpdateManyWithoutProgramInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  canonicalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1036,7 +991,6 @@ export type PeriodSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   programId?: boolean
   completedAt?: boolean
   slug?: boolean
-  canonicalCode?: boolean
   classGroups?: boolean | Prisma.Period$classGroupsArgs<ExtArgs>
   courses?: boolean | Prisma.Period$coursesArgs<ExtArgs>
   program?: boolean | Prisma.ProgramDefaultArgs<ExtArgs>
@@ -1054,7 +1008,6 @@ export type PeriodSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   programId?: boolean
   completedAt?: boolean
   slug?: boolean
-  canonicalCode?: boolean
   program?: boolean | Prisma.ProgramDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["period"]>
 
@@ -1067,7 +1020,6 @@ export type PeriodSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   programId?: boolean
   completedAt?: boolean
   slug?: boolean
-  canonicalCode?: boolean
   program?: boolean | Prisma.ProgramDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["period"]>
 
@@ -1080,10 +1032,9 @@ export type PeriodSelectScalar = {
   programId?: boolean
   completedAt?: boolean
   slug?: boolean
-  canonicalCode?: boolean
 }
 
-export type PeriodOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "name" | "startDate" | "endDate" | "programId" | "completedAt" | "slug" | "canonicalCode", ExtArgs["result"]["period"]>
+export type PeriodOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "name" | "startDate" | "endDate" | "programId" | "completedAt" | "slug", ExtArgs["result"]["period"]>
 export type PeriodInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classGroups?: boolean | Prisma.Period$classGroupsArgs<ExtArgs>
   courses?: boolean | Prisma.Period$coursesArgs<ExtArgs>
@@ -1117,7 +1068,6 @@ export type $PeriodPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     programId: string
     completedAt: Date | null
     slug: string
-    canonicalCode: string | null
   }, ExtArgs["result"]["period"]>
   composites: {}
 }
@@ -1554,7 +1504,6 @@ export interface PeriodFieldRefs {
   readonly programId: Prisma.FieldRef<"Period", 'String'>
   readonly completedAt: Prisma.FieldRef<"Period", 'DateTime'>
   readonly slug: Prisma.FieldRef<"Period", 'String'>
-  readonly canonicalCode: Prisma.FieldRef<"Period", 'String'>
 }
     
 

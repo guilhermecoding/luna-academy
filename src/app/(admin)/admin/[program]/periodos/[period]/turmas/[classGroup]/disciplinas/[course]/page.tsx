@@ -20,10 +20,10 @@ import { notFound } from "next/navigation";
 import { Shift, DayOfWeek } from "@/generated/prisma/enums";
 import { Metadata } from "next";
 import LessonCardList from "./_components/lesson-card-list";
-import { CreateLessonSheet } from "./_components/create-lesson-dialog";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { Suspense } from "react";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import { generateUpcomingLessons } from "@/lib/lesson-schedule-utils";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -35,89 +35,7 @@ const shiftMap: Record<Shift, string> = {
     EVENING: "NOTURNO",
 };
 
-// Mapeia DayOfWeek do Prisma para o número JS de getDay() (0=Dom, 1=Seg, ..., 6=Sáb)
-const dayOfWeekToJs: Record<DayOfWeek, number> = {
-    SUNDAY: 0,
-    MONDAY: 1,
-    TUESDAY: 2,
-    WEDNESDAY: 3,
-    THURSDAY: 4,
-    FRIDAY: 5,
-    SATURDAY: 6,
-};
-
-/**
- * Gera as datas de aulas futuras (a partir de hoje) com base nos schedules
- * da disciplina dentro do intervalo do período.
- */
-function generateUpcomingLessons(
-    schedules: {
-        id: string;
-        dayOfWeek: DayOfWeek;
-        timeSlotId: string;
-        timeSlot: { id: string; name: string; startTime: string; endTime: string };
-        teacher: { id: string; name: string } | null;
-    }[],
-    periodStart: Date,
-    periodEnd: Date,
-    existingLessons: { date: Date; timeSlotId: string | null }[],
-) {
-    if (schedules.length === 0) return [];
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const start = new Date(Math.max(periodStart.getTime(), today.getTime()));
-    const end = new Date(periodEnd);
-
-    // Criar um Set de chaves já ocupadas: "YYYY-MM-DD_timeSlotId"
-    const occupiedKeys = new Set(
-        existingLessons
-            .filter((l) => l.timeSlotId)
-            .map((l) => {
-                const d = new Date(l.date).toISOString().split("T")[0];
-                return `${d}_${l.timeSlotId}`;
-            }),
-    );
-
-    const upcoming: {
-        date: string;
-        dayOfWeek: string;
-        scheduleId: string;
-        timeSlotName: string;
-        startTime: string;
-        endTime: string;
-        teacherName: string | null;
-    }[] = [];
-
-    // Iterar dia a dia do start ao end
-    const cursor = new Date(start);
-    while (cursor <= end) {
-        const jsDay = cursor.getUTCDay();
-        const dateStr = cursor.toISOString().split("T")[0];
-
-        for (const schedule of schedules) {
-            if (dayOfWeekToJs[schedule.dayOfWeek] === jsDay) {
-                const key = `${dateStr}_${schedule.timeSlotId}`;
-                if (!occupiedKeys.has(key)) {
-                    upcoming.push({
-                        date: dateStr,
-                        dayOfWeek: schedule.dayOfWeek,
-                        scheduleId: schedule.id,
-                        timeSlotName: schedule.timeSlot.name,
-                        startTime: schedule.timeSlot.startTime,
-                        endTime: schedule.timeSlot.endTime,
-                        teacherName: schedule.teacher?.name || null,
-                    });
-                }
-            }
-        }
-
-        cursor.setUTCDate(cursor.getUTCDate() + 1);
-    }
-
-    return upcoming;
-}
+const PREVIEW_LESSONS_LIMIT = 5;
 
 async function AdminCoursePageContent({
     params,
@@ -146,7 +64,6 @@ async function AdminCoursePageContent({
     const teacher = courseData.schedules.find((s) => s.teacher)?.teacher?.name || "Não atribuído";
     const basePath = `/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}`;
 
-    // Gerar aulas futuras com base na grade de horários
     const schedulesWithTimeSlot = courseData.schedules.filter((s) => s.timeSlot);
     const upcomingLessons = generateUpcomingLessons(
         schedulesWithTimeSlot.map((s) => ({
@@ -161,19 +78,16 @@ async function AdminCoursePageContent({
         lessons.map((l) => ({ date: l.date, timeSlotId: l.timeSlotId })),
     );
 
-    // Preparar schedules para o Sheet de criação
-    const scheduleOptions = courseData.schedules
-        .filter((s) => s.timeSlot)
-        .map((s) => ({
-            id: s.id,
-            dayOfWeek: s.dayOfWeek,
-            timeSlotId: s.timeSlotId,
-            timeSlotName: s.timeSlot.name,
-            startTime: s.timeSlot.startTime,
-            endTime: s.timeSlot.endTime,
-            teacherId: s.teacherId,
-            teacherName: s.teacher?.name || null,
-        }));
+    const scheduleOptions = schedulesWithTimeSlot.map((s) => ({
+        id: s.id,
+        dayOfWeek: s.dayOfWeek,
+        timeSlotId: s.timeSlotId,
+        timeSlotName: s.timeSlot.name,
+        startTime: s.timeSlot.startTime,
+        endTime: s.timeSlot.endTime,
+        teacherId: s.teacherId,
+        teacherName: s.teacher?.name || null,
+    }));
 
     return (
         <Page>
@@ -238,27 +152,24 @@ async function AdminCoursePageContent({
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-foreground">Diário de Aulas</h2>
-                            {upcomingLessons.length > 0 && (
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                    {lessonsCount} registrada{lessonsCount !== 1 ? "s" : ""} • {upcomingLessons.length} prevista{upcomingLessons.length !== 1 ? "s" : ""}
-                                </p>
-                            )}
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                                {lessonsCount} registrada{lessonsCount !== 1 ? "s" : ""}
+                                {upcomingLessons.length > 0 && (
+                                    <> • {upcomingLessons.length} prevista{upcomingLessons.length !== 1 ? "s" : ""} não registrada{upcomingLessons.length !== 1 ? "s" : ""}</>
+                                )}
+                            </p>
                         </div>
                     </div>
-                    {canWrite && (
-                        <CreateLessonSheet
-                            programSlug={program}
-                            periodSlug={period}
-                            classGroupSlug={classGroupSlug}
-                            courseCode={courseCode}
-                            schedules={scheduleOptions}
-                        />
-                    )}
+                    <ButtonLink
+                        href={`${basePath}/aulas`}
+                        className="w-full sm:w-auto"
+                    >
+                        Ver todas as aulas
+                    </ButtonLink>
                 </div>
 
                 <LessonCardList
                     lessons={lessons}
-                    upcomingLessons={upcomingLessons}
                     basePath={basePath}
                     programSlug={program}
                     periodSlug={period}
@@ -266,6 +177,11 @@ async function AdminCoursePageContent({
                     courseCode={courseCode}
                     schedules={scheduleOptions}
                     canWrite={canWrite}
+                    registeredLimit={PREVIEW_LESSONS_LIMIT}
+                    showUpcoming={false}
+                    viewAllHref={`${basePath}/aulas`}
+                    totalRegisteredCount={lessonsCount}
+                    emptyMessage="Nenhuma aula registrada ainda. Acesse a página de aulas para registrar."
                 />
             </Section>
         </Page>

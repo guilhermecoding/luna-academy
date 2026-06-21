@@ -6,6 +6,8 @@ import { ItemMenuSidebarAdmin } from "@/@types/item-menu-sidebar.type";
 
 import { usePathname, useParams } from "next/navigation";
 import { useCanWrite } from "@/components/write-access-provider";
+import Link from "next/link";
+import { IconExclamationCircle } from "@tabler/icons-react";
 
 function injectParams(url: string, params: Record<string, string | string[] | undefined>): string | null {
     let finalUrl = url;
@@ -54,7 +56,7 @@ export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }
             acc.push({ ...item, url: injectedItemUrl, items: validSubItems });
             return acc;
         }, []);
-        
+
         return { ...group, items: groupItems };
     }).filter(group => {
         if (group.hiddenOnPaths?.some(p => new RegExp(p).test(pathname))) return false;
@@ -66,5 +68,13 @@ export function AdminSidebarContent({ menus }: { menus: ItemMenuSidebarAdmin[] }
 }
 
 export function AdminSidebarFooter() {
-    return <NavUser baseUrl="/admin" />;
+    return (
+        <>
+            <Link href="/admin/sobre" className="px-3 py-2 text-muted-foreground rounded-2xl flex items-center gap-2 hover:bg-accent">
+                <IconExclamationCircle className="size-4" />
+                <span className="text-sm">Sobre</span>
+            </Link>
+            <NavUser baseUrl="/admin" />
+        </>
+    );
 }

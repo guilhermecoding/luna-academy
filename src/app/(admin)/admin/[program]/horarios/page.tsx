@@ -7,14 +7,18 @@ import { Metadata } from "next";
 import { getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
 import ListTimeSlots from "./_components/list-time-slots";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import TimeSlotSkeleton from "./_components/timeslot-skeleton";
+import { Suspense } from "react";
+import ButtonSkeleton from "@/components/skeletons/button-skeleton";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Configurar Horários",
 };
 
-export default async function TimeSlotsPage({
+async function AdminTimeSlotsPageContent({
     params,
-}: PageProps<"/admin/[program]/horarios">) {
+}: Omit<PageProps<"/admin/[program]/horarios">, "searchParams">) {
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
     const canWrite = userCanWrite(authResult.session.user);
@@ -37,19 +41,33 @@ export default async function TimeSlotsPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        {canWrite && (
-                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/horarios/novo`}>
-                                <IconCirclePlusFilled className="size-5" />
-                                Adicionar Horário
-                            </ButtonLink>
-                        )}
+                        <Suspense fallback={<ButtonSkeleton />}>
+                            {canWrite && (
+                                <ButtonLink className="w-full sm:w-auto" href={`/admin/${program}/horarios/novo`}>
+                                    <IconCirclePlusFilled className="size-5" />
+                                    Adicionar Horário
+                                </ButtonLink>
+                            )}
+                        </Suspense>
                     </div>
                 </div>
             </Section>
 
             <Section className="mt-8">
-                <ListTimeSlots timeSlots={timeSlots} programSlug={program} />
+                <Suspense fallback={<TimeSlotSkeleton />}>
+                    <ListTimeSlots timeSlots={timeSlots} programSlug={program} />
+                </Suspense>
             </Section>
         </Page>
+    );
+}
+
+export default async function TimeSlotsPage({
+    params,
+}: PageProps<"/admin/[program]/horarios">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminTimeSlotsPageContent params={params} />
+        </Suspense>
     );
 }

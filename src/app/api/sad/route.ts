@@ -12,8 +12,13 @@ function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function isValidUUID(uuid: string): boolean {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
+function isValidCanonicalCode(key: string): boolean {
+    try {
+        const decoded = Buffer.from(key, "base64");
+        return decoded.length === 32 && decoded.toString("base64") === key;
+    } catch {
+        return false;
+    }
 }
 
 // ─── Tipagem do Response ────────────────────────────────────
@@ -151,9 +156,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             );
         }
 
-        if (typeof canonicalCode !== "string" || !isValidUUID(canonicalCode)) {
+        if (typeof canonicalCode !== "string" || !isValidCanonicalCode(canonicalCode)) {
             return NextResponse.json(
-                { success: false, error: "Código canônico em formato inválido. Deve ser um UUID.", code: "INVALID_CANONICAL_CODE" },
+                { success: false, error: "Código canônico em formato inválido. Deve ser uma chave base64 de 32 bytes.", code: "INVALID_CANONICAL_CODE" },
                 { status: 422 },
             );
         }
@@ -165,6 +170,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             );
         }
 
+        const expectedCanonicalCode = process.env.SAD_CANONICAL_CODE;
+        if (!expectedCanonicalCode) {
+            console.error("[API /api/sad] Código canônico não configurado no ambiente.");
+            return NextResponse.json(
+                { success: false, error: "Erro interno do servidor.", code: "INTERNAL_ERROR" },
+                { status: 500 },
+            );
+        }
+
+        if (canonicalCode !== expectedCanonicalCode) {
+            return NextResponse.json(
+                { success: false, error: "Código canônico inválido.", code: "CANONICAL_MISMATCH" },
+                { status: 403 },
+            );
+        }
+
         // 4. Buscar período pelo slug (código)
         const period = await prisma.period.findFirst({
             where: { slug: periodCode.trim() },
@@ -173,7 +194,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                 name: true,
                 startDate: true,
                 endDate: true,
-                canonicalCode: true,
                 program: {
                     select: { name: true },
                 },
@@ -184,14 +204,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return NextResponse.json(
                 { success: false, error: "Período não encontrado com o código informado.", code: "PERIOD_NOT_FOUND" },
                 { status: 404 },
-            );
-        }
-
-        // 5. Validar chave canônica
-        if (period.canonicalCode !== canonicalCode) {
-            return NextResponse.json(
-                { success: false, error: "Código canônico não corresponde ao período informado.", code: "CANONICAL_MISMATCH" },
-                { status: 403 },
             );
         }
 

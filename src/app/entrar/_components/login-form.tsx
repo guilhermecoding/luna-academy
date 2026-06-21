@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { IconLogin2, IconUserShield, IconSchool, IconLoader2 } from "@tabler/icons-react";
+import { IconLogin2, IconUserShield, IconSchool, IconLoader2, IconEye, IconEyeOff } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/@types/session-type";
 
@@ -42,6 +42,7 @@ export default function LoginForm() {
     const pathname = usePathname();
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<"admin" | "teacher">("teacher");
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         control,
@@ -57,6 +58,7 @@ export default function LoginForm() {
     useEffect(() => {
         reset(emptyLoginValues);
         setActiveTab("teacher");
+        setShowPassword(false);
     }, [pathname, reset]);
 
     useEffect(() => {
@@ -212,16 +214,31 @@ export default function LoginForm() {
                         name="password"
                         control={control}
                         render={({ field }) => (
-                            <Input
-                                {...field}
-                                id="password"
-                                type="password"
-                                placeholder="••••••••"
-                                className={cn(
-                                    "h-12 rounded-xl border-2 px-4 outline-none transition-all focus:ring-0 bg-background",
-                                    errors.password ? "border-destructive focus:border-destructive" : "border-foreground/20 focus:border-primary",
-                                )}
-                            />
+                            <div className="relative">
+                                <Input
+                                    {...field}
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    autoComplete="current-password"
+                                    placeholder="••••••••"
+                                    className={cn(
+                                        "h-12 rounded-xl border-2 px-4 pr-12 outline-none transition-all focus:ring-0 bg-background password-input-native-toggle-hidden",
+                                        errors.password ? "border-destructive focus:border-destructive" : "border-foreground/20 focus:border-primary",
+                                    )}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                                >
+                                    {showPassword ? (
+                                        <IconEyeOff className="size-5" />
+                                    ) : (
+                                        <IconEye className="size-5" />
+                                    )}
+                                </button>
+                            </div>
                         )}
                     />
                     {errors.password && (

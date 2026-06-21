@@ -2538,8 +2538,7 @@ export const PeriodScalarFieldEnum = {
   endDate: 'endDate',
   programId: 'programId',
   completedAt: 'completedAt',
-  slug: 'slug',
-  canonicalCode: 'canonicalCode'
+  slug: 'slug'
 } as const
 
 export type PeriodScalarFieldEnum = (typeof PeriodScalarFieldEnum)[keyof typeof PeriodScalarFieldEnum]

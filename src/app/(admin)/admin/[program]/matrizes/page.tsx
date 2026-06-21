@@ -7,14 +7,17 @@ import { Metadata } from "next";
 import ListDegrees from "./_components/list-degrees";
 import { getProgramBySlug } from "@/services/programs/programs.service";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import { Suspense } from "react";
+import ButtonSkeleton from "@/components/skeletons/button-skeleton";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Matrizes Curriculares",
 };
 
-export default async function DegreesPage({
+async function AdminDegreesPageContent({
     params,
-}: PageProps<"/admin/[program]/matrizes">) {
+}: Omit<PageProps<"/admin/[program]/matrizes">, "searchParams">) {
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
     const canWrite = userCanWrite(authResult.session.user);
@@ -34,12 +37,14 @@ export default async function DegreesPage({
                         />
                     </div>
                     <div className="flex flex-1 justify-end items-end">
-                        {canWrite && (
-                            <ButtonLink className="w-full sm:w-auto" href={`/admin/${programSlug}/matrizes/novo`}>
-                                <IconCirclePlusFilled className="size-5" />
-                                Criar Matriz Curricular
-                            </ButtonLink>
-                        )}
+                        <Suspense fallback={<ButtonSkeleton />}>
+                            {canWrite && (
+                                <ButtonLink className="w-full sm:w-auto" href={`/admin/${programSlug}/matrizes/novo`}>
+                                    <IconCirclePlusFilled className="size-5" />
+                                    Criar Matriz Curricular
+                                </ButtonLink>
+                            )}
+                        </Suspense>
                     </div>
                 </div>
             </Section>
@@ -48,5 +53,15 @@ export default async function DegreesPage({
                 <ListDegrees programId={program.id} programSlug={programSlug} />
             </Section>
         </Page>
+    );
+}
+
+export default async function AdminDegreesPage({
+    params,
+}: PageProps<"/admin/[program]/matrizes">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <AdminDegreesPageContent params={params} />
+        </Suspense>
     );
 }
