@@ -1,5 +1,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import { AGE_RANGE_VALUES, type AgeRangeValue } from "@/lib/age-range";
+import { GENRE_VALUES, type GenreValue } from "@/lib/genre";
 import { cacheLife, cacheTag } from "next/cache";
 
 /**
@@ -125,6 +127,84 @@ export async function getTransferredStudentsCount(): Promise<number> {
             },
         },
     });
+}
+
+export type StudentsGenderDistribution = Record<GenreValue, number>;
+
+/**
+ * Retorna a distribuição de alunos por gênero.
+ */
+export async function getStudentsGenderDistribution(): Promise<StudentsGenderDistribution> {
+    "use cache";
+    cacheLife("days");
+    cacheTag("students-indicators");
+
+    const groups = await prisma.student.groupBy({
+        by: ["genre"],
+        _count: { _all: true },
+    });
+
+    const distribution = Object.fromEntries(
+        GENRE_VALUES.map((genre) => [genre, 0]),
+    ) as StudentsGenderDistribution;
+
+    for (const group of groups) {
+        distribution[group.genre] = group._count._all;
+    }
+
+    return distribution;
+}
+
+export type StudentsAgeRangeDistribution = Record<AgeRangeValue, number>;
+
+/**
+ * Retorna a distribuição de alunos por faixa etária (anos completos).
+ */
+export async function getStudentsAgeRangeDistribution(): Promise<StudentsAgeRangeDistribution> {
+    "use cache";
+    cacheLife("days");
+    cacheTag("students-indicators");
+
+    const [row] = await prisma.$queryRaw<
+        {
+            BABY: number;
+            CHILDREN_I: number;
+            CHILDREN_II: number;
+            TEEN: number;
+            YOUNG: number;
+            ADULT: number;
+            SENIOR: number;
+        }[]
+    >`
+        SELECT
+            COUNT(*) FILTER (WHERE age BETWEEN 0 AND 3)::int AS "BABY",
+            COUNT(*) FILTER (WHERE age BETWEEN 4 AND 8)::int AS "CHILDREN_I",
+            COUNT(*) FILTER (WHERE age BETWEEN 9 AND 12)::int AS "CHILDREN_II",
+            COUNT(*) FILTER (WHERE age BETWEEN 13 AND 16)::int AS "TEEN",
+            COUNT(*) FILTER (WHERE age BETWEEN 17 AND 24)::int AS "YOUNG",
+            COUNT(*) FILTER (WHERE age BETWEEN 25 AND 60)::int AS "ADULT",
+            COUNT(*) FILTER (WHERE age >= 61)::int AS "SENIOR"
+        FROM (
+            SELECT EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date))::int AS age
+            FROM public.students
+        ) AS student_ages
+    `;
+
+    if (!row) {
+        return Object.fromEntries(
+            AGE_RANGE_VALUES.map((range) => [range, 0]),
+        ) as StudentsAgeRangeDistribution;
+    }
+
+    return {
+        BABY: row.BABY,
+        CHILDREN_I: row.CHILDREN_I,
+        CHILDREN_II: row.CHILDREN_II,
+        TEEN: row.TEEN,
+        YOUNG: row.YOUNG,
+        ADULT: row.ADULT,
+        SENIOR: row.SENIOR,
+    };
 }
 
 /**
