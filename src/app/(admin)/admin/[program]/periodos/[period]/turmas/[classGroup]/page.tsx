@@ -5,7 +5,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getStudentCountByClassGroupId, getStudentsByClassGroupList } from "@/services/students/students.service";
-import { IconBooks, IconClockHour2, IconPencil, IconSchool, IconUsers } from "@tabler/icons-react";
+import { IconBooks, IconChevronRight, IconClockHour2, IconPencil, IconSchool, IconUsers } from "@tabler/icons-react";
 import { notFound } from "next/navigation";
 import InfoBoxPeriod from "../../_components/info-box-period";
 import ListDisciplines from "../_components/list-disciplines";
@@ -16,6 +16,7 @@ import { AddStudentsToClassSheet } from "./_components/add-students-to-class-she
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Detalhes da Turma",
@@ -110,11 +111,19 @@ async function AdminClassPageContent({
             </Section>
 
             <Section className="mt-12">
-                <div className="flex flex-row items-center gap-2 mb-6">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                        <IconBooks className="size-5 text-primary" />
+                <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+                    <div className="flex flex-row items-center gap-2">
+                        <div className="bg-primary/10 p-2 rounded-lg">
+                            <IconBooks className="size-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-bold text-foreground">Disciplinas Ofertadas</h2>
                     </div>
-                    <h2 className="text-xl font-bold text-foreground">Disciplinas Ofertadas</h2>
+                    <Link href={`/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas`}
+                        className="flex flex-row items-center mt-2 sm:mt-0 gap-1 text-sm text-muted-foreground hover:text-muted-foreground/80 transition-colors"
+                    >
+                        Todas as disciplinas
+                        <IconChevronRight className="size-3 shrink-0" />
+                    </Link>
                 </div>
 
                 <ListDisciplines
