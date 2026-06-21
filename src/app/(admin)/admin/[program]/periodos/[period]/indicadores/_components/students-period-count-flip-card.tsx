@@ -46,7 +46,7 @@ export default function StudentsPeriodCountFlipCard({ periodId }: { periodId: st
         <WrapperFlipCardIndicator
             title="Total de alunos"
             icon={<IconUsers className="size-5" />}
-            className="w-max"
+            className="w-max min-w-68"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <StudentsPeriodCountFlipCardContent periodId={periodId} />
