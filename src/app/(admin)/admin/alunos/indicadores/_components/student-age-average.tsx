@@ -19,7 +19,7 @@ async function StudentAgeAverageContent() {
 export default function StudentAgeAverage() {
     return (
         <WrapperFlipCardIndicator
-            title="Idade Média"
+            title="Idade média"
             icon={<IconGenderAgender className="size-6" />}
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
