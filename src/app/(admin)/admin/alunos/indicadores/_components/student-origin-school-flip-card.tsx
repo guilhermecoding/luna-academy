@@ -1,5 +1,18 @@
 import WrapperFlipCardIndicator from "@/components/wrapper-flip-card-indicator";
+import { getTransferredStudentsCount } from "@/services/students/students.service";
 import { IconSwipeRightFilled } from "@tabler/icons-react";
+import { Suspense } from "react";
+import FlipCardValueSkeleton from "../../../../../../components/skeletons/flip-card-value-skeleton";
+
+async function StudentOriginSchoolContent() {
+    const count = await getTransferredStudentsCount();
+
+    return (
+        <div className="py-4">
+            <span className="text-foreground text-3xl font-bold">{count}</span>
+        </div>
+    );
+}
 
 export default function StudentOriginSchoolFlipCard() {
     return (
@@ -7,9 +20,9 @@ export default function StudentOriginSchoolFlipCard() {
             title="Transferidos de outras escolas"
             icon={<IconSwipeRightFilled className="size-5" />}
         >
-            <div className="py-4">
-                <span className="text-foreground text-3xl font-bold ">135</span>
-            </div>
+            <Suspense fallback={<FlipCardValueSkeleton />}>
+                <StudentOriginSchoolContent />
+            </Suspense>
         </WrapperFlipCardIndicator>
     );
 }

@@ -92,6 +92,42 @@ export async function getTotalStudentsCount(): Promise<number> {
 }
 
 /**
+ * Retorna a idade média dos alunos (anos completos), calculada no banco.
+ */
+export async function getStudentsAverageAge(): Promise<number | null> {
+    "use cache";
+    cacheLife("days");
+    cacheTag("students-indicators");
+
+    const [row] = await prisma.$queryRaw<{ average_age: number | null }[]>`
+        SELECT ROUND(AVG(EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date))))::int AS average_age
+        FROM public.students
+    `;
+
+    return row?.average_age ?? null;
+}
+
+/**
+ * Retorna a quantidade de alunos com escola de origem informada.
+ */
+export async function getTransferredStudentsCount(): Promise<number> {
+    "use cache";
+    cacheLife("days");
+    cacheTag("students-indicators");
+
+    return await prisma.student.count({
+        where: {
+            originSchool: {
+                not: null,
+            },
+            NOT: {
+                originSchool: "",
+            },
+        },
+    });
+}
+
+/**
  * Retorna a lista de alunos do sistema, com opção de filtro pelo nome ou CPF.
  */
 export async function getStudentsList(query?: string) {

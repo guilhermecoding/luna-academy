@@ -27,6 +27,7 @@ export async function createStudentAction(data: CreateStudentData, periodId?: st
 
         updateTag("students-list");
         updateTag("students-count");
+        updateTag("students-indicators");
         if (periodId) {
             updateTag(`period:${periodId}:students-list`);
             updateTag(`period:${periodId}:students-count`);
@@ -79,6 +80,7 @@ export async function editStudentAction(id: string, data: EditStudentData) {
         });
 
         updateTag("students-list");
+        updateTag("students-indicators");
         updateTag(`student-${id}`);
 
     } catch (error) {
@@ -137,6 +139,7 @@ export async function deleteStudentAction(studentId: string, adminPasswordConfir
 
         updateTag("students-list");
         updateTag("students-count");
+        updateTag("students-indicators");
         updateTag(`student-${studentId}`);
 
         return { success: true };
@@ -259,6 +262,7 @@ export async function importStudentsAction(formData: FormData): Promise<ImportRe
 
         updateTag("students-list");
         updateTag("students-count");
+        updateTag("students-indicators");
         if (periodId) {
             updateTag(`period:${periodId}:students-list`);
             updateTag(`period:${periodId}:students-count`);
