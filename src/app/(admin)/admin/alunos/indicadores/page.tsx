@@ -6,6 +6,11 @@ import StudentsCountFlipCard from "./_components/students-count-flip-card";
 import StudentAgeAverage from "./_components/student-age-average";
 import StudentOriginSchoolFlipCard from "./_components/student-origin-school-flip-card";
 import StudentsIndicatorsCharts from "./_components/students-indicators-charts";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Indicadores Gerais dos Alunos",
+};
 
 export default function AdminStudentsIndicatorsPage() {
     return (
@@ -16,7 +21,7 @@ export default function AdminStudentsIndicatorsPage() {
                     <p className="text-muted-foreground font-bold">Alunos</p>
                 </div>
                 <TitlePage
-                    title="Indicadores"
+                    title="Indicadores Gerais dos Alunos"
                 />
                 <div className="flex sm:hidden flex-row items-start sm:items-center text-muted-foreground gap-1 shrink-0">
                     <IconAlertSquareRounded className="size-3 mt-0.5 shrink-0" />
