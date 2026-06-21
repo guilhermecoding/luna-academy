@@ -182,7 +182,6 @@ model Period {
   programId      String          @map("id_program") @db.Uuid
   completedAt    DateTime?       @map("completed_at") @db.Timestamptz(6)
   slug           String
-  canonicalCode  String?         @unique @default(dbgenerated("gen_random_uuid()")) @map("canonical_code") @db.Uuid
   classGroups    ClassGroup[]
   courses        Course[]
   program        Program         @relation(fields: [programId], references: [id])
@@ -350,20 +349,20 @@ model StudentPeriod {
 }
 
 model Lesson {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
-  courseId    String       @map("course_id") @db.Uuid
-  date        DateTime     @db.Date
-  topic       String
-  scheduleId  String?      @map("schedule_id") @db.Uuid
-  timeSlotId  String?      @map("time_slot_id") @db.Uuid
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  courseId            String       @map("course_id") @db.Uuid
+  date                DateTime     @db.Date
+  topic               String
+  scheduleId          String?      @map("schedule_id") @db.Uuid
+  timeSlotId          String?      @map("time_slot_id") @db.Uuid
   teacherId           String?      @map("teacher_id")
   attendanceUpdatedAt DateTime?    @map("attendance_updated_at") @db.Timestamptz(6)
   attendances         Attendance[]
-  course      Course       @relation(fields: [courseId], references: [id])
-  schedule    Schedule?    @relation(fields: [scheduleId], references: [id])
-  teacher     User?        @relation(fields: [teacherId], references: [id])
-  timeSlot    TimeSlot?    @relation(fields: [timeSlotId], references: [id])
+  course              Course       @relation(fields: [courseId], references: [id])
+  schedule            Schedule?    @relation(fields: [scheduleId], references: [id])
+  teacher             User?        @relation(fields: [teacherId], references: [id])
+  timeSlot            TimeSlot?    @relation(fields: [timeSlotId], references: [id])
 
   @@map("lessons")
   @@schema("public")

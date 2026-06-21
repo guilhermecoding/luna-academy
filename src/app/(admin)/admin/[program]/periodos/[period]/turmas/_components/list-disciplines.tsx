@@ -222,14 +222,13 @@ function ListDisciplinesContent({
                                 <td className="px-4 sm:px-6 py-4">
                                     <div className="flex justify-center">
                                         {course.room ? (
-                                            <div className="w-full max-w-30 space-y-1">
+                                            <div className="w-full max-w-30 space-y-1 text-center">
                                                 <div className="flex items-center justify-center gap-2 text-[10px]">
                                                     <span className={`font-bold ${roomColor?.text}`}>
                                                         <span className="text-base">{enrolled}</span>
                                                         <span className="text-base text-muted-foreground px-0.5">/</span>
                                                         <span className="text-sm text-muted-foreground">{roomCapacity}</span>
                                                     </span>
-                                                    <span className="text-muted-foreground">({Math.round(occupancyPct)}% {overbookingPct > 0 ? ` + ${Math.round(overbookingPct)}% overbooking` : ""})</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-primary/10 dark:bg-muted rounded-full overflow-hidden">
                                                     <div
@@ -237,6 +236,7 @@ function ListDisciplinesContent({
                                                         style={{ width: `${occupancyPct}%` }}
                                                     />
                                                 </div>
+                                                <span className="text-xs text-center text-muted-foreground">({overbookingPct > 0 ? `${Math.round(overbookingPct)}% acima` : `${Math.round(occupancyPct)}%`})</span>
                                             </div>
                                         ) : (
                                             <span className="text-muted-foreground/30 text-[10px]">—</span>

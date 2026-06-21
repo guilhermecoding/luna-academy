@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { IconCalendarFilled, IconDeviceAnalytics, IconDotsVerticalFilled, IconFileTextFilled, IconPencilFilled } from "@tabler/icons-react";
+import { IconCalendarFilled, IconDotsVerticalFilled, IconFileTextFilled, IconPencilFilled, IconReportSearch } from "@tabler/icons-react";
 import Link from "next/link";
 import { useCanWrite } from "@/components/write-access-provider";
 
@@ -117,8 +117,8 @@ export default function ItemPeriod({
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                         <Link href={`/admin/${programSlug}/periodos/${periodSlug}/sad`} className="flex flex-row items-center gap-2 text-sm text-muted-foreground/90">
-                            <IconDeviceAnalytics className="size-5" />
-                            <span>Monitoramento SAD</span>
+                            <IconReportSearch className="size-5" />
+                            <span>SAD</span>
                         </Link>
                     </DropdownMenuItem>
                 </DropdownMenuContent>

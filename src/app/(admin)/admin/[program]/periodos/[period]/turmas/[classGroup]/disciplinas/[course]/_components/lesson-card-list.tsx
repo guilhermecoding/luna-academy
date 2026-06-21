@@ -1,24 +1,21 @@
 "use client";
 
-import { IconCalendarEvent, IconClock, IconPencil } from "@tabler/icons-react";
+import { IconCalendarEvent, IconClock, IconPencil, IconArrowRight } from "@tabler/icons-react";
 import type { LessonListItem } from "@/services/lessons/lessons.service";
 import { EditLessonSheet, type ScheduleOption } from "./edit-lesson-dialog";
 import Link from "next/link";
 import { useCanWrite } from "@/components/write-access-provider";
-
-interface UpcomingLesson {
-    date: string; // YYYY-MM-DD
-    dayOfWeek: string;
-    scheduleId: string;
-    timeSlotName: string;
-    startTime: string;
-    endTime: string;
-    teacherName: string | null;
-}
+import {
+    mergeAndSortLessons,
+    type MergedLessonItem,
+    type UpcomingLesson,
+} from "@/lib/lesson-schedule-utils";
+import { ButtonLink } from "@/components/ui/button-link";
 
 interface LessonCardListProps {
     lessons: LessonListItem[];
-    upcomingLessons: UpcomingLesson[];
+    upcomingLessons?: UpcomingLesson[];
+    items?: MergedLessonItem[];
     basePath: string;
     programSlug: string;
     periodSlug: string;
@@ -26,6 +23,15 @@ interface LessonCardListProps {
     courseCode: string;
     schedules: ScheduleOption[];
     canWrite?: boolean;
+    /** Exibe no máximo N aulas registradas (preview na página da disciplina). */
+    registeredLimit?: number;
+    /** Inclui aulas previstas não registradas. */
+    showUpcoming?: boolean;
+    /** Lista plana, sem seções de pendentes/realizadas. */
+    variant?: "grouped" | "flat";
+    viewAllHref?: string;
+    totalRegisteredCount?: number;
+    emptyMessage?: string;
 }
 
 function formatDate(date: Date | string) {
@@ -44,50 +50,47 @@ function formatWeekDay(date: Date | string) {
     }).format(new Date(date));
 }
 
-type MergedItem =
-    | { type: "lesson"; data: LessonListItem }
-    | { type: "upcoming"; data: UpcomingLesson };
-
-function mergeAndSort(lessons: LessonListItem[], upcoming: UpcomingLesson[]): MergedItem[] {
-    // Mapear datas+timeslots que já foram criadas
-
-    // Filtrar upcoming que não colidem com lessons criadas
-    const filteredUpcoming = upcoming.filter((u) => {
-        // Buscar por data+timeSlot direto
-        return !lessons.some((l) => {
-            const ld = new Date(l.date).toISOString().split("T")[0];
-            return ld === u.date && l.timeSlotId === u.scheduleId;
-        });
-    });
-
-    const items: MergedItem[] = [
-        ...lessons.map((l) => ({ type: "lesson" as const, data: l })),
-        ...filteredUpcoming.map((u) => ({ type: "upcoming" as const, data: u })),
-    ];
-
-    items.sort((a, b) => {
-        const dateA = a.type === "lesson" ? new Date(a.data.date).getTime() : new Date(a.data.date + "T00:00:00Z").getTime();
-        const dateB = b.type === "lesson" ? new Date(b.data.date).getTime() : new Date(b.data.date + "T00:00:00Z").getTime();
-        return dateA - dateB;
-    });
-
-    return items;
-}
-
 export default function LessonCardList({
-    lessons, upcomingLessons, basePath, programSlug, periodSlug, classGroupSlug, courseCode, schedules, canWrite: canWriteProp,
+    lessons,
+    upcomingLessons = [],
+    items: itemsProp,
+    basePath,
+    programSlug,
+    periodSlug,
+    classGroupSlug,
+    courseCode,
+    schedules,
+    canWrite: canWriteProp,
+    registeredLimit,
+    showUpcoming = true,
+    variant = "grouped",
+    viewAllHref,
+    totalRegisteredCount,
+    emptyMessage,
 }: LessonCardListProps) {
     const canWriteFromContext = useCanWrite();
     const canWrite = canWriteProp ?? canWriteFromContext;
-    const items = mergeAndSort(lessons, upcomingLessons);
+
+    const registeredLessons = registeredLimit != null
+        ? [...lessons]
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .slice(0, registeredLimit)
+        : lessons;
+
+    const items = itemsProp ?? mergeAndSortLessons(
+        registeredLessons,
+        showUpcoming ? upcomingLessons : [],
+    );
+
+    const registeredTotal = totalRegisteredCount ?? lessons.length;
 
     if (items.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-surface-border rounded-4xl">
                 <IconCalendarEvent className="size-12 text-muted-foreground mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold">Nenhuma aula registrada</h3>
+                <h3 className="text-lg font-semibold">Nenhuma aula encontrada</h3>
                 <p className="text-muted-foreground mt-2 max-w-sm">
-                    Configure os horários da disciplina ou clique em &quot;Nova Aula&quot; para registrar aulas manualmente.
+                    {emptyMessage ?? "Configure os horários da disciplina ou registre aulas na página completa."}
                 </p>
             </div>
         );
@@ -96,17 +99,7 @@ export default function LessonCardList({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const pendingItems = items.filter(item => {
-        if (item.type === "upcoming") return true;
-        return !item.data.attendanceUpdatedAt;
-    });
-
-    const realizedItems = items.filter(item => {
-        if (item.type === "lesson") return !!item.data.attendanceUpdatedAt;
-        return false;
-    });
-
-    const renderItem = (item: MergedItem, index: number) => {
+    const renderItem = (item: MergedLessonItem, index: number) => {
         if (item.type === "lesson") {
             const lesson = item.data;
             const isLate = !lesson.attendanceUpdatedAt && new Date(lesson.date).getTime() < today.getTime();
@@ -140,6 +133,11 @@ export default function LessonCardList({
                                 {isLate && (
                                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-amber-200 text-amber-800 dark:bg-amber-900 dark:text-amber-300 uppercase tracking-wider font-black">
                                         Chamada Pendente
+                                    </span>
+                                )}
+                                {lesson.attendanceUpdatedAt && (
+                                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-emerald-200 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 uppercase tracking-wider font-black">
+                                        Fechada
                                     </span>
                                 )}
                             </h3>
@@ -188,7 +186,6 @@ export default function LessonCardList({
             );
         }
 
-        // Upcoming
         const upcoming = item.data;
         const upcomingDate = new Date(upcoming.date + "T00:00:00Z");
         const uDay = upcomingDate.getUTCDate().toString().padStart(2, "0");
@@ -206,7 +203,7 @@ export default function LessonCardList({
 
                     <div className="flex-1 min-w-0 pr-12">
                         <h3 className="font-medium text-muted-foreground text-sm sm:text-base truncate">
-                            Aula prevista
+                            Aula prevista — não registrada
                         </h3>
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 overflow-hidden">
                             <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground whitespace-nowrap">
@@ -252,29 +249,59 @@ export default function LessonCardList({
         );
     };
 
+    const pendingItems = items.filter((item) => {
+        if (item.type === "upcoming") return true;
+        return !item.data.attendanceUpdatedAt;
+    });
+
+    const realizedItems = items.filter((item) => {
+        if (item.type === "lesson") return !!item.data.attendanceUpdatedAt;
+        return false;
+    });
+
     return (
-        <div className="space-y-8">
-            {pendingItems.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-2">
-                        <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
-                        Próximas Aulas e Pendências
-                    </h2>
-                    <div className="space-y-3">
-                        {pendingItems.map((item, index) => renderItem(item, index))}
-                    </div>
+        <div className="space-y-6">
+            {variant === "flat" ? (
+                <div className="space-y-3">
+                    {items.map((item, index) => renderItem(item, index))}
+                </div>
+            ) : (
+                <div className="space-y-8">
+                    {pendingItems.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-2">
+                                <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                Próximas Aulas e Pendências
+                            </h2>
+                            <div className="space-y-3">
+                                {pendingItems.map((item, index) => renderItem(item, index))}
+                            </div>
+                        </div>
+                    )}
+
+                    {realizedItems.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-2">
+                                <span className="size-1.5 rounded-full bg-emerald-500" />
+                                Aulas Realizadas
+                            </h2>
+                            <div className="space-y-3">
+                                {realizedItems.map((item, index) => renderItem(item, index))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
-            {realizedItems.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1 flex items-center gap-2">
-                        <span className="size-1.5 rounded-full bg-emerald-500" />
-                        Aulas Realizadas
-                    </h2>
-                    <div className="space-y-3">
-                        {realizedItems.map((item, index) => renderItem(item, index))}
-                    </div>
+            {viewAllHref && registeredTotal > (registeredLimit ?? 0) && (
+                <div className="flex justify-center pt-2">
+                    <ButtonLink
+                        href={viewAllHref}
+                        className="bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
+                    >
+                        Ver todas as aulas ({registeredTotal})
+                        <IconArrowRight className="size-4" />
+                    </ButtonLink>
                 </div>
             )}
         </div>
