@@ -1,7 +1,6 @@
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
-import { ButtonLink } from "@/components/ui/button-link";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
@@ -15,7 +14,7 @@ import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 import { generateUpcomingLessons, type LessonFilter } from "@/lib/lesson-schedule-utils";
 import { CreateLessonSheet } from "../_components/create-lesson-dialog";
 import { LessonsFilteredList } from "../_components/lessons-filtered-list";
-import { IconArrowLeft, IconCalendarEvent } from "@tabler/icons-react";
+import { IconCalendarEvent } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
     title: "Aulas da Disciplina",

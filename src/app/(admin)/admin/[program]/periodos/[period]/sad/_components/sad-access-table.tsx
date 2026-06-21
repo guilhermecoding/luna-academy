@@ -193,7 +193,7 @@ export function SADAccessTable({ data, currentFilter }: SADAccessTableProps) {
 
     return (
         <div className="space-y-4">
-            <div className="rounded-md border border-surface-border overflow-hidden bg-background">
+            <div className="rounded-3xl border border-surface-border overflow-hidden bg-background">
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between px-4 py-3 border-b border-surface-border bg-surface">
                     <div className="w-full sm:max-w-xs flex flex-row items-center gap-2 px-4 py-1 rounded-full border border-input bg-background transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
@@ -222,7 +222,7 @@ export function SADAccessTable({ data, currentFilter }: SADAccessTableProps) {
                             className="rounded-full text-xs px-2 py-4"
                         >
                             <IconCheck className="size-3 mr-1" />
-                            Visualizados
+                            Vistos
                         </Button>
                         <Button
                             variant={activeFilter === "NOT_VIEWED" ? "default" : "ghost"}
