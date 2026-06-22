@@ -1,5 +1,10 @@
+import { Shift } from "@/generated/prisma/enums";
+import { type AgeRangeValue } from "@/lib/age-range";
+import { type GenreValue } from "@/lib/genre";
 import prisma from "@/lib/prisma";
 import { cacheLife, cacheTag } from "next/cache";
+
+const PERIOD_SHIFTS = [Shift.MORNING, Shift.AFTERNOON, Shift.EVENING] as const;
 
 function computeTrend(current: number, previous: number | null): {
     delta: number | null;
@@ -46,6 +51,25 @@ export type PeriodSADAccessStats = {
 export type PeriodStudentProfileStats = {
     averageAge: number | null;
     transferredCount: number;
+};
+
+export type PeriodStudentDemographics = {
+    gender: Record<GenreValue, number>;
+    ageRange: Record<AgeRangeValue, number>;
+};
+
+export type PeriodProportionStats = {
+    enrolled: number;
+    waiting: number;
+    sadViewed: number;
+    sadNotViewed: number;
+    transferred: number;
+    notTransferred: number;
+};
+
+export type PeriodStructureDistribution = {
+    byShift: { shift: Shift; count: number }[];
+    byClassGroup: { name: string; count: number }[];
 };
 
 /**
@@ -262,5 +286,185 @@ export async function getPeriodStudentProfileStats(periodId: string): Promise<Pe
     return {
         averageAge: row?.average_age ?? null,
         transferredCount: row?.transferred_count ?? 0,
+    };
+}
+
+/**
+ * Distribuição demográfica dos alunos vinculados ao período (gênero + faixa etária).
+ */
+export async function getPeriodStudentDemographics(periodId: string): Promise<PeriodStudentDemographics> {
+    "use cache";
+    cacheLife("days");
+    cacheTag(`period:${periodId}:indicators`);
+
+    const [row] = await prisma.$queryRaw<{
+        male: number;
+        female: number;
+        non_binary: number;
+        prefer_not_to_say: number;
+        baby: number;
+        children_i: number;
+        children_ii: number;
+        teen: number;
+        young: number;
+        adult: number;
+        senior: number;
+    }[]>`
+        WITH period_students AS (
+            SELECT
+                s.genre,
+                EXTRACT(YEAR FROM AGE(CURRENT_DATE, s.birth_date))::int AS age
+            FROM public.students s
+            INNER JOIN public.student_periods sp ON sp.student_id = s.id
+            WHERE sp.period_id = ${periodId}::uuid
+        )
+        SELECT
+            COUNT(*) FILTER (WHERE genre = 'MALE')::int AS male,
+            COUNT(*) FILTER (WHERE genre = 'FEMALE')::int AS female,
+            COUNT(*) FILTER (WHERE genre = 'NON_BINARY')::int AS non_binary,
+            COUNT(*) FILTER (WHERE genre = 'PREFER_NOT_TO_SAY')::int AS prefer_not_to_say,
+            COUNT(*) FILTER (WHERE age BETWEEN 0 AND 3)::int AS baby,
+            COUNT(*) FILTER (WHERE age BETWEEN 4 AND 8)::int AS children_i,
+            COUNT(*) FILTER (WHERE age BETWEEN 9 AND 12)::int AS children_ii,
+            COUNT(*) FILTER (WHERE age BETWEEN 13 AND 16)::int AS teen,
+            COUNT(*) FILTER (WHERE age BETWEEN 17 AND 24)::int AS young,
+            COUNT(*) FILTER (WHERE age BETWEEN 25 AND 60)::int AS adult,
+            COUNT(*) FILTER (WHERE age >= 61)::int AS senior
+        FROM period_students
+    `;
+
+    return {
+        gender: {
+            MALE: row?.male ?? 0,
+            FEMALE: row?.female ?? 0,
+            NON_BINARY: row?.non_binary ?? 0,
+            PREFER_NOT_TO_SAY: row?.prefer_not_to_say ?? 0,
+        },
+        ageRange: {
+            BABY: row?.baby ?? 0,
+            CHILDREN_I: row?.children_i ?? 0,
+            CHILDREN_II: row?.children_ii ?? 0,
+            TEEN: row?.teen ?? 0,
+            YOUNG: row?.young ?? 0,
+            ADULT: row?.adult ?? 0,
+            SENIOR: row?.senior ?? 0,
+        },
+    };
+}
+
+/**
+ * Proporções de matrícula, acesso ao SAD e transferência para gráficos do período.
+ */
+export async function getPeriodProportionStats(periodId: string): Promise<PeriodProportionStats> {
+    "use cache";
+    cacheLife("days");
+    cacheTag(`period:${periodId}:indicators`);
+
+    const [row] = await prisma.$queryRaw<{
+        enrolled: number;
+        waiting: number;
+        sad_viewed: number;
+        sad_not_viewed: number;
+        transferred: number;
+        not_transferred: number;
+    }[]>`
+        WITH period_students AS (
+            SELECT
+                sp.student_id,
+                sp.status,
+                sp.accessed_at,
+                s.origin_school,
+                EXISTS (
+                    SELECT 1
+                    FROM public.enrollments e
+                    JOIN public.courses c ON c.id = e.course_id
+                    WHERE e.student_id = sp.student_id
+                      AND c.period_id = ${periodId}::uuid
+                      AND c.class_group_id IS NOT NULL
+                ) AS is_class_enrolled
+            FROM public.student_periods sp
+            INNER JOIN public.students s ON s.id = sp.student_id
+            WHERE sp.period_id = ${periodId}::uuid
+        )
+        SELECT
+            COUNT(*) FILTER (WHERE status = 'ENROLLED')::int AS enrolled,
+            COUNT(*) FILTER (WHERE status = 'WAITING')::int AS waiting,
+            COUNT(*) FILTER (WHERE is_class_enrolled AND accessed_at IS NOT NULL)::int AS sad_viewed,
+            COUNT(*) FILTER (WHERE is_class_enrolled AND accessed_at IS NULL)::int AS sad_not_viewed,
+            COUNT(*) FILTER (
+                WHERE origin_school IS NOT NULL AND origin_school <> ''
+            )::int AS transferred,
+            COUNT(*) FILTER (
+                WHERE origin_school IS NULL OR origin_school = ''
+            )::int AS not_transferred
+        FROM period_students
+    `;
+
+    return {
+        enrolled: row?.enrolled ?? 0,
+        waiting: row?.waiting ?? 0,
+        sadViewed: row?.sad_viewed ?? 0,
+        sadNotViewed: row?.sad_not_viewed ?? 0,
+        transferred: row?.transferred ?? 0,
+        notTransferred: row?.not_transferred ?? 0,
+    };
+}
+
+/**
+ * Distribuição de alunos por turno e por turma no período.
+ */
+export async function getPeriodStructureDistribution(periodId: string): Promise<PeriodStructureDistribution> {
+    "use cache";
+    cacheLife("days");
+    cacheTag(`period:${periodId}:indicators`);
+
+    const [row] = await prisma.$queryRaw<{
+        by_shift: { shift: string; count: number }[] | null;
+        by_class_group: { name: string; count: number }[] | null;
+    }[]>`
+        WITH shift_counts AS (
+            SELECT
+                cg.shift::text AS shift,
+                COUNT(DISTINCT e.student_id)::int AS count
+            FROM public.class_groups cg
+            JOIN public.courses c ON c.class_group_id = cg.id
+            JOIN public.enrollments e ON e.course_id = c.id
+            WHERE cg.period_id = ${periodId}::uuid
+            GROUP BY cg.shift
+        ),
+        class_group_counts AS (
+            SELECT
+                cg.name,
+                COUNT(DISTINCT e.student_id)::int AS count
+            FROM public.class_groups cg
+            LEFT JOIN public.courses c ON c.class_group_id = cg.id
+            LEFT JOIN public.enrollments e ON e.course_id = c.id
+            WHERE cg.period_id = ${periodId}::uuid
+            GROUP BY cg.id, cg.name
+        )
+        SELECT
+            COALESCE(
+                (SELECT json_agg(json_build_object('shift', shift, 'count', count)) FROM shift_counts),
+                '[]'::json
+            ) AS by_shift,
+            COALESCE(
+                (
+                    SELECT json_agg(json_build_object('name', name, 'count', count) ORDER BY count DESC, name ASC)
+                    FROM class_group_counts
+                ),
+                '[]'::json
+            ) AS by_class_group
+    `;
+
+    const shiftCounts = new Map(
+        (row?.by_shift ?? []).map((entry) => [entry.shift, entry.count]),
+    );
+
+    return {
+        byShift: PERIOD_SHIFTS.map((shift) => ({
+            shift,
+            count: shiftCounts.get(shift) ?? 0,
+        })),
+        byClassGroup: row?.by_class_group ?? [],
     };
 }

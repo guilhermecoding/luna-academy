@@ -14,6 +14,7 @@ import AvgStudentsPerClassPeriodFlipCard from "./_components/avg-students-per-cl
 import SadAccessPeriodFlipCard from "./_components/sad-access-period-flip-card";
 import PeriodStudentsAgeAverageFlipCard from "./_components/period-students-age-average-flip-card";
 import PeriodOriginSchoolFlipCard from "./_components/period-origin-school-flip-card";
+import PeriodIndicatorsCharts from "./_components/period-indicators-charts";
 
 export const metadata: Metadata = {
     title: "Indicadores Gerais do Período",
@@ -59,6 +60,7 @@ export default async function AdminPeriodIndicatorsPage({
                     <ClassGroupsCountPeriodFlipCard periodId={periodId} />
                     <AvgStudentsPerClassPeriodFlipCard periodId={periodId} />
                 </div>
+                <PeriodIndicatorsCharts periodId={periodId} />
             </Section>
         </Page>
     );
