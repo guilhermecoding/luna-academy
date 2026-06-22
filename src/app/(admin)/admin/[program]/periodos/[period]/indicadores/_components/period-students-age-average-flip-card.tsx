@@ -21,7 +21,7 @@ export default function PeriodStudentsAgeAverageFlipCard({ periodId }: { periodI
         <WrapperFlipCardIndicator
             title="Idade média"
             icon={<IconGenderAgender className="size-6" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <PeriodStudentsAgeAverageFlipCardContent periodId={periodId} />

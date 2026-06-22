@@ -22,7 +22,7 @@ export default function EnrolledStudentsPeriodFlipCard({ periodId }: { periodId:
         <WrapperFlipCardIndicator
             title="Alunos matriculados"
             icon={<IconCircleCheck className="size-5" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <EnrolledStudentsPeriodFlipCardContent periodId={periodId} />

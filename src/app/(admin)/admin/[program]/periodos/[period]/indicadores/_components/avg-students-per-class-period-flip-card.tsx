@@ -21,7 +21,7 @@ export default function AvgStudentsPerClassPeriodFlipCard({ periodId }: { period
         <WrapperFlipCardIndicator
             title="Média alunos/turma"
             icon={<IconUsersGroup className="size-5" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <AvgStudentsPerClassPeriodFlipCardContent periodId={periodId} />

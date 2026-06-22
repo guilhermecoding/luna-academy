@@ -22,7 +22,7 @@ export default function WaitingStudentsPeriodFlipCard({ periodId }: { periodId: 
         <WrapperFlipCardIndicator
             title="Em espera"
             icon={<IconClock className="size-5" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <WaitingStudentsPeriodFlipCardContent periodId={periodId} />

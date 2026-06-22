@@ -48,7 +48,7 @@ export default async function AdminPeriodIndicatorsPage({
             </Section>
 
             <Section className="mt-8 flex flex-col gap-8">
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-8 @3xl/main:grid-cols-2 @6xl/main:grid-cols-3">
                     <StudentsPeriodCountFlipCard periodId={periodId} />
                     <PeriodStudentsAgeAverageFlipCard periodId={periodId} />
                     <PeriodOriginSchoolFlipCard periodId={periodId} />

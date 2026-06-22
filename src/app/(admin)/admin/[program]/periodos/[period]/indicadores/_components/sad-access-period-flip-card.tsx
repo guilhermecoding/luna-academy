@@ -22,7 +22,7 @@ export default function SadAccessPeriodFlipCard({ periodId }: { periodId: string
         <WrapperFlipCardIndicator
             title="Acesso ao SAD"
             icon={<IconReportSearch className="size-5" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <SadAccessPeriodFlipCardContent periodId={periodId} />

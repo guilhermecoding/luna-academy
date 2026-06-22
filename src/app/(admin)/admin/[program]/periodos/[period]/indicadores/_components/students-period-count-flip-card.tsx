@@ -22,7 +22,7 @@ export default function StudentsPeriodCountFlipCard({ periodId }: { periodId: st
         <WrapperFlipCardIndicator
             title="Total de alunos"
             icon={<IconUsers className="size-5" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <StudentsPeriodCountFlipCardContent periodId={periodId} />

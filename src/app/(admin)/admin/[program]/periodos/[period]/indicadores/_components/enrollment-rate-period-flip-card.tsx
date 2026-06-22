@@ -24,7 +24,7 @@ export default function EnrollmentRatePeriodFlipCard({ periodId }: { periodId: s
         <WrapperFlipCardIndicator
             title="Taxa de enturmação"
             icon={<IconProgress className="size-5" />}
-            className="w-86"
+            className="w-86 justify-self-center"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <EnrollmentRatePeriodFlipCardContent periodId={periodId} />
