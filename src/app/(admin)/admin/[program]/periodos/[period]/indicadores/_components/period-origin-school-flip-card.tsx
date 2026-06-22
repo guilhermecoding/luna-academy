@@ -19,6 +19,7 @@ export default function PeriodOriginSchoolFlipCard({ periodId }: { periodId: str
         <WrapperFlipCardIndicator
             title="Transferidos de outras escolas"
             icon={<IconSwipeRightFilled className="size-5" />}
+            className="w-86"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <PeriodOriginSchoolFlipCardContent periodId={periodId} />

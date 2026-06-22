@@ -19,6 +19,7 @@ export default function ClassGroupsCountPeriodFlipCard({ periodId }: { periodId:
         <WrapperFlipCardIndicator
             title="Total de turmas"
             icon={<IconSchool className="size-5" />}
+            className="w-86"
         >
             <Suspense fallback={<FlipCardValueSkeleton />}>
                 <ClassGroupsCountPeriodFlipCardContent periodId={periodId} />

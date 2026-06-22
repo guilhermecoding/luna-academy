@@ -50,20 +50,14 @@ export default async function AdminPeriodIndicatorsPage({
             <Section className="mt-8 flex flex-col gap-8">
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     <StudentsPeriodCountFlipCard periodId={periodId} />
+                    <PeriodStudentsAgeAverageFlipCard periodId={periodId} />
+                    <PeriodOriginSchoolFlipCard periodId={periodId} />
                     <EnrolledStudentsPeriodFlipCard periodId={periodId} />
                     <WaitingStudentsPeriodFlipCard periodId={periodId} />
                     <EnrollmentRatePeriodFlipCard periodId={periodId} />
-                </div>
-
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <SadAccessPeriodFlipCard periodId={periodId} />
                     <ClassGroupsCountPeriodFlipCard periodId={periodId} />
                     <AvgStudentsPerClassPeriodFlipCard periodId={periodId} />
-                    <SadAccessPeriodFlipCard periodId={periodId} />
-                </div>
-
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    <PeriodStudentsAgeAverageFlipCard periodId={periodId} />
-                    <PeriodOriginSchoolFlipCard periodId={periodId} />
                 </div>
             </Section>
         </Page>
