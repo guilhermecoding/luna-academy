@@ -261,7 +261,7 @@ export function AddStudentsToClassSheet({
                                     placeholder="Ex: 2024001, 2024002, 123.456.789-00&#10;Pode separar por vírgula ou nova linha.&#10;Alunos já matriculados serão ignorados."
                                     value={bulkInput}
                                     onChange={(e) => setBulkInput(e.target.value)}
-                                    className="min-h-37.5 rounded-2xl bg-background border-surface-border resize-none focus:ring-primary/20"
+                                    className="min-h-37.5 max-h-48 field-sizing-fixed overflow-y-auto rounded-2xl bg-background border-surface-border resize-none focus:ring-primary/20"
                                 />
                                 <div className="flex justify-center items-center">
                                     <Button
