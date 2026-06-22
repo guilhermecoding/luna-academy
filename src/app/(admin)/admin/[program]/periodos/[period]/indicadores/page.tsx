@@ -6,6 +6,14 @@ import TitlePage from "@/components/title-page";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { notFound } from "next/navigation";
 import StudentsPeriodCountFlipCard from "./_components/students-period-count-flip-card";
+import EnrolledStudentsPeriodFlipCard from "./_components/enrolled-students-period-flip-card";
+import WaitingStudentsPeriodFlipCard from "./_components/waiting-students-period-flip-card";
+import EnrollmentRatePeriodFlipCard from "./_components/enrollment-rate-period-flip-card";
+import ClassGroupsCountPeriodFlipCard from "./_components/class-groups-count-period-flip-card";
+import AvgStudentsPerClassPeriodFlipCard from "./_components/avg-students-per-class-period-flip-card";
+import SadAccessPeriodFlipCard from "./_components/sad-access-period-flip-card";
+import PeriodStudentsAgeAverageFlipCard from "./_components/period-students-age-average-flip-card";
+import PeriodOriginSchoolFlipCard from "./_components/period-origin-school-flip-card";
 
 export const metadata: Metadata = {
     title: "Indicadores Gerais do Período",
@@ -13,13 +21,15 @@ export const metadata: Metadata = {
 
 export default async function AdminPeriodIndicatorsPage({
     params,
-}: PageProps<"/admin/[program]/periodos/[period]">) {
+}: PageProps<"/admin/[program]/periodos/[period]/indicadores">) {
     const { program, period } = await params;
     const periodData = await getPeriodByProgramAndSlug(program, period);
 
     if (!periodData) {
         notFound();
     }
+
+    const periodId = periodData.id;
 
     return (
         <Page>
@@ -37,8 +47,24 @@ export default async function AdminPeriodIndicatorsPage({
                 </div>
             </Section>
 
-            <Section className="mt-8">
-                <StudentsPeriodCountFlipCard periodId={periodData.id} />
+            <Section className="mt-8 flex flex-col gap-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <StudentsPeriodCountFlipCard periodId={periodId} />
+                    <EnrolledStudentsPeriodFlipCard periodId={periodId} />
+                    <WaitingStudentsPeriodFlipCard periodId={periodId} />
+                    <EnrollmentRatePeriodFlipCard periodId={periodId} />
+                </div>
+
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <ClassGroupsCountPeriodFlipCard periodId={periodId} />
+                    <AvgStudentsPerClassPeriodFlipCard periodId={periodId} />
+                    <SadAccessPeriodFlipCard periodId={periodId} />
+                </div>
+
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <PeriodStudentsAgeAverageFlipCard periodId={periodId} />
+                    <PeriodOriginSchoolFlipCard periodId={periodId} />
+                </div>
             </Section>
         </Page>
     );

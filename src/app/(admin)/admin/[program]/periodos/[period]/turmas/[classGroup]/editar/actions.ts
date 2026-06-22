@@ -42,6 +42,7 @@ async function invalidateCachesForCourseClassGroups(
     }
     if (uniqueIds.length > 0) {
         updateTag(`period:${periodId}:class-groups`);
+        updateTag(`period:${periodId}:indicators`);
     }
     return slugs;
 }
@@ -227,6 +228,7 @@ export async function updateClassGroupAction(
         });
 
         updateTag(`period:${period.id}:class-groups`);
+        updateTag(`period:${period.id}:indicators`);
         updateTag(`period:${period.id}:class-group:${classGroupSlug}`);
         updateTag(`period:${period.id}:courses`); // Invalida pois o turno das disciplinas pode ter mudado
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas`);
@@ -279,6 +281,7 @@ export async function deleteClassGroupAction(
         await deleteClassGroup(classGroup.id);
 
         updateTag(`period:${period.id}:class-groups`);
+        updateTag(`period:${period.id}:indicators`);
         updateTag(`period:${period.id}:courses`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas`);
     } catch (error) {

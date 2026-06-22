@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { updateTag } from "next/cache";
 import prisma from "@/lib/prisma";
 
 // ─── Validações ────────────────────────────────────────────
@@ -256,6 +257,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             },
             data: { accessedAt: new Date() },
         });
+
+        updateTag(`period:${period.id}:indicators`);
+        updateTag(`period:${period.id}:sad-access`);
 
         // 8. Verificar se o aluno possui ao menos uma matrícula em turma deste período
         const enrollmentCount = await prisma.enrollment.count({

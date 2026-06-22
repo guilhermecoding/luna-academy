@@ -358,54 +358,14 @@ export async function getPeriodStudentsCountTrend(periodId: string): Promise<Per
     cacheLife("days");
     cacheTag(`period:${periodId}:students-count`);
 
-    const [row] = await prisma.$queryRaw<{
-        count: number;
-        previous_count: number | null;
-    }[]>`
-        WITH current_period AS (
-            SELECT id, id_program, start_date, created_at
-            FROM public.periods
-            WHERE id = ${periodId}::uuid
-        ),
-        previous_period AS (
-            SELECT p.id
-            FROM public.periods p
-            INNER JOIN current_period cp ON p.id_program = cp.id_program
-            WHERE p.start_date < cp.start_date
-               OR (p.start_date = cp.start_date AND p.created_at < cp.created_at)
-            ORDER BY p.start_date DESC, p.created_at DESC
-            LIMIT 1
-        )
-        SELECT
-            (SELECT COUNT(*)::int FROM public.student_periods sp WHERE sp.period_id = cp.id) AS count,
-            (
-                SELECT CASE
-                    WHEN EXISTS (SELECT 1 FROM previous_period)
-                    THEN (
-                        SELECT COUNT(*)::int
-                        FROM public.student_periods sp
-                        WHERE sp.period_id = (SELECT id FROM previous_period)
-                    )
-                    ELSE NULL
-                END
-            ) AS previous_count
-        FROM current_period cp
-    `;
+    const { getPeriodOperationalStats } = await import("@/services/periods/period-indicators.service");
+    const stats = await getPeriodOperationalStats(periodId);
 
-    if (!row) {
-        return { count: 0, delta: null, percentageChange: null };
-    }
-
-    if (row.previous_count === null) {
-        return { count: row.count, delta: null, percentageChange: null };
-    }
-
-    const delta = row.count - row.previous_count;
-    const percentageChange = row.previous_count > 0
-        ? Math.round((Math.abs(delta) / row.previous_count) * 100)
-        : (row.count > 0 ? 100 : 0);
-
-    return { count: row.count, delta, percentageChange };
+    return {
+        count: stats.total,
+        delta: stats.totalDelta,
+        percentageChange: stats.totalPercentageChange,
+    };
 }
 
 /**

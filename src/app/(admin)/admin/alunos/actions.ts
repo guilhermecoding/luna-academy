@@ -31,6 +31,7 @@ export async function createStudentAction(data: CreateStudentData, periodId?: st
         if (periodId) {
             updateTag(`period:${periodId}:students-list`);
             updateTag(`period:${periodId}:students-count`);
+            updateTag(`period:${periodId}:indicators`);
         }
 
     } catch (error) {
@@ -79,9 +80,17 @@ export async function editStudentAction(id: string, data: EditStudentData) {
             originSchool: parsedData.originSchool || null,
         });
 
+        const linkedPeriods = await prisma.studentPeriod.findMany({
+            where: { studentId: id },
+            select: { periodId: true },
+        });
+
         updateTag("students-list");
         updateTag("students-indicators");
         updateTag(`student-${id}`);
+        for (const { periodId } of linkedPeriods) {
+            updateTag(`period:${periodId}:indicators`);
+        }
 
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -134,6 +143,11 @@ export async function deleteStudentAction(studentId: string, adminPasswordConfir
             return { success: false, error: "Senha incorreta." };
         }
 
+        const linkedPeriods = await prisma.studentPeriod.findMany({
+            where: { studentId: studentId },
+            select: { periodId: true },
+        });
+
         const { deleteStudent } = await import("@/services/students/students.service");
         await deleteStudent(studentId);
 
@@ -141,6 +155,10 @@ export async function deleteStudentAction(studentId: string, adminPasswordConfir
         updateTag("students-count");
         updateTag("students-indicators");
         updateTag(`student-${studentId}`);
+        for (const { periodId } of linkedPeriods) {
+            updateTag(`period:${periodId}:students-count`);
+            updateTag(`period:${periodId}:indicators`);
+        }
 
         return { success: true };
     } catch (error) {
@@ -266,6 +284,7 @@ export async function importStudentsAction(formData: FormData): Promise<ImportRe
         if (periodId) {
             updateTag(`period:${periodId}:students-list`);
             updateTag(`period:${periodId}:students-count`);
+            updateTag(`period:${periodId}:indicators`);
         }
 
         return {
@@ -317,6 +336,7 @@ export async function unlinkStudentsFromPeriodAction(studentIds: string[], perio
 
         updateTag(`period:${periodId}:students-list`);
         updateTag(`period:${periodId}:students-count`);
+        updateTag(`period:${periodId}:indicators`);
         updateTag(`period:${periodId}:class-groups`);
         updateTag(`period:${periodId}`);
         updateTag(`program:${periodId}:periods`);
@@ -342,6 +362,7 @@ export async function enrollStudentsInClassGroupAction(studentIds: string[], cla
 
         updateTag(`period:${periodId}:students-list`);
         updateTag(`period:${periodId}:students-count`);
+        updateTag(`period:${periodId}:indicators`);
         updateTag(`period:${periodId}:available-students`);
         updateTag(`period:${periodId}:class-groups`);
         updateTag(`class-group:${classGroupId}:students-list`);
@@ -397,6 +418,7 @@ export async function unlinkStudentsFromClassGroupAction(studentIds: string[], c
 
         updateTag(`period:${periodId}:students-list`);
         updateTag(`period:${periodId}:students-count`);
+        updateTag(`period:${periodId}:indicators`);
         updateTag(`period:${periodId}:available-students`);
         updateTag(`period:${periodId}:class-groups`);
         updateTag(`class-group:${classGroupId}:students-list`);

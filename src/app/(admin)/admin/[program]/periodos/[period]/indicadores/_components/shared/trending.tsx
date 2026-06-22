@@ -21,10 +21,12 @@ export function TrendingTextIndicator({
     status,
     value,
     nextText = "",
+    suffix = "",
 }: {
     status: TrendingStatus,
     value: number
     nextText?: string
+    suffix?: string
 }) {
     return (
         <div className={cn("flex flex-row text-sm  text-muted-foreground items-center gap-1", {
@@ -34,7 +36,7 @@ export function TrendingTextIndicator({
         })}>
             <span>
                 {status === "up" ? "+" : status === "down" ? "-" : ""}
-                {value}
+                {value}{suffix}
             </span>
             <span className="text-muted-foreground">
                 {status === "up" ? "a mais que " : status === "down" ? "a menos que " : ""}

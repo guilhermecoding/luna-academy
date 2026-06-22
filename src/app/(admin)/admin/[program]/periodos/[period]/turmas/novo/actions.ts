@@ -36,6 +36,7 @@ export async function createClassAction(
 
         updateTag(`period:${period.id}:class-groups`);
         updateTag(`period:${period.id}:courses`);
+        updateTag(`period:${period.id}:indicators`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas`);
     } catch (error) {
         if (error instanceof ZodError) {
