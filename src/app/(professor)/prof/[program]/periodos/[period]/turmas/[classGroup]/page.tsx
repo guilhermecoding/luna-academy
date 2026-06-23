@@ -13,6 +13,7 @@ import { Shift } from "@/generated/prisma/enums";
 import { ClassGroupStudentsTable } from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/[classGroup]/_components/class-group-students-table";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { isTeacherAssignedToCourse } from "@/lib/schedule-teacher-utils";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 
@@ -48,8 +49,8 @@ async function ProfClassPageContent({
         notFound();
     }
 
-    const teacherCourses = classGroupData.courses.filter(course =>
-        course.schedules.some(schedule => schedule.teacherId === session.user.id),
+    const teacherCourses = classGroupData.courses.filter((course) =>
+        isTeacherAssignedToCourse(course, session.user.id),
     );
 
     const [studentCount, disciplinesCount, studentsList] = await Promise.all([

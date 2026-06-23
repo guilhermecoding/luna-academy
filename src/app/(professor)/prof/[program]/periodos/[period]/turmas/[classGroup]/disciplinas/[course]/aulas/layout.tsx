@@ -2,6 +2,7 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
+import { isTeacherAssignedToCourse } from "@/lib/schedule-teacher-utils";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/lib/auth";
@@ -33,8 +34,7 @@ async function CourseLessonsLayoutContent({
     const courseData = await getCourseByPeriodIdAndCode(periodData.id, courseCode);
     if (!courseData || courseData.classGroupId !== classGroup.id) return notFound();
 
-    // Validar se o professor ministra esta disciplina específica (através da grade horária)
-    const hasAccess = courseData.schedules.some(schedule => schedule.teacherId === session?.user?.id);
+    const hasAccess = isTeacherAssignedToCourse(courseData, session.user.id);
 
     if (!hasAccess) {
         redirect(`/prof/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}`);

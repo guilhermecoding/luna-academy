@@ -10,6 +10,7 @@ import { courseUpdateSchema, type CourseUpdateInput } from "../../schema";
 import { revalidatePath, updateTag } from "next/cache";
 import { DayOfWeek, Shift } from "@/generated/prisma/enums";
 import { editClassGroupSchema, type EditClassGroupInput } from "./schema";
+import { splitScheduleTeachers } from "@/lib/schedule-teacher-utils";
 
 const deleteCourseSchema = z.object({
     confirmationName: z.string().min(1, "Digite o nome da disciplina para confirmar"),
@@ -42,6 +43,7 @@ async function invalidateCachesForCourseClassGroups(
     }
     if (uniqueIds.length > 0) {
         updateTag(`period:${periodId}:class-groups`);
+        updateTag(`period:${periodId}:indicators`);
     }
     return slugs;
 }
@@ -87,12 +89,16 @@ export async function updateCourseAction(
             roomId: validatedData.roomId || null,
             shift: validatedData.shift as Shift,
             classGroupId: validatedData.classGroupId || null,
-            schedules: validatedData.schedules.map((s) => ({
-                dayOfWeek: s.dayOfWeek as DayOfWeek,
-                timeSlotId: s.timeSlotId,
-                teacherId: s.teacherId || null,
-                roomId: s.roomId || null,
-            })),
+            schedules: validatedData.schedules.map((s) => {
+                const { titularId, assistantIds } = splitScheduleTeachers(s.teachers);
+                return {
+                    dayOfWeek: s.dayOfWeek as DayOfWeek,
+                    timeSlotId: s.timeSlotId,
+                    teacherId: titularId,
+                    assistantIds,
+                    roomId: s.roomId || null,
+                };
+            }),
         });
 
         updateTag(`period:${course.periodId}:courses`);
@@ -227,6 +233,7 @@ export async function updateClassGroupAction(
         });
 
         updateTag(`period:${period.id}:class-groups`);
+        updateTag(`period:${period.id}:indicators`);
         updateTag(`period:${period.id}:class-group:${classGroupSlug}`);
         updateTag(`period:${period.id}:courses`); // Invalida pois o turno das disciplinas pode ter mudado
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas`);
@@ -279,6 +286,7 @@ export async function deleteClassGroupAction(
         await deleteClassGroup(classGroup.id);
 
         updateTag(`period:${period.id}:class-groups`);
+        updateTag(`period:${period.id}:indicators`);
         updateTag(`period:${period.id}:courses`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas`);
     } catch (error) {

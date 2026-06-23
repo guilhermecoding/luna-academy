@@ -93,7 +93,7 @@ Retornado quando o aluno possui ao menos uma matrícula em turma do período (`s
   "student": {
     "name": "Ana Clara Silva",
     "phone": "11999001001",
-    "school": "Escola Estadual Prof. Maria Luiza"
+    "originSchool": "Escola Estadual Prof. Maria Luiza"
   },
   "period": {
     "name": "Primeiro Semestre 2025",
@@ -149,7 +149,7 @@ Retornado quando o aluno possui ao menos uma matrícula em turma do período (`s
 | `status` | `"ENROLLED"` | Aluno matriculado em ao menos uma turma. |
 | `student.name` | `string` | Nome completo do aluno. |
 | `student.phone` | `string` | Telefone de contato do aluno. |
-| `student.school` | `string` | Escola de origem do aluno. |
+| `student.originSchool` | `string \| null` | Escola de origem do aluno. |
 | `period.name` | `string` | Nome do período letivo. |
 | `period.startDate` | `string` | Data de início (`YYYY-MM-DD`). |
 | `period.endDate` | `string` | Data de término (`YYYY-MM-DD`). |
@@ -186,7 +186,7 @@ Retornado quando o aluno está vinculado ao período, mas ainda não foi enturma
   "student": {
     "name": "Ana Clara Silva",
     "phone": "11999001001",
-    "school": "Escola Estadual Prof. Maria Luiza"
+    "originSchool": "Escola Estadual Prof. Maria Luiza"
   },
   "period": {
     "name": "Primeiro Semestre 2025",

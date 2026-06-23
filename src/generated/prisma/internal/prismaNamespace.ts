@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.7.0
- * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
+ * Prisma Client JS version: 7.8.0
+ * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.7.0",
-  engine: "75cbdc1eb7150937890ad5465d861175c6624711"
+  client: "7.8.0",
+  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
 }
 
 /**
@@ -409,7 +409,7 @@ export const ModelName = {
   FinalGrade: 'FinalGrade',
   StudentCourseStats: 'StudentCourseStats',
   Notification: 'Notification',
-  CourseAssistant: 'CourseAssistant'
+  ScheduleAssistant: 'ScheduleAssistant'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "program" | "degree" | "subject" | "campus" | "room" | "period" | "subPeriod" | "classGroup" | "timeSlot" | "schedule" | "course" | "student" | "enrollment" | "studentPeriod" | "lesson" | "attendance" | "activity" | "activityGrade" | "finalGrade" | "studentCourseStats" | "notification" | "courseAssistant"
+    modelProps: "user" | "session" | "account" | "verification" | "program" | "degree" | "subject" | "campus" | "room" | "period" | "subPeriod" | "classGroup" | "timeSlot" | "schedule" | "course" | "student" | "enrollment" | "studentPeriod" | "lesson" | "attendance" | "activity" | "activityGrade" | "finalGrade" | "studentCourseStats" | "notification" | "scheduleAssistant"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2279,77 +2279,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    CourseAssistant: {
-      payload: Prisma.$CourseAssistantPayload<ExtArgs>
-      fields: Prisma.CourseAssistantFieldRefs
+    ScheduleAssistant: {
+      payload: Prisma.$ScheduleAssistantPayload<ExtArgs>
+      fields: Prisma.ScheduleAssistantFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.CourseAssistantFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload> | null
+          args: Prisma.ScheduleAssistantFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.CourseAssistantFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>
+          args: Prisma.ScheduleAssistantFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>
         }
         findFirst: {
-          args: Prisma.CourseAssistantFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload> | null
+          args: Prisma.ScheduleAssistantFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.CourseAssistantFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>
+          args: Prisma.ScheduleAssistantFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>
         }
         findMany: {
-          args: Prisma.CourseAssistantFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>[]
+          args: Prisma.ScheduleAssistantFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>[]
         }
         create: {
-          args: Prisma.CourseAssistantCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>
+          args: Prisma.ScheduleAssistantCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>
         }
         createMany: {
-          args: Prisma.CourseAssistantCreateManyArgs<ExtArgs>
+          args: Prisma.ScheduleAssistantCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.CourseAssistantCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>[]
+          args: Prisma.ScheduleAssistantCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>[]
         }
         delete: {
-          args: Prisma.CourseAssistantDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>
+          args: Prisma.ScheduleAssistantDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>
         }
         update: {
-          args: Prisma.CourseAssistantUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>
+          args: Prisma.ScheduleAssistantUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>
         }
         deleteMany: {
-          args: Prisma.CourseAssistantDeleteManyArgs<ExtArgs>
+          args: Prisma.ScheduleAssistantDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.CourseAssistantUpdateManyArgs<ExtArgs>
+          args: Prisma.ScheduleAssistantUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.CourseAssistantUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>[]
+          args: Prisma.ScheduleAssistantUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>[]
         }
         upsert: {
-          args: Prisma.CourseAssistantUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourseAssistantPayload>
+          args: Prisma.ScheduleAssistantUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleAssistantPayload>
         }
         aggregate: {
-          args: Prisma.CourseAssistantAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateCourseAssistant>
+          args: Prisma.ScheduleAssistantAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScheduleAssistant>
         }
         groupBy: {
-          args: Prisma.CourseAssistantGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CourseAssistantGroupByOutputType>[]
+          args: Prisma.ScheduleAssistantGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScheduleAssistantGroupByOutputType>[]
         }
         count: {
-          args: Prisma.CourseAssistantCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CourseAssistantCountAggregateOutputType> | number
+          args: Prisma.ScheduleAssistantCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScheduleAssistantCountAggregateOutputType> | number
         }
       }
     }
@@ -2624,7 +2624,7 @@ export const StudentScalarFieldEnum = {
   parentPhone: 'parentPhone',
   cpf: 'cpf',
   email: 'email',
-  school: 'school',
+  originSchool: 'originSchool',
   genre: 'genre',
   lunaId: 'lunaId'
 } as const
@@ -2750,14 +2750,14 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
-export const CourseAssistantScalarFieldEnum = {
+export const ScheduleAssistantScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  courseId: 'courseId',
+  scheduleId: 'scheduleId',
   assistantId: 'assistantId'
 } as const
 
-export type CourseAssistantScalarFieldEnum = (typeof CourseAssistantScalarFieldEnum)[keyof typeof CourseAssistantScalarFieldEnum]
+export type ScheduleAssistantScalarFieldEnum = (typeof ScheduleAssistantScalarFieldEnum)[keyof typeof ScheduleAssistantScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3116,6 +3116,21 @@ export type PrismaClientOptions = ({
    * ```
    */
   comments?: runtime.SqlCommenterPlugin[]
+  /**
+   * Optional maximum size for the query plan cache. If not provided, a default size will be used.
+   * A value of `0` can be used to disable the cache entirely. A higher cache size can improve
+   * performance for applications that execute a large number of unique queries, while a smaller
+   * cache size can reduce memory usage.
+   * 
+   * @example
+   * ```
+   * const prisma = new PrismaClient({
+   *   adapter,
+   *   queryPlanCacheMaxSize: 100,
+   * })
+   * ```
+   */
+  queryPlanCacheMaxSize?: number
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
@@ -3143,7 +3158,7 @@ export type GlobalOmitConfig = {
   finalGrade?: Prisma.FinalGradeOmit
   studentCourseStats?: Prisma.StudentCourseStatsOmit
   notification?: Prisma.NotificationOmit
-  courseAssistant?: Prisma.CourseAssistantOmit
+  scheduleAssistant?: Prisma.ScheduleAssistantOmit
 }
 
 /* Types for Logging */

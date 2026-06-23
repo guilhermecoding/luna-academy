@@ -143,7 +143,7 @@ export type StudentCourseStats = Prisma.StudentCourseStatsModel
  */
 export type Notification = Prisma.NotificationModel
 /**
- * Model CourseAssistant
+ * Model ScheduleAssistant
  * 
  */
-export type CourseAssistant = Prisma.CourseAssistantModel
+export type ScheduleAssistant = Prisma.ScheduleAssistantModel

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { IconSun, IconSunset2, IconMoon, IconCodeAsterisk, IconUsersGroup } from "@tabler/icons-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shift } from "@/generated/prisma/enums";
@@ -8,6 +9,20 @@ import { getAvatarColor, getInitials, hashString } from "@/lib/avatar-utils";
 import { CourseWithRelations } from "@/services/courses/courses.type";
 import Link from "next/link";
 import { useCanWrite } from "@/components/write-access-provider";
+import {
+    aggregateCourseTeachers,
+    getCourseTeachersModalTitle,
+} from "@/lib/schedule-teacher-utils";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 const OCCUPANCY_COLORS = [
     { bar: "bg-green-500", text: "text-green-700 dark:text-green-400" },
@@ -40,6 +55,148 @@ function ShiftIcon({ shift }: { shift: Shift }) {
 }
 
 
+// ── Professores ────────────────────────────────────────────────────
+function CourseTeachersCell({
+    schedules,
+}: {
+    schedules: CourseWithRelations["schedules"];
+}) {
+    const [open, setOpen] = useState(false);
+    const { titular, assistants } = aggregateCourseTeachers(schedules);
+    const totalTeachers = (titular ? 1 : 0) + assistants.length;
+
+    if (totalTeachers === 0) {
+        return (
+            <span className="text-sm sm:text-base text-muted-foreground italic whitespace-nowrap">
+                Não atribuído
+            </span>
+        );
+    }
+
+    if (!titular) {
+        if (assistants.length === 1) {
+            return (
+                <span className="text-sm sm:text-base text-foreground whitespace-nowrap">
+                    {assistants[0].name} (Assistente)
+                </span>
+            );
+        }
+
+        return (
+            <>
+                <span className="inline-flex items-center gap-1 text-sm sm:text-base text-foreground whitespace-nowrap">
+                    <span>{assistants.length} assistentes</span>
+                    <button
+                        type="button"
+                        onClick={() => setOpen(true)}
+                        className="text-primary font-medium hover:underline"
+                    >
+                        [+{assistants.length}]
+                    </button>
+                </span>
+                <CourseTeachersDialog
+                    open={open}
+                    onOpenChange={setOpen}
+                    titular={null}
+                    assistants={assistants}
+                    totalTeachers={totalTeachers}
+                />
+            </>
+        );
+    }
+
+    return (
+        <>
+            <span className="inline-flex items-center gap-1 text-sm sm:text-base text-foreground whitespace-nowrap">
+                <span>{titular.name} (Titular)</span>
+                {assistants.length > 0 && (
+                    <>
+                        <span>e</span>
+                        <button
+                            type="button"
+                            onClick={() => setOpen(true)}
+                            className="text-primary font-medium hover:cursor-pointer hover:bg-muted/80 border border-surface-border px-2 py-0.5 rounded-sm"
+                        >
+                            +{assistants.length}
+                        </button>
+                    </>
+                )}
+            </span>
+            {assistants.length > 0 && (
+                <CourseTeachersDialog
+                    open={open}
+                    onOpenChange={setOpen}
+                    titular={titular}
+                    assistants={assistants}
+                    totalTeachers={totalTeachers}
+                />
+            )}
+        </>
+    );
+}
+
+function CourseTeachersDialog({
+    open,
+    onOpenChange,
+    titular,
+    assistants,
+    totalTeachers,
+}: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    titular: { id: string; name: string } | null;
+    assistants: { id: string; name: string }[];
+    totalTeachers: number;
+}) {
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="text-lg">{getCourseTeachersModalTitle(totalTeachers)}</DialogTitle>
+                </DialogHeader>
+
+                <DialogDescription className="sr-only">
+                    Caixa de diálogo para exibir os professores de uma disciplina.
+                </DialogDescription>
+
+                <div className="space-y-4">
+                    <div className="space-y-1">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                            Titular:
+                        </p>
+                        <p className="text-xl font-bold">
+                            {titular?.name ?? "Não atribuído"}
+                        </p>
+                    </div>
+
+                    <Separator className="my-4" />
+
+                    {assistants.length > 0 && (
+                        <div className="space-y-2">
+                            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                {assistants.length === 1 ? "Assistente:" : "Assistentes:"}
+                            </p>
+                            <ul className="space-y-1">
+                                {assistants.map((assistant) => (
+                                    <li key={assistant.id} className="text-lg font-bold">
+                                        {assistant.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                        Fechar
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 // ── Skeleton ───────────────────────────────────────────────────────
 export function ListDisciplinesSkeleton() {
     return (
@@ -48,7 +205,7 @@ export function ListDisciplinesSkeleton() {
                 <thead className="bg-primary/5 text-muted-foreground uppercase text-xs">
                     <tr>
                         <th className="px-6 py-4 font-medium">Disciplina</th>
-                        <th className="px-6 py-4 font-medium text-center">Professor</th>
+                        <th className="px-6 py-4 font-medium text-center">Professor(es)</th>
                         <th className="px-6 py-4 font-medium text-center">Turno</th>
                         <th className="px-6 py-4 font-medium text-center">Sala</th>
                         <th className="px-6 py-4 font-medium text-center">Ocupação</th>
@@ -139,7 +296,7 @@ function ListDisciplinesContent({
                 <thead className="bg-primary/5 text-muted-foreground uppercase text-[10px] sm:text-xs">
                     <tr>
                         <th className="px-4 sm:px-6 py-4 font-medium min-w-50">Disciplina</th>
-                        <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-37.5">Professor</th>
+                        <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-37.5">Professor(es)</th>
                         <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-22.5">Turno</th>
                         <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-30">Sala</th>
                         <th className="px-4 sm:px-6 py-4 font-medium text-center min-w-35">Ocupação</th>
@@ -149,7 +306,6 @@ function ListDisciplinesContent({
                 <tbody className="divide-y divide-surface-border">
                     {courses.map((course) => {
                         const avatarColor = getAvatarColor(course.subject.name);
-                        const teacher = course.schedules.find(s => s.teacher)?.teacher?.name || "Não atribuído";
                         const enrolled = studentCount;
                         const roomCapacity = course.room ? Number(course.room.capacity) : 0;
                         const occupancyPct = roomCapacity > 0 ? Math.min((enrolled / roomCapacity) * 100, 100) : 0;
@@ -181,9 +337,7 @@ function ListDisciplinesContent({
                                 {/* ── Professor ── */}
                                 <td className="px-4 sm:px-6 py-4">
                                     <div className="flex justify-center">
-                                        <span className="inline-flex items-center gap-1.5 text-sm sm:text-base text-foreground whitespace-nowrap">
-                                            {teacher}
-                                        </span>
+                                        <CourseTeachersCell schedules={course.schedules} />
                                     </div>
                                 </td>
 

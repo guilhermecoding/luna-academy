@@ -5,6 +5,53 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.5.0] - 2026-06-23
+
+### Adicionado
+
+- Página de indicadores gerais do período letivo (`/admin/[program]/periodos/[period]/indicadores`) com:
+  - Flip cards: total de alunos, média etária, escola de origem, matriculados, aguardando, taxa de matrícula, acesso SAD, total de turmas e média de alunos por turma
+  - Gráficos: gênero, faixa etária, status de matrícula, acesso SAD, transferências, distribuição por turno, alunos por turma, frequência, comparação entre turmas e faixa etária por turno
+  - Indicadores de tendência comparando com o período anterior
+- Serviço `period-indicators.service.ts` com queries agregadas e cache
+- Página de indicadores gerais dos alunos (`/admin/alunos/indicadores`) refatorada com flip cards (contagem total, média etária, alunos de outras escolas) e gráficos de gênero e faixa etária com carregamento assíncrono
+- Componentes de UI para gráficos: `chart.tsx` (base shadcn/recharts), `NumberTicker` (animação de números), `WrapperFlipCardIndicator` e skeletons `ChartAreaSkeleton` e `FlipCardValueSkeleton`
+- Utilitários `age-range.ts`, `period-chart-colors.ts` e hook `use-chart-animation-key.ts`
+- Dependência `recharts` 3.8.0
+- Botão "Indicadores" na página do período letivo
+- `ScheduleTeachersSheet` para atribuição de professores titulares e assistentes por slot de horário
+- `schedule-teacher-utils.ts` com funções de agregação, formatação e filtragem por professor
+- Exibição de professores (titular e assistentes) na listagem de disciplinas por turma, com modal de detalhamento
+- Script `analyze` no `package.json` (`next experimental-analyze`)
+- README reescrito com descrição do projeto, recursos, motivação e instruções de uso
+- Variáveis CSS de cores para gráficos em `globals.css`
+
+### Alterado
+
+- Professores assistentes passam a ser vinculados ao slot de horário (`Schedule`) em vez da disciplina (`Course`)
+- Modelo `CourseAssistant` migrado para `ScheduleAssistant` (`schedule_assistants`)
+- Índice único de `Schedule`: removido `(teacherId, dayOfWeek, timeSlotId)`; mantidos `(courseId, dayOfWeek, timeSlotId)` e `(roomId, dayOfWeek, timeSlotId)`
+- Campo `school` do modelo `Student` renomeado para `originSchool` (opcional), com migração correspondente
+- Formulários de criação/edição de aluno e importação em lote adaptados ao novo campo
+- Formulários de criação/edição de disciplina por turma passam a usar `ScheduleTeachersSheet` por slot
+- Guards do portal do professor (`teacher-period-guards`) atualizados para considerar assistentes por slot
+- Portal do professor: acesso a disciplinas e aulas filtrado por vínculo em slot (titular ou assistente)
+- Filtro de aulas: labels ajustados ("Registradas (futuras)", "Não registradas", "Fechadas")
+- Estilo do campo de busca em `add-students-to-class-sheet`
+- Fallback do `Suspense` na home admin simplificado para `null`
+- `pnpm-workspace.yaml` atualizado com configurações adicionais
+
+### Removido
+
+- Página placeholder de indicadores em `/admin/[program]/periodos/[period]/alunos/indicadores` (substituída pela nova rota de indicadores do período)
+- Botão "Indicadores" da página de alunos do período
+- Modelo/tabela `course_assistants`
+
+### Refatoração
+
+- Página de indicadores de alunos dividida em flip cards e gráficos com componentes client/server separados
+- Serviços `courses`, `class-groups`, `programs`, `users` e `students` estendidos para suportar indicadores e a nova estrutura de professores
+
 ## [1.4.0] - 2026-06-21
 
 ### Adicionado

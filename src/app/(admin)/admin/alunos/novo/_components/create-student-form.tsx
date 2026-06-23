@@ -41,7 +41,7 @@ export default function CreateStudentForm({
             cpf: "",
             studentPhone: "",
             parentPhone: "",
-            school: "",
+            originSchool: "",
             birthDate: undefined,
             genre: "PREFER_NOT_TO_SAY",
         },
@@ -159,15 +159,15 @@ export default function CreateStudentForm({
                             {errors.cpf && <p className="text-sm text-red-600">{errors.cpf.message}</p>}
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="school">Escola de Origem *</Label>
+                            <Label htmlFor="originSchool">Escola de Origem</Label>
                             <Input
-                                id="school"
-                                {...register("school")}
+                                id="originSchool"
+                                {...register("originSchool")}
                                 placeholder="Escola Estadual..."
                                 className="p-5 h-15.5 rounded-xl bg-background"
-                                aria-invalid={errors.school ? "true" : "false"}
+                                aria-invalid={errors.originSchool ? "true" : "false"}
                             />
-                            {errors.school && <p className="text-sm text-red-600">{errors.school.message}</p>}
+                            {errors.originSchool && <p className="text-sm text-red-600">{errors.originSchool.message}</p>}
                         </div>
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="studentPhone">Celular do Aluno *</Label>

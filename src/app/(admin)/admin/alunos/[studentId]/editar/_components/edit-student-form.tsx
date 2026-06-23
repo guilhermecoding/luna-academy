@@ -38,7 +38,7 @@ export default function EditStudentForm({ student }: { student: Student }) {
             cpf: student.cpf,
             studentPhone: student.studentPhone,
             parentPhone: student.parentPhone || "",
-            school: student.school,
+            originSchool: student.originSchool ?? "",
             birthDate: new Date(student.birthDate),
             genre: student.genre as UserGenre,
         },
@@ -61,7 +61,7 @@ export default function EditStudentForm({ student }: { student: Student }) {
             cpf: student.cpf,
             studentPhone: student.studentPhone,
             parentPhone: student.parentPhone || "",
-            school: student.school,
+            originSchool: student.originSchool ?? "",
             birthDate: new Date(student.birthDate),
             genre: student.genre as UserGenre,
         });
@@ -175,15 +175,15 @@ export default function EditStudentForm({ student }: { student: Student }) {
                         {errors.cpf && <p className="text-sm text-red-600">{errors.cpf.message}</p>}
                     </div>
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="school">Escola de Origem *</Label>
+                        <Label htmlFor="originSchool">Escola de Origem</Label>
                         <Input
-                            id="school"
-                            {...register("school")}
+                            id="originSchool"
+                            {...register("originSchool")}
                             placeholder="Escola Estadual..."
                             className="p-5 h-15.5 rounded-xl bg-background"
-                            aria-invalid={errors.school ? "true" : "false"}
+                            aria-invalid={errors.originSchool ? "true" : "false"}
                         />
-                        {errors.school && <p className="text-sm text-red-600">{errors.school.message}</p>}
+                        {errors.originSchool && <p className="text-sm text-red-600">{errors.originSchool.message}</p>}
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="studentPhone">Celular do Aluno *</Label>

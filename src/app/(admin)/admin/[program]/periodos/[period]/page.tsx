@@ -1,7 +1,7 @@
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
-import { IconCalendarFilled, IconSchool, IconCircleCheck, IconUsers, IconProgress, IconPencil, IconReportSearch } from "@tabler/icons-react";
+import { IconCalendarFilled, IconSchool, IconCircleCheck, IconUsers, IconProgress, IconPencil, IconReportSearch, IconChartBar } from "@tabler/icons-react";
 import { ButtonLink } from "@/components/ui/button-link";
 import { getPeriodByProgramAndSlug, getPeriodStats } from "@/services/periods/periods.service";
 import { getSubPeriodsByPeriodId } from "@/services/sub-periods/sub-periods.service";
@@ -51,28 +51,37 @@ async function AdminPeriodPageContent({
                     <IconCalendarFilled className="size-4 text-muted-foreground" />
                     <p className="text-muted-foreground font-bold">Período Letivo</p>
                 </div>
-                <div className="flex flex-col lg:flex-row gap-y-6 justify-between">
-                    <div className="flex-1">
+                <div className="flex flex-col gap-y-6 justify-between">
+                    <div className="w-full">
                         <TitlePage
                             title={periodData.name}
                             description={`De ${new Date(periodData.startDate).toLocaleDateString("pt-BR")} à ${new Date(periodData.endDate).toLocaleDateString("pt-BR")}`}
                         />
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-3 items-start lg:items-end lg:justify-end">
-                        <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/sad`}>
-                            <IconReportSearch className="size-5 mr-2" />
-                            SAD
-                        </ButtonLink>
-                        <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/alunos`}>
-                            <IconSchool className="size-5 mr-2" />
-                            Alunos
-                        </ButtonLink>
+                    <div className="w-full grid grid-cols-1 @md/main:grid-cols-2 @3xl/main:grid-cols-4 gap-2 @4xl/main:gap-6">
                         {canWrite && (
-                            <ButtonLink className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/editar`}>
+                            <ButtonLink className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11"
+                                href={`/admin/${program}/periodos/${period}/editar`}
+                            >
                                 <IconPencil className="size-5 mr-2" />
                                 Editar Período
                             </ButtonLink>
                         )}
+                        <ButtonLink
+                            className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11"
+                            href={`/admin/${program}/periodos/${period}/indicadores`}
+                        >
+                            <IconChartBar className="size-5 mr-1" />
+                            Indicadores
+                        </ButtonLink>
+                        <ButtonLink className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/alunos`}>
+                            <IconSchool className="size-5 mr-2" />
+                            Alunos
+                        </ButtonLink>
+                        <ButtonLink className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/sad`}>
+                            <IconReportSearch className="size-5 mr-2" />
+                            SAD
+                        </ButtonLink>
                     </div>
                 </div>
             </Section>
