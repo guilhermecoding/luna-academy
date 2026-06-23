@@ -265,7 +265,6 @@ model Schedule {
   timeSlot    TimeSlot             @relation(fields: [timeSlotId], references: [id])
 
   @@unique([courseId, dayOfWeek, timeSlotId])
-  @@unique([roomId, dayOfWeek, timeSlotId])
   @@map("schedules")
   @@schema("public")
 }

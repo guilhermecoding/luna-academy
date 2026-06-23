@@ -1,5 +1,10 @@
 import { Course, DayOfWeek, Prisma, Shift } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import {
+    findScheduleConflictInList,
+    resolveScheduleRoomId,
+    type ScheduleSlot,
+} from "@/lib/schedule-conflict-utils";
 import { cacheLife, cacheTag } from "next/cache";
 import { CourseWithRelations, scheduleInclude } from "./courses.type";
 
@@ -24,6 +29,69 @@ function buildScheduleCreateData(schedules: ScheduleInput[]) {
                   }
                 : undefined,
     }));
+}
+
+function toScheduleSlot(
+    schedule: ScheduleInput,
+    courseRoomId: string | null,
+): ScheduleSlot {
+    return {
+        dayOfWeek: schedule.dayOfWeek,
+        timeSlotId: schedule.timeSlotId,
+        teacherId: schedule.teacherId ?? null,
+        roomId: resolveScheduleRoomId(schedule.roomId, courseRoomId),
+    };
+}
+
+async function assertNoScheduleConflicts(
+    periodId: string,
+    courseRoomId: string | null,
+    schedules: ScheduleInput[],
+    excludeCourseId?: string,
+): Promise<void> {
+    if (schedules.length === 0) return;
+
+    const normalized = schedules.map((schedule) => toScheduleSlot(schedule, courseRoomId));
+
+    for (let i = 0; i < normalized.length; i++) {
+        const othersInBatch = normalized.filter((_, index) => index !== i);
+        const batchConflict = findScheduleConflictInList(normalized[i], othersInBatch);
+        if (batchConflict) {
+            throw new Error(batchConflict);
+        }
+    }
+
+    const existingSchedules = await prisma.schedule.findMany({
+        where: {
+            course: { periodId },
+            ...(excludeCourseId ? { courseId: { not: excludeCourseId } } : {}),
+        },
+        select: {
+            dayOfWeek: true,
+            timeSlotId: true,
+            teacherId: true,
+            roomId: true,
+            course: {
+                select: {
+                    roomId: true,
+                },
+            },
+        },
+    });
+
+    const existingSlots: ScheduleSlot[] = existingSchedules.map((schedule) => ({
+        dayOfWeek: schedule.dayOfWeek,
+        timeSlotId: schedule.timeSlotId,
+        teacherId: schedule.teacherId,
+        roomId: resolveScheduleRoomId(schedule.roomId, schedule.course.roomId),
+    }));
+
+    for (const slot of normalized) {
+        const conflict = findScheduleConflictInList(slot, existingSlots);
+        if (conflict) {
+            throw new Error(conflict);
+        }
+    }
 }
 
 /**
@@ -133,9 +201,6 @@ function mapScheduleUniqueError(error: Prisma.PrismaClientKnownRequestError): st
     const target = error.meta?.target as string[] | undefined;
     const targetStr = target?.join(",") ?? "";
 
-    if (targetStr.includes("room_id")) {
-        return "Esta sala já está ocupada neste dia e horário por outra turma.";
-    }
     if (targetStr.includes("course_id")) {
         return "Esta turma já possui uma aula cadastrada neste dia e horário.";
     }
@@ -157,6 +222,12 @@ export async function createCourse(data: {
     schedules?: ScheduleInput[];
 }): Promise<Course> {
     try {
+        await assertNoScheduleConflicts(
+            data.periodId,
+            data.roomId ?? null,
+            data.schedules ?? [],
+        );
+
         const course = await prisma.course.create({
             data: {
                 name: data.name,
@@ -199,6 +270,22 @@ export async function updateCourse(
     },
 ): Promise<Course> {
     try {
+        const currentCourse = await prisma.course.findUnique({
+            where: { id },
+            select: { periodId: true },
+        });
+
+        if (!currentCourse) {
+            throw new Error("Turma não encontrada.");
+        }
+
+        await assertNoScheduleConflicts(
+            currentCourse.periodId,
+            data.roomId ?? null,
+            data.schedules ?? [],
+            id,
+        );
+
         const course = await prisma.$transaction(async (tx) => {
             // Remove todos os schedules antigos (assistants cascade)
             await tx.schedule.deleteMany({
