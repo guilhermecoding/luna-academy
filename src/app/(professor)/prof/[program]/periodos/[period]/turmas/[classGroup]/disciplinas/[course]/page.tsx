@@ -6,7 +6,7 @@ import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
 import { getStudentCountByClassGroupId } from "@/services/students/students.service";
-import { getLessonsByCourseId, getLessonsCountByCourseId } from "@/services/lessons/lessons.service";
+import { getLessonsByCourseId } from "@/services/lessons/lessons.service";
 import {
     IconBooks,
     IconCalendarEvent,
@@ -22,6 +22,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { filterSchedulesForTeacher, isTeacherAssignedToCourse } from "@/lib/schedule-teacher-utils";
+import { generateUpcomingLessons } from "@/lib/lesson-schedule-utils";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -32,91 +34,6 @@ const shiftMap: Record<Shift, string> = {
     AFTERNOON: "VESPERTINO",
     EVENING: "NOTURNO",
 };
-
-// Mapeia DayOfWeek do Prisma para o número JS de getDay() (0=Dom, 1=Seg, ..., 6=Sáb)
-const dayOfWeekToJs: Record<DayOfWeek, number> = {
-    SUNDAY: 0,
-    MONDAY: 1,
-    TUESDAY: 2,
-    WEDNESDAY: 3,
-    THURSDAY: 4,
-    FRIDAY: 5,
-    SATURDAY: 6,
-};
-
-/**
- * Gera as datas de aulas futuras (a partir de hoje) com base nos schedules
- * da disciplina dentro do intervalo do período.
- */
-function generateUpcomingLessons(
-    schedules: {
-        id: string;
-        dayOfWeek: DayOfWeek;
-        timeSlotId: string;
-        timeSlot: { id: string; name: string; startTime: string; endTime: string };
-        teacher: { id: string; name: string } | null;
-    }[],
-    periodStart: Date,
-    periodEnd: Date,
-    existingLessons: { date: Date; timeSlotId: string | null }[],
-) {
-    if (schedules.length === 0) return [];
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const start = new Date(Math.max(periodStart.getTime(), today.getTime()));
-    const end = new Date(periodEnd);
-
-    // Criar um Set de chaves já ocupadas: "YYYY-MM-DD_timeSlotId"
-    const occupiedKeys = new Set(
-        existingLessons
-            .filter((l) => l.timeSlotId)
-            .map((l) => {
-                const d = new Date(l.date).toISOString().split("T")[0];
-                return `${d}_${l.timeSlotId}`;
-            }),
-    );
-
-    const upcoming: {
-        date: string;
-        dayOfWeek: string;
-        scheduleId: string;
-        timeSlotName: string;
-        startTime: string;
-        endTime: string;
-        teacherName: string | null;
-    }[] = [];
-
-    // Iterar dia a dia do start ao end
-    const cursor = new Date(start);
-    while (cursor <= end) {
-        const jsDay = cursor.getUTCDay();
-        const dateStr = cursor.toISOString().split("T")[0];
-
-        for (const schedule of schedules) {
-            if (dayOfWeekToJs[schedule.dayOfWeek] === jsDay) {
-                const key = `${dateStr}_${schedule.timeSlotId}`;
-                if (!occupiedKeys.has(key)) {
-                    upcoming.push({
-                        date: dateStr,
-                        dayOfWeek: schedule.dayOfWeek,
-                        scheduleId: schedule.id,
-                        timeSlotName: schedule.timeSlot.name,
-                        startTime: schedule.timeSlot.startTime,
-                        endTime: schedule.timeSlot.endTime,
-                        teacherName: schedule.teacher?.name || null,
-                    });
-                }
-            }
-        }
-
-        cursor.setUTCDate(cursor.getUTCDate() + 1);
-    }
-
-    return upcoming;
-}
-
 
 async function ProfCoursePageContent({
     params,
@@ -142,17 +59,27 @@ async function ProfCoursePageContent({
     const courseData = await getCourseByPeriodIdAndCode(periodData.id, courseCode);
     if (!courseData || courseData.classGroupId !== classGroupData.id) notFound();
 
-    const [studentCount, lessonsCount, lessons] = await Promise.all([
+    if (!isTeacherAssignedToCourse(courseData, session.user.id)) {
+        redirect(`/prof/${program}/periodos/${period}/turmas/${classGroupSlug}`);
+    }
+
+    const teacherId = session.user.id;
+    const visibleSchedules = filterSchedulesForTeacher(courseData.schedules, teacherId);
+    const visibleScheduleIds = new Set(visibleSchedules.map((s) => s.id));
+
+    const [studentCount, allLessons] = await Promise.all([
         getStudentCountByClassGroupId(classGroupData.id),
-        getLessonsCountByCourseId(courseData.id),
         getLessonsByCourseId(courseData.id),
     ]);
 
-    // Altera a rota base para /prof para que os links dos LessonCards sigam para o lugar certo
+    const lessons = allLessons.filter(
+        (l) => l.scheduleId != null && visibleScheduleIds.has(l.scheduleId),
+    );
+    const lessonsCount = lessons.length;
+
     const basePath = `/prof/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}`;
 
-    // Gerar aulas futuras com base na grade de horários
-    const schedulesWithTimeSlot = courseData.schedules.filter((s) => s.timeSlot);
+    const schedulesWithTimeSlot = visibleSchedules.filter((s) => s.timeSlot);
     const upcomingLessons = generateUpcomingLessons(
         schedulesWithTimeSlot.map((s) => ({
             id: s.id,
@@ -166,19 +93,16 @@ async function ProfCoursePageContent({
         lessons.map((l) => ({ date: l.date, timeSlotId: l.timeSlotId })),
     );
 
-    // Preparar schedules para o Sheet de criação
-    const scheduleOptions = courseData.schedules
-        .filter((s) => s.timeSlot)
-        .map((s) => ({
-            id: s.id,
-            dayOfWeek: s.dayOfWeek,
-            timeSlotId: s.timeSlotId,
-            timeSlotName: s.timeSlot.name,
-            startTime: s.timeSlot.startTime,
-            endTime: s.timeSlot.endTime,
-            teacherId: s.teacherId,
-            teacherName: s.teacher?.name || null,
-        }));
+    const scheduleOptions = schedulesWithTimeSlot.map((s) => ({
+        id: s.id,
+        dayOfWeek: s.dayOfWeek,
+        timeSlotId: s.timeSlotId,
+        timeSlotName: s.timeSlot.name,
+        startTime: s.timeSlot.startTime,
+        endTime: s.timeSlot.endTime,
+        teacherId: s.teacherId,
+        teacherName: s.teacher?.name || null,
+    }));
 
     return (
         <Page>

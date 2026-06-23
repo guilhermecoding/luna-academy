@@ -58,13 +58,6 @@ async function AdminPeriodStudentsPageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
-                        <ButtonLink
-                            className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11"
-                            href={`/admin/${program}/periodos/${period}/alunos/indicadores`}
-                        >
-                            <IconChartBar className="size-5 mr-1" />
-                            Indicadores
-                        </ButtonLink>
                         {canWrite && (
                             <ButtonLink
                                 className="w-full sm:w-auto h-11"

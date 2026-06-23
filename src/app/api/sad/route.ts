@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { updateTag } from "next/cache";
 import prisma from "@/lib/prisma";
 
 // ─── Validações ────────────────────────────────────────────
@@ -63,7 +64,7 @@ interface EnrolledResponse {
     student: {
         name: string;
         phone: string;
-        school: string;
+        originSchool: string | null;
     };
     period: {
         name: string;
@@ -82,7 +83,7 @@ interface WaitingResponse {
     student: {
         name: string;
         phone: string;
-        school: string;
+        originSchool: string | null;
     };
     period: {
         name: string;
@@ -217,7 +218,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                 id: true,
                 name: true,
                 studentPhone: true,
-                school: true,
+                originSchool: true,
             },
         });
 
@@ -257,6 +258,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             data: { accessedAt: new Date() },
         });
 
+        updateTag(`period:${period.id}:indicators`);
+        updateTag(`period:${period.id}:sad-access`);
+
         // 8. Verificar se o aluno possui ao menos uma matrícula em turma deste período
         const enrollmentCount = await prisma.enrollment.count({
             where: {
@@ -278,7 +282,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                     student: {
                         name: student.name,
                         phone: student.studentPhone,
-                        school: student.school,
+                        originSchool: student.originSchool,
                     },
                     period: {
                         name: period.name,
@@ -372,7 +376,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             student: {
                 name: student.name,
                 phone: student.studentPhone,
-                school: student.school,
+                originSchool: student.originSchool,
             },
             period: {
                 name: period.name,

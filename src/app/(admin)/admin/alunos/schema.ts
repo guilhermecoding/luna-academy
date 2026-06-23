@@ -23,7 +23,7 @@ export const studentSchema = z.object({
     genre: z.enum(["MALE", "FEMALE", "NON_BINARY", "PREFER_NOT_TO_SAY"], { 
         message: "Gênero inválido" ,
     }),
-    school: z.string().min(2, "O nome da escola de origem deve ter no mínimo 2 caracteres").max(255, "Nome muito longo"),
+    originSchool: z.string().min(2, "O nome da escola de origem deve ter no mínimo 2 caracteres").max(255, "Nome muito longo").optional().or(z.literal("")),
 });
 
 export const createStudentSchema = studentSchema;
@@ -48,7 +48,7 @@ export const importStudentRowSchema = z.object({
     genero: z.string().optional().default(""),
     celular_aluno: z.string().min(10, "Celular do aluno inválido"),
     celular_responsavel: z.string().optional().default(""),
-    escola_origem: z.string().min(2, "Escola de origem é obrigatória"),
+    escola_origem: z.string().optional().default(""),
 });
 
 export type ImportStudentRow = z.infer<typeof importStudentRowSchema>;

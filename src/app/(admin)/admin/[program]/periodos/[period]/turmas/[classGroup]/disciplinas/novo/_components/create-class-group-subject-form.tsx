@@ -27,6 +27,7 @@ import {
     type CreateClassGroupSubjectInput,
 } from "../schema";
 import { DAYS_OF_WEEK, dayOfWeekLabels, SHIFTS, shiftLabels } from "../../../../schema";
+import { ScheduleTeachersSheet } from "@/app/(admin)/admin/[program]/periodos/[period]/turmas/_components/schedule-teachers-sheet";
 
 type FormInput = z.input<typeof createClassGroupSubjectSchema>;
 type FormOutput = z.output<typeof createClassGroupSubjectSchema>;
@@ -412,7 +413,7 @@ export function CreateClassGroupSubjectForm({
                                     append({
                                         dayOfWeek: "MONDAY",
                                         timeSlotId: timeSlots[0]?.id ?? "",
-                                        teacherId: "",
+                                        teachers: [],
                                         roomId: "",
                                     })
                                 }
@@ -438,9 +439,9 @@ export function CreateClassGroupSubjectForm({
                                 {fields.map((field, index) => (
                                     <div
                                         key={field.id}
-                                        className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3 p-4 rounded-xl border border-surface-border bg-background items-end"
+                                        className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-3 p-4 rounded-xl border border-surface-border bg-background items-end min-w-0"
                                     >
-                                        <div className="space-y-1.5">
+                                        <div className="space-y-1.5 min-w-0">
                                             <Label className="text-xs text-muted-foreground">Dia</Label>
                                             <Controller
                                                 control={control}
@@ -451,7 +452,7 @@ export function CreateClassGroupSubjectForm({
                                                         onValueChange={dayField.onChange}
                                                         disabled={isSubmitting}
                                                     >
-                                                        <SelectTrigger className="rounded-lg bg-background w-full h-10">
+                                                        <SelectTrigger className="rounded-lg bg-background w-full min-w-0 h-10 overflow-hidden">
                                                             <SelectValue placeholder="Dia" />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -469,7 +470,7 @@ export function CreateClassGroupSubjectForm({
                                             )}
                                         </div>
 
-                                        <div className="space-y-1.5">
+                                        <div className="space-y-1.5 min-w-0">
                                             <Label className="text-xs text-muted-foreground">Horário</Label>
                                             <Controller
                                                 control={control}
@@ -480,7 +481,7 @@ export function CreateClassGroupSubjectForm({
                                                         onValueChange={slotField.onChange}
                                                         disabled={isSubmitting}
                                                     >
-                                                        <SelectTrigger className="rounded-lg bg-background w-full h-10">
+                                                        <SelectTrigger className="rounded-lg bg-background w-full min-w-0 h-10 overflow-hidden">
                                                             <SelectValue placeholder="Horário" />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -498,39 +499,30 @@ export function CreateClassGroupSubjectForm({
                                             )}
                                         </div>
 
-                                        <div className="space-y-1.5">
-                                            <Label className="text-xs text-muted-foreground">Professor</Label>
-                                            {teachers.length === 0 ? (
-                                                <div className="h-10 flex items-center px-3 rounded-lg border-2 border-dashed border-surface-border bg-surface/30 text-[10px] text-muted-foreground leading-tight">
-                                                    Nenhum professor cadastrado.
-                                                </div>
-                                            ) : (
-                                                <Controller
-                                                    control={control}
-                                                    name={`schedules.${index}.teacherId`}
-                                                    render={({ field: teacherField }) => (
-                                                        <Select
-                                                            value={teacherField.value || ""}
-                                                            onValueChange={teacherField.onChange}
-                                                            disabled={isSubmitting}
-                                                        >
-                                                            <SelectTrigger className="rounded-lg bg-background w-full h-10">
-                                                                <SelectValue placeholder="Opcional" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {teachers.map((teacher) => (
-                                                                    <SelectItem key={teacher.id} value={teacher.id}>
-                                                                        {teacher.name}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    )}
-                                                />
+                                        <div className="space-y-1.5 min-w-0 relative top-0 lg:-top-2">
+                                            <Label className="text-xs text-muted-foreground">Professores</Label>
+                                            <Controller
+                                                control={control}
+                                                name={`schedules.${index}.teachers`}
+                                                render={({ field: teachersField }) => (
+                                                    <ScheduleTeachersSheet
+                                                        value={teachersField.value ?? []}
+                                                        onChange={teachersField.onChange}
+                                                        teachers={teachers}
+                                                        disabled={isSubmitting}
+                                                    />
+                                                )}
+                                            />
+                                            {errors.schedules?.[index]?.teachers && (
+                                                <p className="text-xs text-red-600">
+                                                    {typeof errors.schedules[index].teachers?.message === "string"
+                                                        ? errors.schedules[index].teachers?.message
+                                                        : "Verifique os professores do horário."}
+                                                </p>
                                             )}
                                         </div>
 
-                                        <div className="space-y-1.5">
+                                        <div className="space-y-1.5 min-w-0">
                                             <Label className="text-xs text-muted-foreground">Sala</Label>
                                             <Controller
                                                 control={control}
@@ -541,7 +533,7 @@ export function CreateClassGroupSubjectForm({
                                                         onValueChange={roomField.onChange}
                                                         disabled={isSubmitting}
                                                     >
-                                                        <SelectTrigger className="rounded-lg bg-background w-full h-10">
+                                                        <SelectTrigger className="rounded-lg bg-background w-full min-w-0 h-10 overflow-hidden">
                                                             <SelectValue placeholder="Sala padrão" />
                                                         </SelectTrigger>
                                                         <SelectContent>

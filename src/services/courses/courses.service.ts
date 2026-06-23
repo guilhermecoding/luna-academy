@@ -1,7 +1,98 @@
 import { Course, DayOfWeek, Prisma, Shift } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import {
+    findScheduleConflictInList,
+    resolveScheduleRoomId,
+    type ScheduleSlot,
+} from "@/lib/schedule-conflict-utils";
 import { cacheLife, cacheTag } from "next/cache";
-import { CourseWithRelations } from "./courses.type";
+import { CourseWithRelations, scheduleInclude } from "./courses.type";
+
+export type ScheduleInput = {
+    dayOfWeek: DayOfWeek;
+    timeSlotId: string;
+    teacherId?: string | null;
+    assistantIds?: string[];
+    roomId?: string | null;
+};
+
+function buildScheduleCreateData(schedules: ScheduleInput[]) {
+    return schedules.map((s) => ({
+        dayOfWeek: s.dayOfWeek,
+        timeSlotId: s.timeSlotId,
+        teacherId: s.teacherId || null,
+        roomId: s.roomId || null,
+        assistants:
+            s.assistantIds && s.assistantIds.length > 0
+                ? {
+                      create: s.assistantIds.map((assistantId) => ({ assistantId })),
+                  }
+                : undefined,
+    }));
+}
+
+function toScheduleSlot(
+    schedule: ScheduleInput,
+    courseRoomId: string | null,
+): ScheduleSlot {
+    return {
+        dayOfWeek: schedule.dayOfWeek,
+        timeSlotId: schedule.timeSlotId,
+        teacherId: schedule.teacherId ?? null,
+        roomId: resolveScheduleRoomId(schedule.roomId, courseRoomId),
+    };
+}
+
+async function assertNoScheduleConflicts(
+    periodId: string,
+    courseRoomId: string | null,
+    schedules: ScheduleInput[],
+    excludeCourseId?: string,
+): Promise<void> {
+    if (schedules.length === 0) return;
+
+    const normalized = schedules.map((schedule) => toScheduleSlot(schedule, courseRoomId));
+
+    for (let i = 0; i < normalized.length; i++) {
+        const othersInBatch = normalized.filter((_, index) => index !== i);
+        const batchConflict = findScheduleConflictInList(normalized[i], othersInBatch);
+        if (batchConflict) {
+            throw new Error(batchConflict);
+        }
+    }
+
+    const existingSchedules = await prisma.schedule.findMany({
+        where: {
+            course: { periodId },
+            ...(excludeCourseId ? { courseId: { not: excludeCourseId } } : {}),
+        },
+        select: {
+            dayOfWeek: true,
+            timeSlotId: true,
+            teacherId: true,
+            roomId: true,
+            course: {
+                select: {
+                    roomId: true,
+                },
+            },
+        },
+    });
+
+    const existingSlots: ScheduleSlot[] = existingSchedules.map((schedule) => ({
+        dayOfWeek: schedule.dayOfWeek,
+        timeSlotId: schedule.timeSlotId,
+        teacherId: schedule.teacherId,
+        roomId: resolveScheduleRoomId(schedule.roomId, schedule.course.roomId),
+    }));
+
+    for (const slot of normalized) {
+        const conflict = findScheduleConflictInList(slot, existingSlots);
+        if (conflict) {
+            throw new Error(conflict);
+        }
+    }
+}
 
 /**
  * Lista todas as turmas de um período específico.
@@ -92,20 +183,7 @@ export async function getCourseByPeriodIdAndCode(periodId: string, code: string)
             },
             period: true,
             schedules: {
-                include: {
-                    timeSlot: true,
-                    teacher: {
-                        select: {
-                            id: true,
-                            name: true,
-                        },
-                    },
-                    room: {
-                        include: {
-                            campus: true,
-                        },
-                    },
-                },
+                include: scheduleInclude,
                 orderBy: [
                     { dayOfWeek: "asc" },
                     { timeSlot: { startTime: "asc" } },
@@ -123,12 +201,6 @@ function mapScheduleUniqueError(error: Prisma.PrismaClientKnownRequestError): st
     const target = error.meta?.target as string[] | undefined;
     const targetStr = target?.join(",") ?? "";
 
-    if (targetStr.includes("room_id")) {
-        return "Esta sala já está ocupada neste dia e horário por outra turma.";
-    }
-    if (targetStr.includes("teacher_id")) {
-        return "O professor selecionado já possui aula neste dia e horário.";
-    }
     if (targetStr.includes("course_id")) {
         return "Esta turma já possui uma aula cadastrada neste dia e horário.";
     }
@@ -147,14 +219,15 @@ export async function createCourse(data: {
     roomId?: string | null;
     shift: Shift;
     classGroupId?: string | null;
-    schedules?: {
-        dayOfWeek: DayOfWeek;
-        timeSlotId: string;
-        teacherId?: string | null;
-        roomId?: string | null;
-    }[];
+    schedules?: ScheduleInput[];
 }): Promise<Course> {
     try {
+        await assertNoScheduleConflicts(
+            data.periodId,
+            data.roomId ?? null,
+            data.schedules ?? [],
+        );
+
         const course = await prisma.course.create({
             data: {
                 name: data.name,
@@ -166,12 +239,7 @@ export async function createCourse(data: {
                 classGroupId: data.classGroupId || null,
                 schedules: data.schedules && data.schedules.length > 0
                     ? {
-                        create: data.schedules.map((s) => ({
-                            dayOfWeek: s.dayOfWeek,
-                            timeSlotId: s.timeSlotId,
-                            teacherId: s.teacherId || null,
-                            roomId: s.roomId || null,
-                        })),
+                        create: buildScheduleCreateData(data.schedules),
                     }
                     : undefined,
             },
@@ -198,17 +266,28 @@ export async function updateCourse(
         roomId?: string | null;
         shift: Shift;
         classGroupId?: string | null;
-        schedules?: {
-            dayOfWeek: DayOfWeek;
-            timeSlotId: string;
-            teacherId?: string | null;
-            roomId?: string | null;
-        }[];
+        schedules?: ScheduleInput[];
     },
 ): Promise<Course> {
     try {
+        const currentCourse = await prisma.course.findUnique({
+            where: { id },
+            select: { periodId: true },
+        });
+
+        if (!currentCourse) {
+            throw new Error("Turma não encontrada.");
+        }
+
+        await assertNoScheduleConflicts(
+            currentCourse.periodId,
+            data.roomId ?? null,
+            data.schedules ?? [],
+            id,
+        );
+
         const course = await prisma.$transaction(async (tx) => {
-            // Remove todos os schedules antigos
+            // Remove todos os schedules antigos (assistants cascade)
             await tx.schedule.deleteMany({
                 where: { courseId: id },
             });
@@ -225,12 +304,7 @@ export async function updateCourse(
                     classGroupId: data.classGroupId || null,
                     schedules: data.schedules && data.schedules.length > 0
                         ? {
-                            create: data.schedules.map((s) => ({
-                                dayOfWeek: s.dayOfWeek,
-                                timeSlotId: s.timeSlotId,
-                                teacherId: s.teacherId || null,
-                                roomId: s.roomId || null,
-                            })),
+                            create: buildScheduleCreateData(data.schedules),
                         }
                         : undefined,
                 },

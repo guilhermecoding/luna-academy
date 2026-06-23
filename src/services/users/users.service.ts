@@ -138,7 +138,7 @@ export async function updateUser(id: string, data: Prisma.UserUpdateInput) {
                 data: { teacherId: null },
             });
 
-            await tx.courseAssistant.deleteMany({
+            await tx.scheduleAssistant.deleteMany({
                 where: { assistantId: id },
             });
         }
@@ -167,7 +167,7 @@ export async function deleteUser(id: string) {
         });
 
         // Remover assistências, contas, sessões e notificações
-        await tx.courseAssistant.deleteMany({ where: { assistantId: id } });
+        await tx.scheduleAssistant.deleteMany({ where: { assistantId: id } });
         await tx.account.deleteMany({ where: { userId: id } });
         await tx.session.deleteMany({ where: { userId: id } });
         await tx.notification.deleteMany({ where: { userId: id } });

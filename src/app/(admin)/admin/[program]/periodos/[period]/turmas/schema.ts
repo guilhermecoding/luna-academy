@@ -38,13 +38,39 @@ export const dayOfWeekShortLabels: Record<(typeof DAYS_OF_WEEK)[number], string>
     SUNDAY: "Dom",
 };
 
+export const scheduleTeacherSchema = z.object({
+    teacherId: z.string().min(1, "Professor inválido"),
+    role: z.enum(["TITULAR", "ASSISTENTE"]),
+});
+
+export type ScheduleTeacherInput = z.infer<typeof scheduleTeacherSchema>;
+
 export const scheduleEntrySchema = z.object({
     dayOfWeek: z.enum(DAYS_OF_WEEK, {
         message: "Selecione o dia da semana",
     }),
     timeSlotId: z.string().min(1, "Selecione o horário"),
-    teacherId: z.string().optional().or(z.literal("")),
     roomId: z.string().optional().or(z.literal("")),
+    teachers: z.array(scheduleTeacherSchema).default([]),
+}).superRefine((data, ctx) => {
+    const ids = data.teachers.map((t) => t.teacherId);
+    const uniqueIds = new Set(ids);
+    if (uniqueIds.size !== ids.length) {
+        ctx.addIssue({
+            code: "custom",
+            message: "Não é possível adicionar o mesmo professor mais de uma vez no slot.",
+            path: ["teachers"],
+        });
+    }
+
+    const titularCount = data.teachers.filter((t) => t.role === "TITULAR").length;
+    if (data.teachers.length > 0 && titularCount !== 1) {
+        ctx.addIssue({
+            code: "custom",
+            message: "Selecione exatamente um professor titular quando houver professores no slot.",
+            path: ["teachers"],
+        });
+    }
 });
 
 export const courseSchema = z.object({

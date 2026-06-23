@@ -312,7 +312,7 @@ export type UserWhereInput = {
   genre?: Prisma.EnumUserGenreFilter<"User"> | $Enums.UserGenre
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
-  courseAssistants?: Prisma.CourseAssistantListRelationFilter
+  scheduleAssistants?: Prisma.ScheduleAssistantListRelationFilter
   lessons?: Prisma.LessonListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   schedules?: Prisma.ScheduleListRelationFilter
@@ -342,7 +342,7 @@ export type UserOrderByWithRelationInput = {
   genre?: Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
-  courseAssistants?: Prisma.CourseAssistantOrderByRelationAggregateInput
+  scheduleAssistants?: Prisma.ScheduleAssistantOrderByRelationAggregateInput
   lessons?: Prisma.LessonOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   schedules?: Prisma.ScheduleOrderByRelationAggregateInput
@@ -375,7 +375,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   genre?: Prisma.EnumUserGenreFilter<"User"> | $Enums.UserGenre
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
-  courseAssistants?: Prisma.CourseAssistantListRelationFilter
+  scheduleAssistants?: Prisma.ScheduleAssistantListRelationFilter
   lessons?: Prisma.LessonListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   schedules?: Prisma.ScheduleListRelationFilter
@@ -459,7 +459,7 @@ export type UserCreateInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
@@ -489,7 +489,7 @@ export type UserUncheckedCreateInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonUncheckedCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
@@ -519,7 +519,7 @@ export type UserUpdateInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
@@ -549,7 +549,7 @@ export type UserUncheckedUpdateInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUncheckedUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
@@ -817,18 +817,18 @@ export type UserUpdateOneWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
-export type UserCreateNestedOneWithoutCourseAssistantsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCourseAssistantsInput, Prisma.UserUncheckedCreateWithoutCourseAssistantsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCourseAssistantsInput
+export type UserCreateNestedOneWithoutScheduleAssistantsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutScheduleAssistantsInput, Prisma.UserUncheckedCreateWithoutScheduleAssistantsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutScheduleAssistantsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutCourseAssistantsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCourseAssistantsInput, Prisma.UserUncheckedCreateWithoutCourseAssistantsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCourseAssistantsInput
-  upsert?: Prisma.UserUpsertWithoutCourseAssistantsInput
+export type UserUpdateOneRequiredWithoutScheduleAssistantsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutScheduleAssistantsInput, Prisma.UserUncheckedCreateWithoutScheduleAssistantsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutScheduleAssistantsInput
+  upsert?: Prisma.UserUpsertWithoutScheduleAssistantsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCourseAssistantsInput, Prisma.UserUpdateWithoutCourseAssistantsInput>, Prisma.UserUncheckedUpdateWithoutCourseAssistantsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutScheduleAssistantsInput, Prisma.UserUpdateWithoutScheduleAssistantsInput>, Prisma.UserUncheckedUpdateWithoutScheduleAssistantsInput>
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -854,7 +854,7 @@ export type UserCreateWithoutSessionsInput = {
   systemRole?: $Enums.SystemRole
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
@@ -883,7 +883,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   systemRole?: $Enums.SystemRole
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonUncheckedCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
@@ -928,7 +928,7 @@ export type UserUpdateWithoutSessionsInput = {
   systemRole?: Prisma.EnumSystemRoleFieldUpdateOperationsInput | $Enums.SystemRole
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
@@ -957,7 +957,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   systemRole?: Prisma.EnumSystemRoleFieldUpdateOperationsInput | $Enums.SystemRole
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUncheckedUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
@@ -986,7 +986,7 @@ export type UserCreateWithoutAccountsInput = {
   systemRole?: $Enums.SystemRole
   genre?: $Enums.UserGenre
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
@@ -1015,7 +1015,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   systemRole?: $Enums.SystemRole
   genre?: $Enums.UserGenre
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonUncheckedCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
@@ -1060,7 +1060,7 @@ export type UserUpdateWithoutAccountsInput = {
   systemRole?: Prisma.EnumSystemRoleFieldUpdateOperationsInput | $Enums.SystemRole
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
@@ -1089,7 +1089,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   systemRole?: Prisma.EnumSystemRoleFieldUpdateOperationsInput | $Enums.SystemRole
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUncheckedUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
@@ -1119,7 +1119,7 @@ export type UserCreateWithoutSchedulesInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -1148,7 +1148,7 @@ export type UserUncheckedCreateWithoutSchedulesInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonUncheckedCreateNestedManyWithoutTeacherInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1193,7 +1193,7 @@ export type UserUpdateWithoutSchedulesInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -1222,7 +1222,7 @@ export type UserUncheckedUpdateWithoutSchedulesInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUncheckedUpdateManyWithoutTeacherNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1251,7 +1251,7 @@ export type UserCreateWithoutLessonsInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantCreateNestedManyWithoutAssistantInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
 }
@@ -1280,7 +1280,7 @@ export type UserUncheckedCreateWithoutLessonsInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedCreateNestedManyWithoutAssistantInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
 }
@@ -1325,7 +1325,7 @@ export type UserUpdateWithoutLessonsInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUpdateManyWithoutAssistantNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
 }
@@ -1354,7 +1354,7 @@ export type UserUncheckedUpdateWithoutLessonsInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedUpdateManyWithoutAssistantNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
 }
@@ -1383,7 +1383,7 @@ export type UserCreateWithoutNotificationsInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonCreateNestedManyWithoutTeacherInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
 }
@@ -1412,7 +1412,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   genre?: $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedCreateNestedManyWithoutAssistantInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedCreateNestedManyWithoutAssistantInput
   lessons?: Prisma.LessonUncheckedCreateNestedManyWithoutTeacherInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
 }
@@ -1457,7 +1457,7 @@ export type UserUpdateWithoutNotificationsInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUpdateManyWithoutTeacherNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
 }
@@ -1486,12 +1486,12 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   genre?: Prisma.EnumUserGenreFieldUpdateOperationsInput | $Enums.UserGenre
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  courseAssistants?: Prisma.CourseAssistantUncheckedUpdateManyWithoutAssistantNestedInput
+  scheduleAssistants?: Prisma.ScheduleAssistantUncheckedUpdateManyWithoutAssistantNestedInput
   lessons?: Prisma.LessonUncheckedUpdateManyWithoutTeacherNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeacherNestedInput
 }
 
-export type UserCreateWithoutCourseAssistantsInput = {
+export type UserCreateWithoutScheduleAssistantsInput = {
   id: string
   name: string
   email: string
@@ -1520,7 +1520,7 @@ export type UserCreateWithoutCourseAssistantsInput = {
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeacherInput
 }
 
-export type UserUncheckedCreateWithoutCourseAssistantsInput = {
+export type UserUncheckedCreateWithoutScheduleAssistantsInput = {
   id: string
   name: string
   email: string
@@ -1549,23 +1549,23 @@ export type UserUncheckedCreateWithoutCourseAssistantsInput = {
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeacherInput
 }
 
-export type UserCreateOrConnectWithoutCourseAssistantsInput = {
+export type UserCreateOrConnectWithoutScheduleAssistantsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCourseAssistantsInput, Prisma.UserUncheckedCreateWithoutCourseAssistantsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutScheduleAssistantsInput, Prisma.UserUncheckedCreateWithoutScheduleAssistantsInput>
 }
 
-export type UserUpsertWithoutCourseAssistantsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCourseAssistantsInput, Prisma.UserUncheckedUpdateWithoutCourseAssistantsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCourseAssistantsInput, Prisma.UserUncheckedCreateWithoutCourseAssistantsInput>
+export type UserUpsertWithoutScheduleAssistantsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutScheduleAssistantsInput, Prisma.UserUncheckedUpdateWithoutScheduleAssistantsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutScheduleAssistantsInput, Prisma.UserUncheckedCreateWithoutScheduleAssistantsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutCourseAssistantsInput = {
+export type UserUpdateToOneWithWhereWithoutScheduleAssistantsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCourseAssistantsInput, Prisma.UserUncheckedUpdateWithoutCourseAssistantsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutScheduleAssistantsInput, Prisma.UserUncheckedUpdateWithoutScheduleAssistantsInput>
 }
 
-export type UserUpdateWithoutCourseAssistantsInput = {
+export type UserUpdateWithoutScheduleAssistantsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1594,7 +1594,7 @@ export type UserUpdateWithoutCourseAssistantsInput = {
   schedules?: Prisma.ScheduleUpdateManyWithoutTeacherNestedInput
 }
 
-export type UserUncheckedUpdateWithoutCourseAssistantsInput = {
+export type UserUncheckedUpdateWithoutScheduleAssistantsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1631,7 +1631,7 @@ export type UserUncheckedUpdateWithoutCourseAssistantsInput = {
 export type UserCountOutputType = {
   accounts: number
   sessions: number
-  courseAssistants: number
+  scheduleAssistants: number
   lessons: number
   notifications: number
   schedules: number
@@ -1640,7 +1640,7 @@ export type UserCountOutputType = {
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
-  courseAssistants?: boolean | UserCountOutputTypeCountCourseAssistantsArgs
+  scheduleAssistants?: boolean | UserCountOutputTypeCountScheduleAssistantsArgs
   lessons?: boolean | UserCountOutputTypeCountLessonsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   schedules?: boolean | UserCountOutputTypeCountSchedulesArgs
@@ -1673,8 +1673,8 @@ export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountCourseAssistantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CourseAssistantWhereInput
+export type UserCountOutputTypeCountScheduleAssistantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScheduleAssistantWhereInput
 }
 
 /**
@@ -1723,7 +1723,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   genre?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  courseAssistants?: boolean | Prisma.User$courseAssistantsArgs<ExtArgs>
+  scheduleAssistants?: boolean | Prisma.User$scheduleAssistantsArgs<ExtArgs>
   lessons?: boolean | Prisma.User$lessonsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   schedules?: boolean | Prisma.User$schedulesArgs<ExtArgs>
@@ -1806,7 +1806,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  courseAssistants?: boolean | Prisma.User$courseAssistantsArgs<ExtArgs>
+  scheduleAssistants?: boolean | Prisma.User$scheduleAssistantsArgs<ExtArgs>
   lessons?: boolean | Prisma.User$lessonsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   schedules?: boolean | Prisma.User$schedulesArgs<ExtArgs>
@@ -1820,7 +1820,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
-    courseAssistants: Prisma.$CourseAssistantPayload<ExtArgs>[]
+    scheduleAssistants: Prisma.$ScheduleAssistantPayload<ExtArgs>[]
     lessons: Prisma.$LessonPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     schedules: Prisma.$SchedulePayload<ExtArgs>[]
@@ -2243,7 +2243,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  courseAssistants<T extends Prisma.User$courseAssistantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$courseAssistantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseAssistantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  scheduleAssistants<T extends Prisma.User$scheduleAssistantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scheduleAssistantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduleAssistantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lessons<T extends Prisma.User$lessonsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lessonsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LessonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   schedules<T extends Prisma.User$schedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$schedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2738,27 +2738,27 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * User.courseAssistants
+ * User.scheduleAssistants
  */
-export type User$courseAssistantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$scheduleAssistantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the CourseAssistant
+   * Select specific fields to fetch from the ScheduleAssistant
    */
-  select?: Prisma.CourseAssistantSelect<ExtArgs> | null
+  select?: Prisma.ScheduleAssistantSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the CourseAssistant
+   * Omit specific fields from the ScheduleAssistant
    */
-  omit?: Prisma.CourseAssistantOmit<ExtArgs> | null
+  omit?: Prisma.ScheduleAssistantOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.CourseAssistantInclude<ExtArgs> | null
-  where?: Prisma.CourseAssistantWhereInput
-  orderBy?: Prisma.CourseAssistantOrderByWithRelationInput | Prisma.CourseAssistantOrderByWithRelationInput[]
-  cursor?: Prisma.CourseAssistantWhereUniqueInput
+  include?: Prisma.ScheduleAssistantInclude<ExtArgs> | null
+  where?: Prisma.ScheduleAssistantWhereInput
+  orderBy?: Prisma.ScheduleAssistantOrderByWithRelationInput | Prisma.ScheduleAssistantOrderByWithRelationInput[]
+  cursor?: Prisma.ScheduleAssistantWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.CourseAssistantScalarFieldEnum | Prisma.CourseAssistantScalarFieldEnum[]
+  distinct?: Prisma.ScheduleAssistantScalarFieldEnum | Prisma.ScheduleAssistantScalarFieldEnum[]
 }
 
 /**

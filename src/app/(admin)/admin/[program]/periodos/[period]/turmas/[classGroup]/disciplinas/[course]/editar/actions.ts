@@ -13,6 +13,18 @@ import {
     editClassGroupCourseSchema,
     type EditClassGroupCourseInput,
 } from "./schema";
+import { splitScheduleTeachers } from "@/lib/schedule-teacher-utils";
+
+function mapScheduleToInput(schedule: EditClassGroupCourseInput["schedules"][number]) {
+    const { titularId, assistantIds } = splitScheduleTeachers(schedule.teachers);
+    return {
+        dayOfWeek: schedule.dayOfWeek as DayOfWeek,
+        timeSlotId: schedule.timeSlotId,
+        teacherId: titularId,
+        assistantIds,
+        roomId: schedule.roomId || null,
+    };
+}
 
 function revalidateCoursePaths(
     programSlug: string,
@@ -75,12 +87,7 @@ export async function editClassGroupCourseAction(
             roomId: validatedData.roomId || null,
             shift: validatedData.shift as Shift,
             classGroupId: classGroup.id,
-            schedules: validatedData.schedules.map((schedule) => ({
-                dayOfWeek: schedule.dayOfWeek as DayOfWeek,
-                timeSlotId: schedule.timeSlotId,
-                teacherId: schedule.teacherId || null,
-                roomId: schedule.roomId || null,
-            })),
+            schedules: validatedData.schedules.map(mapScheduleToInput),
         });
 
         updateTag(`period:${period.id}:courses`);
