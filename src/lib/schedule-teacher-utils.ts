@@ -124,6 +124,46 @@ export function formatCourseTeachersSummary(
     return `${parts[0]}, ${parts[1]} +${parts.length - 2}`;
 }
 
+export type CourseTeachersAggregate = {
+    titular: { id: string; name: string } | null;
+    assistants: { id: string; name: string }[];
+};
+
+export function aggregateCourseTeachers(
+    schedules: {
+        teacherId: string | null;
+        teacher?: { id: string; name: string } | null;
+        assistants?: { assistantId: string; assistant?: { id: string; name: string } }[];
+    }[],
+): CourseTeachersAggregate {
+    let titular: { id: string; name: string } | null = null;
+    const assistants = new Map<string, string>();
+
+    for (const schedule of schedules) {
+        if (schedule.teacherId && schedule.teacher && !titular) {
+            titular = { id: schedule.teacher.id, name: schedule.teacher.name };
+        }
+
+        for (const a of schedule.assistants ?? []) {
+            if (!assistants.has(a.assistantId)) {
+                assistants.set(a.assistantId, a.assistant?.name ?? "Assistente");
+            }
+        }
+    }
+
+    const assistantList = Array.from(assistants.entries())
+        .filter(([id]) => id !== titular?.id)
+        .map(([id, name]) => ({ id, name }));
+
+    return { titular, assistants: assistantList };
+}
+
+export function getCourseTeachersModalTitle(totalTeachers: number): string {
+    return totalTeachers === 1
+        ? "Professor desta disciplina"
+        : "Professores desta disciplina";
+}
+
 /** Prisma filter: schedules where user is titular or assistant */
 export function scheduleTeacherFilter(teacherId: string) {
     return {
