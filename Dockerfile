@@ -48,7 +48,7 @@
     # Next standalone
     ENV NEXT_TELEMETRY_DISABLED=1
     
-    RUN pnpm build:local
+    RUN pnpm build
     
     
     # ---------- RUNNER ----------
