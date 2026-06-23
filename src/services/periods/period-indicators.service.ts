@@ -1,5 +1,5 @@
 import { Shift } from "@/generated/prisma/enums";
-import { type AgeRangeValue } from "@/lib/age-range";
+import { AGE_RANGE_VALUES, type AgeRangeValue } from "@/lib/age-range";
 import { type GenreValue } from "@/lib/genre";
 import prisma from "@/lib/prisma";
 import { cacheLife, cacheTag } from "next/cache";
@@ -70,6 +70,33 @@ export type PeriodProportionStats = {
 export type PeriodStructureDistribution = {
     byShift: { shift: Shift; count: number }[];
     byClassGroup: { name: string; count: number }[];
+};
+
+export type PeriodAttendanceStats = {
+    present: number;
+    absent: number;
+    rate: number;
+    closedLessonsCount: number;
+};
+
+export type PeriodClassGroupsHistoryItem = {
+    periodId: string;
+    name: string;
+    classGroupsCount: number;
+    isCurrent: boolean;
+};
+
+export type PeriodClassGroupsHistory = {
+    periods: PeriodClassGroupsHistoryItem[];
+};
+
+export type PeriodAgeRangeByShiftItem = {
+    shift: Shift;
+    ageRange: Record<AgeRangeValue, number>;
+};
+
+export type PeriodAgeRangeByShift = {
+    byShift: PeriodAgeRangeByShiftItem[];
 };
 
 /**
@@ -466,5 +493,187 @@ export async function getPeriodStructureDistribution(periodId: string): Promise<
             count: shiftCounts.get(shift) ?? 0,
         })),
         byClassGroup: row?.by_class_group ?? [],
+    };
+}
+
+/**
+ * Frequência média do período com base em chamadas fechadas (attendance_updated_at preenchido).
+ */
+export async function getPeriodAttendanceStats(periodId: string): Promise<PeriodAttendanceStats> {
+    "use cache";
+    cacheLife("days");
+    cacheTag(`period:${periodId}:indicators`);
+
+    const [row] = await prisma.$queryRaw<{
+        present: number;
+        absent: number;
+        closed_lessons_count: number;
+    }[]>`
+        SELECT
+            COUNT(*) FILTER (WHERE a.is_present)::int AS present,
+            COUNT(*) FILTER (WHERE NOT a.is_present)::int AS absent,
+            COUNT(DISTINCT l.id)::int AS closed_lessons_count
+        FROM public.attendances a
+        INNER JOIN public.lessons l ON l.id = a.lesson_id
+        INNER JOIN public.courses c ON c.id = l.course_id
+        WHERE c.period_id = ${periodId}::uuid
+          AND l.attendance_updated_at IS NOT NULL
+    `;
+
+    const present = row?.present ?? 0;
+    const absent = row?.absent ?? 0;
+    const total = present + absent;
+    const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+
+    return {
+        present,
+        absent,
+        rate,
+        closedLessonsCount: row?.closed_lessons_count ?? 0,
+    };
+}
+
+const CLASS_GROUPS_HISTORY_LIMIT = 6;
+
+/**
+ * Quantidade de turmas do período atual e dos anteriores do mesmo programa.
+ */
+export async function getPeriodClassGroupsHistory(periodId: string): Promise<PeriodClassGroupsHistory> {
+    "use cache";
+    cacheLife("days");
+    cacheTag(`period:${periodId}:indicators`);
+
+    const [row] = await prisma.$queryRaw<{
+        periods: {
+            period_id: string;
+            name: string;
+            class_groups_count: number;
+            is_current: boolean;
+        }[] | null;
+    }[]>`
+        WITH current_period AS (
+            SELECT id, id_program, start_date, created_at
+            FROM public.periods
+            WHERE id = ${periodId}::uuid
+        ),
+        eligible_periods AS (
+            SELECT
+                p.id,
+                p.name,
+                p.start_date,
+                p.created_at,
+                (p.id = cp.id) AS is_current
+            FROM public.periods p
+            INNER JOIN current_period cp ON p.id_program = cp.id_program
+            WHERE p.start_date < cp.start_date
+               OR (p.start_date = cp.start_date AND p.created_at <= cp.created_at)
+            ORDER BY p.start_date DESC, p.created_at DESC
+            LIMIT ${CLASS_GROUPS_HISTORY_LIMIT}
+        ),
+        period_counts AS (
+            SELECT
+                ep.id,
+                ep.name,
+                ep.start_date,
+                ep.created_at,
+                ep.is_current,
+                COUNT(cg.id)::int AS class_groups_count
+            FROM eligible_periods ep
+            LEFT JOIN public.class_groups cg ON cg.period_id = ep.id
+            GROUP BY ep.id, ep.name, ep.start_date, ep.created_at, ep.is_current
+        )
+        SELECT COALESCE(
+            (
+                SELECT json_agg(
+                    json_build_object(
+                        'period_id', pc.id,
+                        'name', pc.name,
+                        'class_groups_count', pc.class_groups_count,
+                        'is_current', pc.is_current
+                    )
+                    ORDER BY pc.start_date ASC, pc.created_at ASC
+                )
+                FROM period_counts pc
+            ),
+            '[]'::json
+        ) AS periods
+    `;
+
+    return {
+        periods: (row?.periods ?? []).map((period) => ({
+            periodId: period.period_id,
+            name: period.name,
+            classGroupsCount: period.class_groups_count,
+            isCurrent: period.is_current,
+        })),
+    };
+}
+
+/**
+ * Distribuição de faixa etária dos alunos enturmados, agrupada por turno.
+ */
+export async function getPeriodAgeRangeByShift(periodId: string): Promise<PeriodAgeRangeByShift> {
+    "use cache";
+    cacheLife("days");
+    cacheTag(`period:${periodId}:indicators`);
+
+    const rows = await prisma.$queryRaw<{
+        shift: string;
+        baby: number;
+        children_i: number;
+        children_ii: number;
+        teen: number;
+        young: number;
+        adult: number;
+        senior: number;
+    }[]>`
+        WITH shift_students AS (
+            SELECT DISTINCT
+                cg.shift::text AS shift,
+                e.student_id,
+                EXTRACT(YEAR FROM AGE(CURRENT_DATE, s.birth_date))::int AS age
+            FROM public.class_groups cg
+            INNER JOIN public.courses c ON c.class_group_id = cg.id
+            INNER JOIN public.enrollments e ON e.course_id = c.id
+            INNER JOIN public.students s ON s.id = e.student_id
+            WHERE cg.period_id = ${periodId}::uuid
+        )
+        SELECT
+            shift,
+            COUNT(*) FILTER (WHERE age BETWEEN 0 AND 3)::int AS baby,
+            COUNT(*) FILTER (WHERE age BETWEEN 4 AND 8)::int AS children_i,
+            COUNT(*) FILTER (WHERE age BETWEEN 9 AND 12)::int AS children_ii,
+            COUNT(*) FILTER (WHERE age BETWEEN 13 AND 16)::int AS teen,
+            COUNT(*) FILTER (WHERE age BETWEEN 17 AND 24)::int AS young,
+            COUNT(*) FILTER (WHERE age BETWEEN 25 AND 60)::int AS adult,
+            COUNT(*) FILTER (WHERE age >= 61)::int AS senior
+        FROM shift_students
+        GROUP BY shift
+    `;
+
+    const countsByShift = new Map(
+        rows.map((row) => [
+            row.shift,
+            {
+                BABY: row.baby,
+                CHILDREN_I: row.children_i,
+                CHILDREN_II: row.children_ii,
+                TEEN: row.teen,
+                YOUNG: row.young,
+                ADULT: row.adult,
+                SENIOR: row.senior,
+            } satisfies Record<AgeRangeValue, number>,
+        ]),
+    );
+
+    const emptyAgeRange = Object.fromEntries(
+        AGE_RANGE_VALUES.map((range) => [range, 0]),
+    ) as Record<AgeRangeValue, number>;
+
+    return {
+        byShift: PERIOD_SHIFTS.map((shift) => ({
+            shift,
+            ageRange: countsByShift.get(shift) ?? emptyAgeRange,
+        })),
     };
 }

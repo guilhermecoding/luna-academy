@@ -45,6 +45,10 @@
   --color-shift-afternoon: var(--shift-afternoon);
   --color-shift-evening: var(--shift-evening);
   --color-period-class-group: var(--period-class-group);
+  --color-period-attendance-present: var(--period-attendance-present);
+  --color-period-attendance-absent: var(--period-attendance-absent);
+  --color-period-class-groups-current: var(--period-class-groups-current);
+  --color-period-class-groups-previous: var(--period-class-groups-previous);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -118,6 +122,10 @@
   --shift-afternoon: oklch(0.72 0.15 55);
   --shift-evening: oklch(0.58 0.18 280);
   --period-class-group: oklch(0.546 0.198 264.376);
+  --period-attendance-present: oklch(0.62 0.17 145);
+  --period-attendance-absent: oklch(0.65 0.2 25);
+  --period-class-groups-current: oklch(0.546 0.198 264.376);
+  --period-class-groups-previous: oklch(0.75 0.02 260);
   --genre-male: oklch(0.58 0.18 250);
   --genre-female: oklch(0.62 0.20 350);
   --genre-non-binary: oklch(0.55 0.22 300);
@@ -182,6 +190,10 @@
   --shift-afternoon: oklch(0.76 0.12 55);
   --shift-evening: oklch(0.68 0.14 280);
   --period-class-group: oklch(0.62 0.16 264.376);
+  --period-attendance-present: oklch(0.72 0.14 145);
+  --period-attendance-absent: oklch(0.72 0.16 25);
+  --period-class-groups-current: oklch(0.62 0.16 264.376);
+  --period-class-groups-previous: oklch(0.52 0.02 260);
   --genre-male: oklch(0.68 0.14 250);
   --genre-female: oklch(0.72 0.14 350);
   --genre-non-binary: oklch(0.65 0.18 300);
@@ -246,6 +258,10 @@
     --shift-afternoon: oklch(0.76 0.12 55);
     --shift-evening: oklch(0.68 0.14 280);
     --period-class-group: oklch(0.62 0.16 264.376);
+    --period-attendance-present: oklch(0.72 0.14 145);
+    --period-attendance-absent: oklch(0.72 0.16 25);
+    --period-class-groups-current: oklch(0.62 0.16 264.376);
+    --period-class-groups-previous: oklch(0.52 0.02 260);
     --genre-male: oklch(0.68 0.14 250);
     --genre-female: oklch(0.72 0.14 350);
     --genre-non-binary: oklch(0.65 0.18 300);

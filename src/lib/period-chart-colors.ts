@@ -90,3 +90,23 @@ export const shiftChartConfig = {
 export const classGroupChartConfig = {
     count: { label: "Alunos", color: PERIOD_CLASS_GROUP_FILL },
 } satisfies ChartConfig;
+
+export const PERIOD_ATTENDANCE_CHART_FILLS = {
+    PRESENT: "var(--period-attendance-present)",
+    ABSENT: "var(--period-attendance-absent)",
+} as const;
+
+export const attendanceChartConfig = {
+    count: { label: "Registros" },
+    PRESENT: { label: "Presentes", color: PERIOD_ATTENDANCE_CHART_FILLS.PRESENT },
+    ABSENT: { label: "Faltas", color: PERIOD_ATTENDANCE_CHART_FILLS.ABSENT },
+} satisfies ChartConfig;
+
+export const PERIOD_CLASS_GROUPS_CURRENT_FILL = "var(--period-class-groups-current)";
+export const PERIOD_CLASS_GROUPS_PREVIOUS_FILL = "var(--period-class-groups-previous)";
+
+export const classGroupsComparisonChartConfig = {
+    count: { label: "Turmas" },
+    current: { label: "Período atual", color: PERIOD_CLASS_GROUPS_CURRENT_FILL },
+    previous: { label: "Períodos anteriores", color: PERIOD_CLASS_GROUPS_PREVIOUS_FILL },
+} satisfies ChartConfig;

@@ -186,8 +186,16 @@ export async function bulkUpdateAttendanceAction(
             })),
         );
 
+        const course = await prisma.course.findUnique({
+            where: { id: courseId },
+            select: { periodId: true },
+        });
+
         updateTag(`lesson:${lessonId}:attendances`);
         updateTag(`course:${courseId}:lessons`);
+        if (course) {
+            updateTag(`period:${course.periodId}:indicators`);
+        }
 
         return { success: true };
     } catch (error) {

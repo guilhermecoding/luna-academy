@@ -1,5 +1,8 @@
+import PeriodAgeRangeByShiftChart from "./period-age-range-by-shift-chart";
 import PeriodAgeRangeChart from "./period-age-range-chart";
+import PeriodAttendanceChart from "./period-attendance-chart";
 import PeriodClassGroupChart from "./period-class-group-chart";
+import PeriodClassGroupsComparisonChart from "./period-class-groups-comparison-chart";
 import PeriodEnrollmentStatusChart from "./period-enrollment-status-chart";
 import PeriodGenderChart from "./period-gender-chart";
 import PeriodSadAccessChart from "./period-sad-access-chart";
@@ -24,6 +27,13 @@ export default function PeriodIndicatorsCharts({ periodId }: { periodId: string 
                 <PeriodShiftChart periodId={periodId} />
                 <PeriodClassGroupChart periodId={periodId} />
             </div>
+
+            <div className="grid grid-cols-1 gap-8 @3xl/main:grid-cols-2">
+                <PeriodAttendanceChart periodId={periodId} />
+                <PeriodClassGroupsComparisonChart periodId={periodId} />
+            </div>
+
+            <PeriodAgeRangeByShiftChart periodId={periodId} />
         </div>
     );
 }
