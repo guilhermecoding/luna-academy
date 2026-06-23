@@ -3,7 +3,13 @@
 import { useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { IconCheck, IconCalendarPlus, IconCalendarEvent } from "@tabler/icons-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import type { LessonListItem } from "@/services/lessons/lessons.service";
 import LessonCardList from "./lesson-card-list";
 import type { ScheduleOption } from "./edit-lesson-dialog";
@@ -15,6 +21,7 @@ import {
     type LessonFilter,
     type UpcomingLesson,
 } from "@/lib/lesson-schedule-utils";
+import { IconFilter } from "@tabler/icons-react";
 
 const PAGE_SIZE = 10;
 
@@ -98,33 +105,30 @@ export function LessonsFilteredList({
 
     return (
         <div className={`space-y-4 ${isPending ? "opacity-70 pointer-events-none" : ""}`}>
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                <div className="flex flex-wrap items-center gap-1 p-0.5 bg-muted/50 rounded-full border border-surface-border w-fit">
-                    <Button
-                        variant={!currentFilter ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => handleFilter()}
-                        className="rounded-full text-xs px-3"
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="ml-2 flex items-center gap-2">
+                    <IconFilter className="size-5 text-muted-foreground" />
+                    <Select
+                        value={currentFilter ?? "all"}
+                        onValueChange={(value) => {
+                            handleFilter(value === "all" ? undefined : (value as LessonFilter));
+                        }}
                     >
-                        Todas ({counts.all})
-                    </Button>
-                    {(Object.keys(FILTER_LABELS) as LessonFilter[]).map((key) => (
-                        <Button
-                            key={key}
-                            variant={currentFilter === key ? "default" : "ghost"}
-                            size="sm"
-                            onClick={() => handleFilter(key)}
-                            className="rounded-full text-xs px-3"
-                        >
-                            {key === "fechadas" && <IconCheck className="size-3 mr-1" />}
-                            {key === "registradas" && <IconCalendarEvent className="size-3 mr-1" />}
-                            {key === "nao-registradas" && <IconCalendarPlus className="size-3 mr-1" />}
-                            {FILTER_LABELS[key]} ({counts[key]})
-                        </Button>
-                    ))}
+                        <SelectTrigger className="w-full bg-background sm:w-72">
+                            <SelectValue placeholder="Filtrar aulas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todas ({counts.all})</SelectItem>
+                            {(Object.keys(FILTER_LABELS) as LessonFilter[]).map((key) => (
+                                <SelectItem key={key} value={key}>
+                                    {FILTER_LABELS[key]} ({counts[key]})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
-                <p className="text-sm text-muted-foreground">
+                <p className="ml-2 text-sm text-muted-foreground">
                     {filteredItems.length} aula{filteredItems.length !== 1 ? "s" : ""} no filtro
                 </p>
             </div>
