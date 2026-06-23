@@ -10,6 +10,7 @@ import { courseUpdateSchema, type CourseUpdateInput } from "../../schema";
 import { revalidatePath, updateTag } from "next/cache";
 import { DayOfWeek, Shift } from "@/generated/prisma/enums";
 import { editClassGroupSchema, type EditClassGroupInput } from "./schema";
+import { splitScheduleTeachers } from "@/lib/schedule-teacher-utils";
 
 const deleteCourseSchema = z.object({
     confirmationName: z.string().min(1, "Digite o nome da disciplina para confirmar"),
@@ -88,12 +89,16 @@ export async function updateCourseAction(
             roomId: validatedData.roomId || null,
             shift: validatedData.shift as Shift,
             classGroupId: validatedData.classGroupId || null,
-            schedules: validatedData.schedules.map((s) => ({
-                dayOfWeek: s.dayOfWeek as DayOfWeek,
-                timeSlotId: s.timeSlotId,
-                teacherId: s.teacherId || null,
-                roomId: s.roomId || null,
-            })),
+            schedules: validatedData.schedules.map((s) => {
+                const { titularId, assistantIds } = splitScheduleTeachers(s.teachers);
+                return {
+                    dayOfWeek: s.dayOfWeek as DayOfWeek,
+                    timeSlotId: s.timeSlotId,
+                    teacherId: titularId,
+                    assistantIds,
+                    roomId: s.roomId || null,
+                };
+            }),
         });
 
         updateTag(`period:${course.periodId}:courses`);

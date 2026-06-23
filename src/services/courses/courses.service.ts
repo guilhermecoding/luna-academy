@@ -1,7 +1,30 @@
 import { Course, DayOfWeek, Prisma, Shift } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { cacheLife, cacheTag } from "next/cache";
-import { CourseWithRelations } from "./courses.type";
+import { CourseWithRelations, scheduleInclude } from "./courses.type";
+
+export type ScheduleInput = {
+    dayOfWeek: DayOfWeek;
+    timeSlotId: string;
+    teacherId?: string | null;
+    assistantIds?: string[];
+    roomId?: string | null;
+};
+
+function buildScheduleCreateData(schedules: ScheduleInput[]) {
+    return schedules.map((s) => ({
+        dayOfWeek: s.dayOfWeek,
+        timeSlotId: s.timeSlotId,
+        teacherId: s.teacherId || null,
+        roomId: s.roomId || null,
+        assistants:
+            s.assistantIds && s.assistantIds.length > 0
+                ? {
+                      create: s.assistantIds.map((assistantId) => ({ assistantId })),
+                  }
+                : undefined,
+    }));
+}
 
 /**
  * Lista todas as turmas de um período específico.
@@ -92,20 +115,7 @@ export async function getCourseByPeriodIdAndCode(periodId: string, code: string)
             },
             period: true,
             schedules: {
-                include: {
-                    timeSlot: true,
-                    teacher: {
-                        select: {
-                            id: true,
-                            name: true,
-                        },
-                    },
-                    room: {
-                        include: {
-                            campus: true,
-                        },
-                    },
-                },
+                include: scheduleInclude,
                 orderBy: [
                     { dayOfWeek: "asc" },
                     { timeSlot: { startTime: "asc" } },
@@ -126,9 +136,6 @@ function mapScheduleUniqueError(error: Prisma.PrismaClientKnownRequestError): st
     if (targetStr.includes("room_id")) {
         return "Esta sala já está ocupada neste dia e horário por outra turma.";
     }
-    if (targetStr.includes("teacher_id")) {
-        return "O professor selecionado já possui aula neste dia e horário.";
-    }
     if (targetStr.includes("course_id")) {
         return "Esta turma já possui uma aula cadastrada neste dia e horário.";
     }
@@ -147,12 +154,7 @@ export async function createCourse(data: {
     roomId?: string | null;
     shift: Shift;
     classGroupId?: string | null;
-    schedules?: {
-        dayOfWeek: DayOfWeek;
-        timeSlotId: string;
-        teacherId?: string | null;
-        roomId?: string | null;
-    }[];
+    schedules?: ScheduleInput[];
 }): Promise<Course> {
     try {
         const course = await prisma.course.create({
@@ -166,12 +168,7 @@ export async function createCourse(data: {
                 classGroupId: data.classGroupId || null,
                 schedules: data.schedules && data.schedules.length > 0
                     ? {
-                        create: data.schedules.map((s) => ({
-                            dayOfWeek: s.dayOfWeek,
-                            timeSlotId: s.timeSlotId,
-                            teacherId: s.teacherId || null,
-                            roomId: s.roomId || null,
-                        })),
+                        create: buildScheduleCreateData(data.schedules),
                     }
                     : undefined,
             },
@@ -198,17 +195,12 @@ export async function updateCourse(
         roomId?: string | null;
         shift: Shift;
         classGroupId?: string | null;
-        schedules?: {
-            dayOfWeek: DayOfWeek;
-            timeSlotId: string;
-            teacherId?: string | null;
-            roomId?: string | null;
-        }[];
+        schedules?: ScheduleInput[];
     },
 ): Promise<Course> {
     try {
         const course = await prisma.$transaction(async (tx) => {
-            // Remove todos os schedules antigos
+            // Remove todos os schedules antigos (assistants cascade)
             await tx.schedule.deleteMany({
                 where: { courseId: id },
             });
@@ -225,12 +217,7 @@ export async function updateCourse(
                     classGroupId: data.classGroupId || null,
                     schedules: data.schedules && data.schedules.length > 0
                         ? {
-                            create: data.schedules.map((s) => ({
-                                dayOfWeek: s.dayOfWeek,
-                                timeSlotId: s.timeSlotId,
-                                teacherId: s.teacherId || null,
-                                roomId: s.roomId || null,
-                            })),
+                            create: buildScheduleCreateData(data.schedules),
                         }
                         : undefined,
                 },

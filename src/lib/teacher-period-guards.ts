@@ -1,6 +1,11 @@
 import type { Period } from "@/generated/prisma/client";
 import { requireAdminWrite, requireTeacherWrite } from "@/lib/auth-guards";
 import prisma from "@/lib/prisma";
+import {
+    filterSchedulesForTeacher,
+    isTeacherAssignedToCourse,
+    isTeacherAssignedToSchedule,
+} from "@/lib/schedule-teacher-utils";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
@@ -127,16 +132,38 @@ async function resolveCourseBySlugs(
     return { period, classGroup, course };
 }
 
-function teacherTeachesCourse(
+export function getTeacherVisibleScheduleIds(
     course: NonNullable<Awaited<ReturnType<typeof getCourseByPeriodIdAndCode>>>,
     teacherId: string,
-) {
-    return course.schedules.some((schedule) => schedule.teacherId === teacherId);
+): Set<string> {
+    return new Set(
+        filterSchedulesForTeacher(course.schedules, teacherId).map((s) => s.id),
+    );
+}
+
+async function teacherCanAccessSchedule(
+    courseId: string,
+    scheduleId: string | null | undefined,
+    teacherId: string,
+): Promise<boolean> {
+    if (!scheduleId) return false;
+
+    const schedule = await prisma.schedule.findFirst({
+        where: { id: scheduleId, courseId },
+        select: {
+            id: true,
+            teacherId: true,
+            assistants: { select: { assistantId: true } },
+        },
+    });
+
+    if (!schedule) return false;
+    return isTeacherAssignedToSchedule(schedule, teacherId);
 }
 
 /**
  * Permite mutações de admin em qualquer estado do período,
- * ou de professor apenas em período ativo na disciplina que ministra.
+ * ou de professor apenas em período ativo na disciplina em que possui slot.
  */
 export async function requireCourseMutationAccess(
     programSlug: string,
@@ -173,11 +200,26 @@ export async function requireCourseMutationAccess(
         return { ok: false, error: resolved.error };
     }
 
-    if (!teacherTeachesCourse(resolved.course, teacherResult.session.user.id)) {
+    if (!isTeacherAssignedToCourse(resolved.course, teacherResult.session.user.id)) {
         return { ok: false, error: "Não autorizado." };
     }
 
     return { ok: true, session: teacherResult.session, resolved };
+}
+
+/**
+ * Valida se professor pode mutar aula vinculada a um schedule específico.
+ */
+export async function requireTeacherScheduleMutationAccess(
+    courseId: string,
+    scheduleId: string | null | undefined,
+    teacherId: string,
+): Promise<GuardFail | GuardOk> {
+    const allowed = await teacherCanAccessSchedule(courseId, scheduleId, teacherId);
+    if (!allowed) {
+        return { ok: false, error: "Não autorizado para este horário." };
+    }
+    return { ok: true, session: { user: { id: teacherId } } };
 }
 
 type LessonAttendanceMutationAccess =
@@ -185,7 +227,7 @@ type LessonAttendanceMutationAccess =
     | GuardFail;
 
 /**
- * Permite salvar presenças para admin ou professor da disciplina em período ativo.
+ * Permite salvar presenças para admin ou professor alocado ao slot da aula.
  */
 export async function requireLessonAttendanceMutationAccess(
     courseId: string,
@@ -210,29 +252,32 @@ export async function requireLessonAttendanceMutationAccess(
         return teacherResult;
     }
 
-    const course = await prisma.course.findUnique({
-        where: { id: courseId },
+    const lesson = await prisma.lesson.findFirst({
+        where: { id: lessonId, courseId },
         select: {
             id: true,
-            schedules: {
-                select: { teacherId: true },
-            },
-            period: {
+            scheduleId: true,
+            course: {
                 select: {
-                    completedAt: true,
-                    slug: true,
-                    program: { select: { slug: true } },
+                    id: true,
+                    period: {
+                        select: {
+                            completedAt: true,
+                            slug: true,
+                            program: { select: { slug: true } },
+                        },
+                    },
                 },
             },
         },
     });
 
-    if (!course) {
-        return { ok: false, error: "Disciplina não encontrada." };
+    if (!lesson) {
+        return { ok: false, error: "Aula não encontrada." };
     }
 
-    const programSlug = course.period.program.slug;
-    const periodSlug = course.period.slug;
+    const programSlug = lesson.course.period.program.slug;
+    const periodSlug = lesson.course.period.slug;
 
     const periodAccess = await requireTeacherActivePeriod(
         programSlug,
@@ -243,17 +288,13 @@ export async function requireLessonAttendanceMutationAccess(
         return periodAccess;
     }
 
-    if (!course.schedules.some((schedule) => schedule.teacherId === teacherResult.session.user.id)) {
-        return { ok: false, error: "Não autorizado." };
-    }
-
-    const lesson = await prisma.lesson.findFirst({
-        where: { id: lessonId, courseId },
-        select: { id: true },
-    });
-
-    if (!lesson) {
-        return { ok: false, error: "Aula não encontrada." };
+    const scheduleAccess = await requireTeacherScheduleMutationAccess(
+        courseId,
+        lesson.scheduleId,
+        teacherResult.session.user.id,
+    );
+    if (!scheduleAccess.ok) {
+        return scheduleAccess;
     }
 
     return { ok: true, session: teacherResult.session, courseId, lessonId };

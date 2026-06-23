@@ -1,6 +1,7 @@
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
+import { isTeacherAssignedToCourse } from "@/lib/schedule-teacher-utils";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/lib/auth";
@@ -35,9 +36,8 @@ async function ClassGroupDisciplinesLayoutContent({
         return notFound();
     }
 
-    // Validar se o professor tem acesso a esta turma (tem que ter aulas agendadas nela)
-    const hasAccess = classGroup.courses.some(course =>
-        course.schedules.some(schedule => schedule.teacherId === session?.user?.id),
+    const hasAccess = classGroup.courses.some((course) =>
+        isTeacherAssignedToCourse(course, session.user.id),
     );
 
     if (!hasAccess) {

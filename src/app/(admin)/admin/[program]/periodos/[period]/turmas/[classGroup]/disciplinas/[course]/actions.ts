@@ -2,9 +2,11 @@
 
 import { updateTag } from "next/cache";
 import prisma from "@/lib/prisma";
+import { requireAdminWrite } from "@/lib/auth-guards";
 import {
     requireCourseMutationAccess,
     requireLessonAttendanceMutationAccess,
+    requireTeacherScheduleMutationAccess,
 } from "@/lib/teacher-period-guards";
 import {
     createLesson,
@@ -41,6 +43,19 @@ export async function createLessonAction(
         const validated = createLessonSchema.parse(data);
 
         const { course } = authResult.resolved;
+
+        const adminResult = await requireAdminWrite();
+        if (!adminResult.ok) {
+            const scheduleAccess = await requireTeacherScheduleMutationAccess(
+                course.id,
+                validated.scheduleId || null,
+                authResult.session.user.id,
+            );
+            if (!scheduleAccess.ok) {
+                return { success: false, error: scheduleAccess.error };
+            }
+        }
+
         const lessonDate = new Date(validated.date + "T00:00:00");
 
         // Validar colisão: mesma disciplina + mesma data + mesmo timeSlot
@@ -98,6 +113,28 @@ export async function updateLessonAction(
         const validated = updateLessonSchema.parse(data);
 
         const { course } = authResult.resolved;
+
+        const existingLesson = await prisma.lesson.findFirst({
+            where: { id: validated.lessonId, courseId: course.id },
+            select: { scheduleId: true },
+        });
+        if (!existingLesson) {
+            return { success: false, error: "Aula não encontrada." };
+        }
+
+        const adminResult = await requireAdminWrite();
+        if (!adminResult.ok) {
+            const targetScheduleId = validated.scheduleId || existingLesson.scheduleId;
+            const scheduleAccess = await requireTeacherScheduleMutationAccess(
+                course.id,
+                targetScheduleId,
+                authResult.session.user.id,
+            );
+            if (!scheduleAccess.ok) {
+                return { success: false, error: scheduleAccess.error };
+            }
+        }
+
         const lessonDate = new Date(validated.date + "T00:00:00");
 
         // Validar colisão: mesma disciplina + mesma data + mesmo timeSlot, mas ignorando a própria aula
@@ -152,6 +189,26 @@ export async function deleteLessonAction(
 
     try {
         const { course } = authResult.resolved;
+
+        const existingLesson = await prisma.lesson.findFirst({
+            where: { id: lessonId, courseId: course.id },
+            select: { scheduleId: true },
+        });
+        if (!existingLesson) {
+            return { success: false, error: "Aula não encontrada." };
+        }
+
+        const adminResult = await requireAdminWrite();
+        if (!adminResult.ok) {
+            const scheduleAccess = await requireTeacherScheduleMutationAccess(
+                course.id,
+                existingLesson.scheduleId,
+                authResult.session.user.id,
+            );
+            if (!scheduleAccess.ok) {
+                return { success: false, error: scheduleAccess.error };
+            }
+        }
 
         await deleteLesson(lessonId);
 

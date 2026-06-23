@@ -11,6 +11,7 @@ import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getSubjectsByDegreeAndBasePeriod } from "@/services/subjects/subjects.service";
 import { getAllRooms } from "@/services/rooms/rooms.service";
 import { getTeachers, getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
+import { scheduleToTeacherEntries } from "@/lib/schedule-teacher-utils";
 import { EditClassGroupSubjectForm } from "./_components/edit-class-group-subject-form";
 import { WritePageGuard } from "@/components/write-page-guard";
 
@@ -81,8 +82,8 @@ async function EditClassGroupCourseContent({
                                     schedules: course.schedules.map((schedule) => ({
                                         dayOfWeek: schedule.dayOfWeek,
                                         timeSlotId: schedule.timeSlotId,
-                                        teacherId: schedule.teacherId || "",
                                         roomId: schedule.roomId || "",
+                                        teachers: scheduleToTeacherEntries(schedule),
                                     })),
                                 }}
                                 subjects={availableSubjects.map((subject) => ({

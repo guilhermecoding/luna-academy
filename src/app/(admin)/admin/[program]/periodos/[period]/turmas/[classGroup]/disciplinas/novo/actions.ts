@@ -9,6 +9,18 @@ import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-gr
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getSubjectById } from "@/services/subjects/subjects.service";
 import { createClassGroupSubjectSchema, type CreateClassGroupSubjectInput } from "./schema";
+import { splitScheduleTeachers } from "@/lib/schedule-teacher-utils";
+
+function mapScheduleToInput(schedule: CreateClassGroupSubjectInput["schedules"][number]) {
+    const { titularId, assistantIds } = splitScheduleTeachers(schedule.teachers);
+    return {
+        dayOfWeek: schedule.dayOfWeek as DayOfWeek,
+        timeSlotId: schedule.timeSlotId,
+        teacherId: titularId,
+        assistantIds,
+        roomId: schedule.roomId || null,
+    };
+}
 
 export async function createClassGroupSubjectAction(
     programSlug: string,
@@ -63,12 +75,7 @@ export async function createClassGroupSubjectAction(
             roomId: validatedData.roomId || null,
             shift: validatedData.shift,
             classGroupId: classGroup.id,
-            schedules: validatedData.schedules.map((schedule) => ({
-                dayOfWeek: schedule.dayOfWeek as DayOfWeek,
-                timeSlotId: schedule.timeSlotId,
-                teacherId: schedule.teacherId || null,
-                roomId: schedule.roomId || null,
-            })),
+            schedules: validatedData.schedules.map(mapScheduleToInput),
         });
 
         updateTag(`period:${period.id}:courses`);

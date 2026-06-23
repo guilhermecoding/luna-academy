@@ -1,6 +1,8 @@
 import { ClassGroup, Prisma, Shift } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import { scheduleTeacherFilter } from "@/lib/schedule-teacher-utils";
 import { backfillAttendancesForStudents } from "@/services/lessons/lessons.service";
+import { scheduleInclude } from "@/services/courses/courses.type";
 import { cacheLife, cacheTag } from "next/cache";
 
 /**
@@ -19,9 +21,7 @@ export async function getClassGroupsByPeriodId(periodId: string, teacherId?: str
                 courses: {
                     some: {
                         schedules: {
-                            some: {
-                                teacherId,
-                            },
+                            some: scheduleTeacherFilter(teacherId),
                         },
                     },
                 },
@@ -104,20 +104,7 @@ export async function getClassGroupByPeriodIdAndSlug(
                     subject: true,
                     period: true,
                     schedules: {
-                        include: {
-                            timeSlot: true,
-                            teacher: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                },
-                            },
-                            room: {
-                                include: {
-                                    campus: true,
-                                },
-                            },
-                        },
+                        include: scheduleInclude,
                     },
                     room: {
                         include: {
@@ -275,7 +262,6 @@ export async function deleteClassGroup(id: string): Promise<ClassGroup> {
             if (courseIds.length > 0) {
                 await tx.enrollment.deleteMany({ where: { courseId: { in: courseIds } } });
                 await tx.schedule.deleteMany({ where: { courseId: { in: courseIds } } });
-                await tx.courseAssistant.deleteMany({ where: { courseId: { in: courseIds } } });
                 await tx.studentCourseStats.deleteMany({ where: { courseId: { in: courseIds } } });
                 await tx.finalGrade.deleteMany({ where: { courseId: { in: courseIds } } });
                 await tx.activityGrade.deleteMany({ where: { activity: { courseId: { in: courseIds } } } });

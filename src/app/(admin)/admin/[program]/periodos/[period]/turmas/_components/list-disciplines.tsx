@@ -8,6 +8,7 @@ import { getAvatarColor, getInitials, hashString } from "@/lib/avatar-utils";
 import { CourseWithRelations } from "@/services/courses/courses.type";
 import Link from "next/link";
 import { useCanWrite } from "@/components/write-access-provider";
+import { formatCourseTeachersSummary } from "@/lib/schedule-teacher-utils";
 
 const OCCUPANCY_COLORS = [
     { bar: "bg-green-500", text: "text-green-700 dark:text-green-400" },
@@ -149,7 +150,7 @@ function ListDisciplinesContent({
                 <tbody className="divide-y divide-surface-border">
                     {courses.map((course) => {
                         const avatarColor = getAvatarColor(course.subject.name);
-                        const teacher = course.schedules.find(s => s.teacher)?.teacher?.name || "Não atribuído";
+                        const teacher = formatCourseTeachersSummary(course.schedules);
                         const enrolled = studentCount;
                         const roomCapacity = course.room ? Number(course.room.capacity) : 0;
                         const occupancyPct = roomCapacity > 0 ? Math.min((enrolled / roomCapacity) * 100, 100) : 0;

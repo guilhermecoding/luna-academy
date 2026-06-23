@@ -1,5 +1,6 @@
 import { Program } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
+import { scheduleTeacherFilter } from "@/lib/schedule-teacher-utils";
 import { cacheLife, cacheTag } from "next/cache";
 import { PeriodListItem } from "@/services/periods/periods.type";
 
@@ -160,9 +161,7 @@ export async function getProgramsForTeacher(teacherId: string) {
                     courses: {
                         some: {
                             schedules: {
-                                some: {
-                                    teacherId: teacherId,
-                                },
+                                some: scheduleTeacherFilter(teacherId),
                             },
                         },
                     },
@@ -210,9 +209,7 @@ export async function getPeriodsForTeacherByProgramSlug(
             courses: {
                 some: {
                     schedules: {
-                        some: {
-                            teacherId: teacherId,
-                        },
+                        some: scheduleTeacherFilter(teacherId),
                     },
                 },
             },

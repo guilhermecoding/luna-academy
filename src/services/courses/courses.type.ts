@@ -1,5 +1,31 @@
 import { Prisma } from "@/generated/prisma/client";
 
+const scheduleInclude = {
+    timeSlot: true,
+    teacher: {
+        select: {
+            id: true,
+            name: true,
+        },
+    },
+    assistants: {
+        select: {
+            assistantId: true,
+            assistant: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+    },
+    room: {
+        include: {
+            campus: true,
+        },
+    },
+} satisfies Prisma.ScheduleInclude;
+
 export type CourseWithRelations = Prisma.CourseGetPayload<{
     include: {
         subject: true;
@@ -10,20 +36,9 @@ export type CourseWithRelations = Prisma.CourseGetPayload<{
         };
         period: true;
         schedules: {
-            include: {
-                timeSlot: true;
-                teacher: {
-                    select: {
-                        id: true;
-                        name: true;
-                    };
-                };
-                room: {
-                    include: {
-                        campus: true;
-                    };
-                };
-            };
+            include: typeof scheduleInclude;
         };
     };
 }>;
+
+export { scheduleInclude };

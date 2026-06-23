@@ -76,7 +76,7 @@ export const ModelName = {
   FinalGrade: 'FinalGrade',
   StudentCourseStats: 'StudentCourseStats',
   Notification: 'Notification',
-  CourseAssistant: 'CourseAssistant'
+  ScheduleAssistant: 'ScheduleAssistant'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -453,14 +453,14 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
-export const CourseAssistantScalarFieldEnum = {
+export const ScheduleAssistantScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  courseId: 'courseId',
+  scheduleId: 'scheduleId',
   assistantId: 'assistantId'
 } as const
 
-export type CourseAssistantScalarFieldEnum = (typeof CourseAssistantScalarFieldEnum)[keyof typeof CourseAssistantScalarFieldEnum]
+export type ScheduleAssistantScalarFieldEnum = (typeof ScheduleAssistantScalarFieldEnum)[keyof typeof ScheduleAssistantScalarFieldEnum]
 
 
 export const SortOrder = {

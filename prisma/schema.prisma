@@ -32,10 +32,10 @@ model User {
   genre            UserGenre         @default(PREFER_NOT_TO_SAY)
   accounts         Account[]
   sessions         Session[]
-  courseAssistants CourseAssistant[]
-  lessons          Lesson[]
-  notifications    Notification[]
-  schedules        Schedule[]
+  scheduleAssistants ScheduleAssistant[]
+  lessons            Lesson[]
+  notifications      Notification[]
+  schedules          Schedule[]
 
   @@map("user")
   @@schema("better_auth")
@@ -255,16 +255,16 @@ model Schedule {
   courseId   String    @map("course_id") @db.Uuid
   dayOfWeek  DayOfWeek @map("day_of_week")
   timeSlotId String    @map("time_slot_id") @db.Uuid
-  teacherId  String?   @map("teacher_id")
-  roomId     String?   @map("room_id") @db.Uuid
-  lessons    Lesson[]
-  course     Course    @relation(fields: [courseId], references: [id])
-  room       Room?     @relation(fields: [roomId], references: [id])
-  teacher    User?     @relation(fields: [teacherId], references: [id])
-  timeSlot   TimeSlot  @relation(fields: [timeSlotId], references: [id])
+  teacherId   String?              @map("teacher_id")
+  roomId      String?              @map("room_id") @db.Uuid
+  lessons     Lesson[]
+  assistants  ScheduleAssistant[]
+  course      Course               @relation(fields: [courseId], references: [id])
+  room        Room?                @relation(fields: [roomId], references: [id])
+  teacher     User?                @relation(fields: [teacherId], references: [id])
+  timeSlot    TimeSlot             @relation(fields: [timeSlotId], references: [id])
 
   @@unique([courseId, dayOfWeek, timeSlotId])
-  @@unique([teacherId, dayOfWeek, timeSlotId])
   @@unique([roomId, dayOfWeek, timeSlotId])
   @@map("schedules")
   @@schema("public")
@@ -280,9 +280,8 @@ model Course {
   subjectId        String               @map("subject_id") @db.Uuid
   shift            Shift
   classGroupId     String?              @map("class_group_id") @db.Uuid
-  activities       Activity[]
-  courseAssistants CourseAssistant[]
-  classGroup       ClassGroup?          @relation(fields: [classGroupId], references: [id])
+  activities Activity[]
+  classGroup ClassGroup?          @relation(fields: [classGroupId], references: [id])
   period           Period               @relation(fields: [periodId], references: [id])
   room             Room?                @relation(fields: [roomId], references: [id])
   subject          Subject              @relation(fields: [subjectId], references: [id])
@@ -466,15 +465,16 @@ model Notification {
   @@schema("public")
 }
 
-model CourseAssistant {
+model ScheduleAssistant {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  courseId    String   @map("course_id") @db.Uuid
+  scheduleId  String   @map("schedule_id") @db.Uuid
   assistantId String   @map("assistant_id")
   assistant   User     @relation(fields: [assistantId], references: [id])
-  course      Course   @relation(fields: [courseId], references: [id])
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
-  @@map("course_assistants")
+  @@unique([scheduleId, assistantId])
+  @@map("schedule_assistants")
   @@schema("public")
 }
 
