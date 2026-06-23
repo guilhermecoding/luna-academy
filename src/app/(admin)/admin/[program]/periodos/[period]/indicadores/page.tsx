@@ -15,14 +15,16 @@ import SadAccessPeriodFlipCard from "./_components/sad-access-period-flip-card";
 import PeriodStudentsAgeAverageFlipCard from "./_components/period-students-age-average-flip-card";
 import PeriodOriginSchoolFlipCard from "./_components/period-origin-school-flip-card";
 import PeriodIndicatorsCharts from "./_components/period-indicators-charts";
+import { Suspense } from "react";
+import AdminPeriodIndicatorPageSkeleton from "./_components/admin-period-indicator-page-skeleton";
 
 export const metadata: Metadata = {
     title: "Indicadores Gerais do Período",
 };
 
-export default async function AdminPeriodIndicatorsPage({
+async function AdminPeriodIndicatorsPageContent({
     params,
-}: PageProps<"/admin/[program]/periodos/[period]/indicadores">) {
+}: Omit<PageProps<"/admin/[program]/periodos/[period]/indicadores">, "searchParams">) {
     const { program, period } = await params;
     const periodData = await getPeriodByProgramAndSlug(program, period);
 
@@ -32,6 +34,27 @@ export default async function AdminPeriodIndicatorsPage({
 
     const periodId = periodData.id;
 
+    return (
+        <Section className="mt-8 flex flex-col gap-8">
+            <div className="grid grid-cols-1 gap-8 @3xl/main:grid-cols-2 @6xl/main:grid-cols-3">
+                <StudentsPeriodCountFlipCard periodId={periodId} />
+                <PeriodStudentsAgeAverageFlipCard periodId={periodId} />
+                <PeriodOriginSchoolFlipCard periodId={periodId} />
+                <EnrolledStudentsPeriodFlipCard periodId={periodId} />
+                <WaitingStudentsPeriodFlipCard periodId={periodId} />
+                <EnrollmentRatePeriodFlipCard periodId={periodId} />
+                <SadAccessPeriodFlipCard periodId={periodId} />
+                <ClassGroupsCountPeriodFlipCard periodId={periodId} />
+                <AvgStudentsPerClassPeriodFlipCard periodId={periodId} />
+            </div>
+            <PeriodIndicatorsCharts periodId={periodId} />
+        </Section>
+    );
+}
+
+export default function AdminPeriodIndicatorsPage({
+    params,
+}: PageProps<"/admin/[program]/periodos/[period]/indicadores">) {
     return (
         <Page>
             <Section>
@@ -48,20 +71,10 @@ export default async function AdminPeriodIndicatorsPage({
                 </div>
             </Section>
 
-            <Section className="mt-8 flex flex-col gap-8">
-                <div className="grid grid-cols-1 gap-8 @3xl/main:grid-cols-2 @6xl/main:grid-cols-3">
-                    <StudentsPeriodCountFlipCard periodId={periodId} />
-                    <PeriodStudentsAgeAverageFlipCard periodId={periodId} />
-                    <PeriodOriginSchoolFlipCard periodId={periodId} />
-                    <EnrolledStudentsPeriodFlipCard periodId={periodId} />
-                    <WaitingStudentsPeriodFlipCard periodId={periodId} />
-                    <EnrollmentRatePeriodFlipCard periodId={periodId} />
-                    <SadAccessPeriodFlipCard periodId={periodId} />
-                    <ClassGroupsCountPeriodFlipCard periodId={periodId} />
-                    <AvgStudentsPerClassPeriodFlipCard periodId={periodId} />
-                </div>
-                <PeriodIndicatorsCharts periodId={periodId} />
-            </Section>
+            <Suspense fallback={<AdminPeriodIndicatorPageSkeleton />}>
+                <AdminPeriodIndicatorsPageContent params={params} />
+            </Suspense>
+
         </Page>
     );
 }
