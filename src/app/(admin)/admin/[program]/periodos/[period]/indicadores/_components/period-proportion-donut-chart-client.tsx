@@ -8,7 +8,7 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart";
-import { Pie, PieChart } from "recharts";
+import { Pie, PieChart, Cell } from "recharts";
 
 export type PeriodProportionDonutChartDataPoint = {
     key: string;
@@ -62,7 +62,11 @@ export default function PeriodProportionDonutChartClient({
                     isAnimationActive
                     animationDuration={800}
                     animationBegin={0}
-                />
+                >
+                    {data.map((entry) => (
+                        <Cell key={entry.key} fill={entry.fill} />
+                    ))}
+                </Pie>
                 <ChartLegend
                     content={<ChartLegendContent nameKey={nameKey} />}
                 />

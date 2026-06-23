@@ -9,7 +9,7 @@ import {
     type ChartConfig,
 } from "@/components/ui/chart";
 import { GENRE_LABELS_PT, type GenreValue } from "@/lib/genre";
-import { Pie, PieChart } from "recharts";
+import { Pie, PieChart, Cell } from "recharts";
 
 export type StudentsGenderChartDataPoint = {
     genre: GenreValue;
@@ -79,7 +79,11 @@ export default function StudentsGenderChartClient({ data }: StudentsGenderChartC
                     isAnimationActive
                     animationDuration={800}
                     animationBegin={0}
-                />
+                >
+                    {data.map((entry) => (
+                        <Cell key={entry.genre} fill={entry.fill} />
+                    ))}
+                </Pie>
                 <ChartLegend
                     content={<ChartLegendContent nameKey="genre" />}
                 />

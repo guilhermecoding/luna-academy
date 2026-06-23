@@ -1,6 +1,7 @@
 import WrapperFlipCardIndicator from "@/components/wrapper-flip-card-indicator";
 import ChartAreaSkeleton from "@/components/skeletons/chart-area-skeleton";
 import { GENRE_VALUES } from "@/lib/genre";
+import { GENRE_CHART_FILLS } from "@/lib/period-chart-colors";
 import { getStudentsGenderDistribution } from "@/services/students/students.service";
 import { IconGenderBigender } from "@tabler/icons-react";
 import { Suspense } from "react";
@@ -11,7 +12,7 @@ async function StudentsGenderChartContent() {
     const data = GENRE_VALUES.map((genre) => ({
         genre,
         count: distribution[genre],
-        fill: `var(--color-${genre})`,
+        fill: GENRE_CHART_FILLS[genre],
     }));
 
     return <StudentsGenderChartClient data={data} />;

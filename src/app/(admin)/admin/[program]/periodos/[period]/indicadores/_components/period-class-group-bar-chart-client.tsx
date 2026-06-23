@@ -6,6 +6,7 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart";
+import { PERIOD_CLASS_GROUP_FILL } from "@/lib/period-chart-colors";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 
 export type PeriodClassGroupBarChartDataPoint = {
@@ -68,7 +69,7 @@ export default function PeriodClassGroupBarChartClient({
                 />
                 <Bar
                     dataKey="count"
-                    fill="var(--chart-2)"
+                    fill={PERIOD_CLASS_GROUP_FILL}
                     radius={[0, 6, 6, 0]}
                     isAnimationActive
                     animationDuration={800}

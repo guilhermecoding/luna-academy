@@ -15,12 +15,6 @@ export type PeriodShiftBarChartDataPoint = {
     fill: string;
 };
 
-const SHIFT_COLORS: Record<string, string> = {
-    MORNING: "var(--chart-2)",
-    AFTERNOON: "var(--chart-3)",
-    EVENING: "var(--chart-4)",
-};
-
 type PeriodShiftBarChartClientProps = {
     data: PeriodShiftBarChartDataPoint[];
     config: ChartConfig;
@@ -92,5 +86,3 @@ export default function PeriodShiftBarChartClient({
         </ChartContainer>
     );
 }
-
-export { SHIFT_COLORS };

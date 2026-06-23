@@ -4,18 +4,12 @@ import { getPeriodStructureDistribution } from "@/services/periods/period-indica
 import { IconSchool } from "@tabler/icons-react";
 import { Suspense } from "react";
 import PeriodClassGroupBarChartClient from "./period-class-group-bar-chart-client";
-import type { ChartConfig } from "@/components/ui/chart";
-
-const chartConfig = {
-    count: {
-        label: "Alunos",
-    },
-} satisfies ChartConfig;
+import { PERIOD_CLASS_GROUP_FILL, classGroupChartConfig } from "@/lib/period-chart-colors";
 
 async function PeriodClassGroupChartContent({ periodId }: { periodId: string }) {
     const { byClassGroup } = await getPeriodStructureDistribution(periodId);
 
-    return <PeriodClassGroupBarChartClient data={byClassGroup} config={chartConfig} />;
+    return <PeriodClassGroupBarChartClient data={byClassGroup} config={classGroupChartConfig} />;
 }
 
 export default function PeriodClassGroupChart({ periodId }: { periodId: string }) {

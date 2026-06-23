@@ -10,7 +10,7 @@ async function AvgStudentsPerClassPeriodFlipCardContent({ periodId }: { periodId
     return (
         <div className="py-4">
             <span className="text-foreground text-3xl font-bold">
-                {avgStudentsPerClass.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}
+                {avgStudentsPerClass.toLocaleString("pt-BR")}
             </span>
         </div>
     );
@@ -19,7 +19,7 @@ async function AvgStudentsPerClassPeriodFlipCardContent({ periodId }: { periodId
 export default function AvgStudentsPerClassPeriodFlipCard({ periodId }: { periodId: string }) {
     return (
         <WrapperFlipCardIndicator
-            title="Média alunos/turma"
+            title="Média de alunos por turma"
             icon={<IconUsersGroup className="size-5" />}
             className="w-86 justify-self-center"
         >

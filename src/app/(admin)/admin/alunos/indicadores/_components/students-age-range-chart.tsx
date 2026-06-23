@@ -1,6 +1,7 @@
 import WrapperFlipCardIndicator from "@/components/wrapper-flip-card-indicator";
 import ChartAreaSkeleton from "@/components/skeletons/chart-area-skeleton";
 import { AGE_RANGE_INTERVALS, AGE_RANGE_VALUES } from "@/lib/age-range";
+import { AGE_RANGE_CHART_FILLS } from "@/lib/period-chart-colors";
 import { getStudentsAgeRangeDistribution } from "@/services/students/students.service";
 import { IconRating12Plus } from "@tabler/icons-react";
 import { Suspense } from "react";
@@ -12,7 +13,7 @@ async function StudentsAgeRangeChartContent() {
         range,
         interval: AGE_RANGE_INTERVALS[range],
         count: distribution[range],
-        fill: `var(--color-${range})`,
+        fill: AGE_RANGE_CHART_FILLS[range],
     }));
 
     return <StudentsAgeRangeChartClient data={data} />;
