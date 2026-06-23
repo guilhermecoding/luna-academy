@@ -3,13 +3,16 @@ import { getTransferredStudentsCount } from "@/services/students/students.servic
 import { IconSwipeRightFilled } from "@tabler/icons-react";
 import { Suspense } from "react";
 import FlipCardValueSkeleton from "../../../../../../components/skeletons/flip-card-value-skeleton";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 async function StudentOriginSchoolContent() {
     const count = await getTransferredStudentsCount();
 
     return (
         <div className="py-4">
-            <span className="text-foreground text-3xl font-bold">{count}</span>
+            <span className="text-foreground text-3xl font-bold">
+                <NumberTicker value={count} />
+            </span>
         </div>
     );
 }

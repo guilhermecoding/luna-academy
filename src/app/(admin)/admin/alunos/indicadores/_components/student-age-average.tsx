@@ -3,6 +3,7 @@ import { getStudentsAverageAge } from "@/services/students/students.service";
 import { IconGenderAgender } from "@tabler/icons-react";
 import { Suspense } from "react";
 import FlipCardValueSkeleton from "../../../../../../components/skeletons/flip-card-value-skeleton";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 async function StudentAgeAverageContent() {
     const averageAge = await getStudentsAverageAge();
@@ -10,7 +11,7 @@ async function StudentAgeAverageContent() {
     return (
         <div className="py-4">
             <span className="text-foreground text-3xl font-bold">
-                {averageAge ?? "—"}
+                {averageAge !== null ? <NumberTicker value={averageAge} /> : "—"}
             </span>
         </div>
     );

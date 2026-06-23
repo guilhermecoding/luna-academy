@@ -3,6 +3,7 @@ import FlipCardValueSkeleton from "@/components/skeletons/flip-card-value-skelet
 import { getPeriodOperationalStats } from "@/services/periods/period-indicators.service";
 import { IconClock } from "@tabler/icons-react";
 import { Suspense } from "react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import PeriodTrendFlipCardBody from "./shared/period-trend-flip-card-body";
 
 async function WaitingStudentsPeriodFlipCardContent({ periodId }: { periodId: string }) {
@@ -10,7 +11,7 @@ async function WaitingStudentsPeriodFlipCardContent({ periodId }: { periodId: st
 
     return (
         <PeriodTrendFlipCardBody
-            value={stats.waiting}
+            value={<NumberTicker value={stats.waiting} />}
             delta={stats.waitingDelta}
             percentageChange={stats.waitingPercentageChange}
         />

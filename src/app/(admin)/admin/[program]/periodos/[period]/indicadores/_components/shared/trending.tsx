@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 
 export type TrendingStatus = "up" | "down" | "stable";
@@ -36,7 +37,8 @@ export function TrendingTextIndicator({
         })}>
             <span>
                 {status === "up" ? "+" : status === "down" ? "-" : ""}
-                {value}{suffix}
+                <NumberTicker value={value} className="text-inherit tracking-normal" />
+                {suffix}
             </span>
             <span className="text-muted-foreground">
                 {status === "up" ? "a mais que " : status === "down" ? "a menos que " : ""}

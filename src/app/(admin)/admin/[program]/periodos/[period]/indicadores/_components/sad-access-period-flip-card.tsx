@@ -3,13 +3,16 @@ import FlipCardValueSkeleton from "@/components/skeletons/flip-card-value-skelet
 import { getPeriodSADAccessStats } from "@/services/periods/period-indicators.service";
 import { IconReportSearch } from "@tabler/icons-react";
 import { Suspense } from "react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 async function SadAccessPeriodFlipCardContent({ periodId }: { periodId: string }) {
     const { total, viewed, percentage } = await getPeriodSADAccessStats(periodId);
 
     return (
         <div className="py-4">
-            <span className="text-foreground text-3xl font-bold">{percentage}%</span>
+            <span className="text-foreground text-3xl font-bold">
+                <NumberTicker value={percentage} />%
+            </span>
             <p className="text-sm text-muted-foreground mt-2">
                 {viewed} de {total} visualizaram
             </p>

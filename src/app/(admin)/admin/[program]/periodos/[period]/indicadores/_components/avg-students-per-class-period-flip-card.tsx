@@ -3,6 +3,7 @@ import FlipCardValueSkeleton from "@/components/skeletons/flip-card-value-skelet
 import { getPeriodStructureStats } from "@/services/periods/period-indicators.service";
 import { IconUsersGroup } from "@tabler/icons-react";
 import { Suspense } from "react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 async function AvgStudentsPerClassPeriodFlipCardContent({ periodId }: { periodId: string }) {
     const { avgStudentsPerClass } = await getPeriodStructureStats(periodId);
@@ -10,7 +11,7 @@ async function AvgStudentsPerClassPeriodFlipCardContent({ periodId }: { periodId
     return (
         <div className="py-4">
             <span className="text-foreground text-3xl font-bold">
-                {avgStudentsPerClass.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}
+                <NumberTicker value={avgStudentsPerClass} decimalPlaces={1} />
             </span>
         </div>
     );

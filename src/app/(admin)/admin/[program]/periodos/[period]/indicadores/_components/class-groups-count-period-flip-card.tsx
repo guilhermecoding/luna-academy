@@ -3,13 +3,16 @@ import FlipCardValueSkeleton from "@/components/skeletons/flip-card-value-skelet
 import { getPeriodStructureStats } from "@/services/periods/period-indicators.service";
 import { IconSchool } from "@tabler/icons-react";
 import { Suspense } from "react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 async function ClassGroupsCountPeriodFlipCardContent({ periodId }: { periodId: string }) {
     const { classGroupsCount } = await getPeriodStructureStats(periodId);
 
     return (
         <div className="py-4">
-            <span className="text-foreground text-3xl font-bold">{classGroupsCount}</span>
+            <span className="text-foreground text-3xl font-bold">
+                <NumberTicker value={classGroupsCount} />
+            </span>
         </div>
     );
 }

@@ -3,6 +3,7 @@ import FlipCardValueSkeleton from "@/components/skeletons/flip-card-value-skelet
 import { getPeriodStudentProfileStats } from "@/services/periods/period-indicators.service";
 import { IconGenderAgender } from "@tabler/icons-react";
 import { Suspense } from "react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 async function PeriodStudentsAgeAverageFlipCardContent({ periodId }: { periodId: string }) {
     const { averageAge } = await getPeriodStudentProfileStats(periodId);
@@ -10,7 +11,7 @@ async function PeriodStudentsAgeAverageFlipCardContent({ periodId }: { periodId:
     return (
         <div className="py-4">
             <span className="text-foreground text-3xl font-bold">
-                {averageAge ?? "—"}
+                {averageAge !== null ? <NumberTicker value={averageAge} /> : "—"}
             </span>
         </div>
     );
