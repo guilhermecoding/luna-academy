@@ -47,7 +47,7 @@ O objetivo é unificar matrículas, oferta de turmas, diário de classe e indica
 
 A gestão acadêmica costuma estar espalhada em planilhas, sistemas legados e ferramentas que não conversam entre si. Currículo, calendário letivo, oferta de turmas, matrículas e diário de classe acabam em fluxos desconectados — o que dificulta a coordenação e aumenta o risco de inconsistências.
 
-A LUNA ACADEMY nasce para reunir esses processos em uma plataforma única, com visibilidade operacional para quem coordena a instituição: indicadores por período, acompanhamento de acesso via SAD e registro de frequência em tempo real.
+O LUNA ACADEMY nasce para reunir esses processos em uma plataforma única, com visibilidade operacional para quem coordena a instituição: indicadores por período, acompanhamento de acesso via SAD e registro de frequência em tempo real.
 
 O foco é atender escolas e cursos técnicos ou profissionalizantes com uma solução pensada para a realidade brasileira — interface em português, fluxos alinhados ao ciclo letivo e ferramentas que apoiam decisões do dia a dia da secretaria e da coordenação pedagógica.
 
