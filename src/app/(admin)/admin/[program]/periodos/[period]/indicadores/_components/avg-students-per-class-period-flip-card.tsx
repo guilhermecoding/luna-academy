@@ -10,7 +10,7 @@ async function AvgStudentsPerClassPeriodFlipCardContent({ periodId }: { periodId
     return (
         <div className="py-4">
             <span className="text-foreground text-3xl font-bold">
-                {avgStudentsPerClass.toLocaleString("pt-BR")}
+                {avgStudentsPerClass.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}
             </span>
         </div>
     );

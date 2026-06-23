@@ -237,7 +237,7 @@ export async function getPeriodStructureStats(periodId: string): Promise<PeriodS
     }[]>`
         SELECT
             COUNT(DISTINCT cg.id)::int AS class_groups_count,
-            COALESCE(ROUND(AVG(group_counts.student_count)), 0)::int AS avg_students_per_class
+            COALESCE(ROUND(AVG(group_counts.student_count), 1), 0)::float AS avg_students_per_class
         FROM public.class_groups cg
         LEFT JOIN LATERAL (
             SELECT COUNT(DISTINCT e.student_id)::int AS student_count
