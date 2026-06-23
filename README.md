@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/luna-logo-full.png" alt="Luna Academy" width="300" />
+</p>
+
 # LUNA ACADEMY
 
 Plataforma de gestão acadêmica para instituições de ensino. Gerencie, acompanhe e otimize o desempenho dos seus alunos em um único lugar.
@@ -9,7 +13,7 @@ A **LUNA ACADEMY** é um sistema de gestão acadêmica que centraliza a operaç�
 - **Painel administrativo** (`/admin`) — configuração de programas, matrizes curriculares, períodos letivos, turmas, alunos, equipe e instituições.
 - **Portal do professor** (`/prof`) — acompanhamento de turmas, disciplinas e registro de aulas com chamada e frequência.
 
-O objetivo é unificar matrículas, oferta de turmas, diário de classe e indicadores operacionais em uma experiência coesa, em português.
+O objetivo é unificar matrículas, oferta de turmas, diário de classe e indicadores operacionais em uma experiência coesa.
 
 ## Recursos
 
