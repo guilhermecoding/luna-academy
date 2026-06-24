@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-const GIBBY_SIZE_PX = 96;
+const GIBBY_SIZE_PX = 76;
 
 interface GibbyAnimateProps {
     className?: string;

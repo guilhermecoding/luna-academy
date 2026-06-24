@@ -81,9 +81,14 @@ export async function editProfileAction(data: EditProfileInput) {
         revalidatePath("/prof", "layout");
         revalidatePath("/prof/perfil");
 
-        return { 
-            success: true as const, 
-            redirectTo: `/prof/perfil?toast=success&message=${encodeURIComponent("Perfil atualizado com sucesso!")}`, 
+        const params = new URLSearchParams({
+            toast: "success",
+            message: "Perfil atualizado com sucesso!",
+        });
+
+        return {
+            success: true as const,
+            redirectTo: `/prof?${params.toString()}`,
         };
     } catch (error) {
         if (error instanceof ZodError) {

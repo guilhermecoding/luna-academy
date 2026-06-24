@@ -19,7 +19,6 @@ const eslintConfig = defineConfig([
       quotes: ["error", "double"],
       semi: ["error", "always"],
       "comma-dangle": ["error", "always-multiline"],
-      "no-console": "warn",
     },
   },
 ]);
