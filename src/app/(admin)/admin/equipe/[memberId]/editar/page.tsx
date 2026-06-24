@@ -3,7 +3,7 @@ import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
 import { Metadata } from "next";
 import { getUserById } from "@/services/users/users.service";
-import { isGoogleAccountLinked } from "@/services/users/accounts.service";
+import { isGoogleAccountLinked, hasCredentialAccount } from "@/services/users/accounts.service";
 import { notFound } from "next/navigation";
 import EditMemberForm from "./_components/edit-member-form";
 import { Suspense } from "react";
@@ -37,6 +37,7 @@ async function AdminEditMemberPageContent({
 
     const isEditingSelf = authResult.session.user.id === member.id;
     const googleLinked = await isGoogleAccountLinked(member.id);
+    const canUnlinkGoogle = await hasCredentialAccount(member.id);
     const googleAuthEnabled = isGoogleAuthConfigured();
 
     return (
@@ -54,6 +55,7 @@ async function AdminEditMemberPageContent({
                         isEditingSelf={isEditingSelf}
                         canWrite={userCanWrite(authResult.session.user)}
                         googleLinked={googleLinked}
+                        canUnlinkGoogle={canUnlinkGoogle}
                         googleAuthEnabled={googleAuthEnabled}
                     />
                 </Section>

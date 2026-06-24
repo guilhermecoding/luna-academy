@@ -27,12 +27,14 @@ export default function EditMemberForm({
     isEditingSelf,
     canWrite = true,
     googleLinked,
+    canUnlinkGoogle,
     googleAuthEnabled,
 }: {
     member: User;
     isEditingSelf: boolean;
     canWrite?: boolean;
     googleLinked: boolean;
+    canUnlinkGoogle: boolean;
     googleAuthEnabled: boolean;
 }) {
     const lockSelfAdmin = isEditingSelf && member.isAdmin;
@@ -366,6 +368,7 @@ export default function EditMemberForm({
                         <Suspense fallback={null}>
                             <GoogleAccountLink
                                 isLinked={googleLinked}
+                                canUnlink={canUnlinkGoogle}
                                 callbackPath={`/admin/equipe/${member.id}/editar`}
                                 enabled={googleAuthEnabled}
                             />

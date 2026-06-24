@@ -21,10 +21,12 @@ import { Suspense } from "react";
 export default function EditProfileForm({
     member,
     googleLinked,
+    canUnlinkGoogle,
     googleAuthEnabled,
 }: {
     member: User;
     googleLinked: boolean;
+    canUnlinkGoogle: boolean;
     googleAuthEnabled: boolean;
 }) {
     const router = useRouter();
@@ -83,7 +85,7 @@ export default function EditProfileForm({
             await authClient.getSession({
                 query: { disableCookieCache: true },
             });
-            toast.success("Perfil atualizado com sucesso!");
+            router.push(result.redirectTo);
             router.refresh();
         }
     };
@@ -258,6 +260,7 @@ export default function EditProfileForm({
                     <Suspense fallback={null}>
                         <GoogleAccountLink
                             isLinked={googleLinked}
+                            canUnlink={canUnlinkGoogle}
                             callbackPath="/prof/perfil"
                             enabled={googleAuthEnabled}
                         />

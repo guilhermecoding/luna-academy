@@ -3,7 +3,7 @@ import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
 import { Metadata } from "next";
 import { getUserById } from "@/services/users/users.service";
-import { isGoogleAccountLinked } from "@/services/users/accounts.service";
+import { isGoogleAccountLinked, hasCredentialAccount } from "@/services/users/accounts.service";
 import { notFound } from "next/navigation";
 import EditProfileForm from "./_components/edit-profile-form";
 import { auth, isGoogleAuthConfigured } from "@/lib/auth";
@@ -29,6 +29,7 @@ export default async function ProfessorProfilePage() {
     }
 
     const googleLinked = await isGoogleAccountLinked(session.user.id);
+    const canUnlinkGoogle = await hasCredentialAccount(session.user.id);
     const googleAuthEnabled = isGoogleAuthConfigured();
 
     return (
@@ -44,6 +45,7 @@ export default async function ProfessorProfilePage() {
                 <EditProfileForm
                     member={member}
                     googleLinked={googleLinked}
+                    canUnlinkGoogle={canUnlinkGoogle}
                     googleAuthEnabled={googleAuthEnabled}
                 />
             </Section>
