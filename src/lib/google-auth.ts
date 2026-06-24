@@ -1,10 +1,17 @@
 export const GOOGLE_AUTH_LINK_ERROR_MESSAGE =
     "não há nenhum vinculo com essa conta aqui registrado.";
 
+export const GOOGLE_AUTH_EMAIL_MISMATCH_MESSAGE =
+    "O e-mail da conta Google precisa ser o mesmo cadastrado aqui.";
+
 export const GOOGLE_AUTH_GENERIC_ERROR_MESSAGE =
     "Ocorre um erro por esse método de login. Vamos resolver isso.";
 
 const GOOGLE_LINK_QUERY_ERRORS = new Set(["account_not_linked", "signup_disabled"]);
+
+function normalizeGoogleOAuthError(error: string): string {
+    return error.toLowerCase().replace(/'/g, "");
+}
 
 export function isGoogleAuthConfigured(): boolean {
     return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
@@ -24,6 +31,10 @@ export function mapGoogleOAuthQueryError(error: string | null): {
 } {
     if (!error) {
         return { userMessage: GOOGLE_AUTH_GENERIC_ERROR_MESSAGE, shouldLog: true };
+    }
+
+    if (normalizeGoogleOAuthError(error) === "email_doesnt_match") {
+        return { userMessage: GOOGLE_AUTH_EMAIL_MISMATCH_MESSAGE, shouldLog: true };
     }
 
     if (GOOGLE_LINK_QUERY_ERRORS.has(error)) {

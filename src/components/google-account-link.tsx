@@ -20,6 +20,7 @@ import {
     buildGoogleCallbackUrl,
     GOOGLE_AUTH_GENERIC_ERROR_MESSAGE,
     logGoogleAuthError,
+    mapGoogleOAuthQueryError,
     warnGoogleAuthMisconfiguration,
 } from "@/lib/google-auth";
 
@@ -51,8 +52,12 @@ export default function GoogleAccountLink({
         }
 
         if (hasLinkError) {
-            logGoogleAuthError("linkSocial callback", "google_error");
-            toast.error(GOOGLE_AUTH_GENERIC_ERROR_MESSAGE);
+            const oauthError = searchParams.get("error");
+            const { userMessage, shouldLog } = mapGoogleOAuthQueryError(oauthError);
+            if (shouldLog) {
+                logGoogleAuthError("linkSocial callback", oauthError ?? "unknown");
+            }
+            toast.error(userMessage);
         } else {
             toast.success("Conta Google vinculada com sucesso!");
             router.refresh();
@@ -61,6 +66,8 @@ export default function GoogleAccountLink({
         const params = new URLSearchParams(searchParams.toString());
         params.delete("google_error");
         params.delete("google_linked");
+        params.delete("error");
+        params.delete("error_description");
 
         const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
         router.replace(nextUrl, { scroll: false });
