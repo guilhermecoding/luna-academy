@@ -3,9 +3,10 @@ import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
 import { Metadata } from "next";
 import { getUserById } from "@/services/users/users.service";
+import { isGoogleAccountLinked } from "@/services/users/accounts.service";
 import { notFound } from "next/navigation";
 import EditProfileForm from "./_components/edit-profile-form";
-import { auth } from "@/lib/auth";
+import { auth, isGoogleAuthConfigured } from "@/lib/auth";
 import { headers } from "next/headers";
 
 export const metadata: Metadata = {
@@ -27,6 +28,9 @@ export default async function ProfessorProfilePage() {
         notFound();
     }
 
+    const googleLinked = await isGoogleAccountLinked(session.user.id);
+    const googleAuthEnabled = isGoogleAuthConfigured();
+
     return (
         <Page>
             <Section>
@@ -37,7 +41,11 @@ export default async function ProfessorProfilePage() {
             </Section>
 
             <Section className="mt-8">
-                <EditProfileForm member={member} />
+                <EditProfileForm
+                    member={member}
+                    googleLinked={googleLinked}
+                    googleAuthEnabled={googleAuthEnabled}
+                />
             </Section>
         </Page>
     );

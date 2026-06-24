@@ -15,11 +15,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { authClient } from "@/lib/auth-client";
+import GoogleAccountLink from "@/components/google-account-link";
+import { Suspense } from "react";
 
 export default function EditProfileForm({
     member,
+    googleLinked,
+    googleAuthEnabled,
 }: {
     member: User;
+    googleLinked: boolean;
+    googleAuthEnabled: boolean;
 }) {
     const router = useRouter();
     const [copied, setCopied] = useState(false);
@@ -248,6 +254,14 @@ export default function EditProfileForm({
                             </div>
                         </div>
                     </div>
+
+                    <Suspense fallback={null}>
+                        <GoogleAccountLink
+                            isLinked={googleLinked}
+                            callbackPath="/prof/perfil"
+                            enabled={googleAuthEnabled}
+                        />
+                    </Suspense>
                 </div>
 
                 <div className="flex flex-col gap-6 p-6 bg-background rounded-2xl border border-surface-border">

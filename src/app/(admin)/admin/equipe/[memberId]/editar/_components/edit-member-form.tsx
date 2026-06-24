@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { authClient } from "@/lib/auth-client";
+import GoogleAccountLink from "@/components/google-account-link";
+import { Suspense } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
 import imgGibbyDuvida from "@/assets/images/logo-gibby-duvida.svg";
@@ -24,10 +26,14 @@ export default function EditMemberForm({
     member,
     isEditingSelf,
     canWrite = true,
+    googleLinked,
+    googleAuthEnabled,
 }: {
     member: User;
     isEditingSelf: boolean;
     canWrite?: boolean;
+    googleLinked: boolean;
+    googleAuthEnabled: boolean;
 }) {
     const lockSelfAdmin = isEditingSelf && member.isAdmin;
     const router = useRouter();
@@ -355,6 +361,16 @@ export default function EditMemberForm({
                             </div>
                         </div>
                     </div>
+
+                    {isEditingSelf && (
+                        <Suspense fallback={null}>
+                            <GoogleAccountLink
+                                isLinked={googleLinked}
+                                callbackPath={`/admin/equipe/${member.id}/editar`}
+                                enabled={googleAuthEnabled}
+                            />
+                        </Suspense>
+                    )}
                 </div>
 
                 <Dialog open={showStatusModal} onOpenChange={setShowStatusModal}>

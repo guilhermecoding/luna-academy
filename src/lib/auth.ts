@@ -4,6 +4,16 @@ import { admin } from "better-auth/plugins";
 import prisma from "@/lib/prisma";
 import { GENRE_VALUES } from "@/lib/genre";
 import { SYSTEM_ROLE } from "@/@types/system-role.type";
+import {
+    isGoogleAuthConfigured,
+    warnGoogleAuthMisconfiguration,
+} from "@/lib/google-auth";
+
+export { isGoogleAuthConfigured };
+
+if (!isGoogleAuthConfigured()) {
+    warnGoogleAuthMisconfiguration();
+}
 
 const trustedOrigins = [
     "http://localhost:3000",
@@ -13,7 +23,7 @@ const trustedOrigins = [
 ];
 
 export const auth = betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL!,
+    baseURL: process.env.BETTER_AUTH_URL as string,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
@@ -25,12 +35,21 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
-    socialProviders: {
-        google: {
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    account: {
+        accountLinking: {
+            enabled: true,
+            disableImplicitLinking: true,
         },
     },
+    socialProviders: isGoogleAuthConfigured()
+        ? {
+            google: {
+                clientId: process.env.GOOGLE_CLIENT_ID as string,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+                disableSignUp: true,
+            },
+        }
+        : {},
     user: {
         additionalFields: {
             cpf: {

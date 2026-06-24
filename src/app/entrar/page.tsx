@@ -12,17 +12,22 @@ import thumb05 from "@/assets/images/thumbs-login-page/Imagem_05.webp";
 import thumb06 from "@/assets/images/thumbs-login-page/Imagem_06.webp";
 import thumb07 from "@/assets/images/thumbs-login-page/Imagem_07.webp";
 import thumb08 from "@/assets/images/thumbs-login-page/Imagem_08.webp";
-import { auth } from "@/lib/auth";
+import { auth, isGoogleAuthConfigured } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { APP_VERSION } from "@/lib/app-version";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import googleIcon from "@/assets/images/icons/google-icon.png";
 
 const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08];
 
-export default async function LoginPage() {
+export default async function LoginPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ oauth?: string }>;
+}) {
+    const { oauth } = await searchParams;
+    const isGoogleOAuthCallback = oauth === "google";
+
     const session = await auth.api.getSession({
         headers: await headers(),
         query: {
@@ -30,7 +35,7 @@ export default async function LoginPage() {
         },
     });
 
-    if (session?.user) {
+    if (session?.user && !isGoogleOAuthCallback) {
         if (session.user.isActive) {
             if (session.user.isTeacher && !session.user.isAdmin) {
                 redirect("/prof");
@@ -41,6 +46,7 @@ export default async function LoginPage() {
 
     const logoCorporation = process.env.NEXT_PUBLIC_LOGO_CORPORATION;
     const randomThumb = loginThumbs[randomInt(loginThumbs.length)];
+    const googleAuthEnabled = isGoogleAuthConfigured();
 
     return (
         <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-surface">
@@ -74,22 +80,7 @@ export default async function LoginPage() {
 
                     {/* Form */}
                     <div className="w-full px-6 py-1 flex flex-col justify-center items-center gap-4">
-                        <LoginForm />
-                        <div className="flex w-full sm:w-3/5 max-w-sm flex-row justify-center items-center gap-4 overflow-hidden">
-                            <Separator className="w-full" />
-                            <span className="text-muted-foreground text-sm font-medium">OU</span>
-                            <Separator className="w-full" />
-                        </div>
-                        <div className="w-full sm:w-3/5 max-w-sm px-3 sm:px-0">
-                            <Button variant="outline" className="w-full bg-transparent hover:bg-background border border-muted-foreground/50 gap-2">
-                                <Image src={googleIcon}
-                                    alt="Google"
-                                    width={20}
-                                    height={20} className="w-5 h-auto object-contain"
-                                />
-                                Entre com o Google
-                            </Button>
-                        </div>
+                        <LoginForm googleAuthEnabled={googleAuthEnabled} />
                     </div>
 
                     {/* Footer opcional */}
