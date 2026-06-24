@@ -13,10 +13,11 @@ import thumb06 from "@/assets/images/thumbs-login-page/Imagem_06.webp";
 import thumb07 from "@/assets/images/thumbs-login-page/Imagem_07.webp";
 import thumb08 from "@/assets/images/thumbs-login-page/Imagem_08.webp";
 import { auth, isGoogleAuthConfigured } from "@/lib/auth";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { APP_VERSION } from "@/lib/app-version";
 import { Separator } from "@/components/ui/separator";
+import { LOGIN_TAB_COOKIE_NAME, loginRedirectPath } from "@/lib/login-session";
 
 const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08];
 
@@ -35,12 +36,16 @@ export default async function LoginPage({
         },
     });
 
+    const cookieStore = await cookies();
+    const tabFromCookie = cookieStore.get(LOGIN_TAB_COOKIE_NAME)?.value ?? null;
+
     if (session?.user && !isGoogleOAuthCallback) {
-        if (session.user.isActive) {
-            if (session.user.isTeacher && !session.user.isAdmin) {
-                redirect("/prof");
+        const redirectPath = loginRedirectPath(session.user, tabFromCookie);
+        if (redirectPath) {
+            if (tabFromCookie) {
+                cookieStore.set(LOGIN_TAB_COOKIE_NAME, "", { maxAge: 0, path: "/" });
             }
-            redirect("/admin");
+            redirect(redirectPath);
         }
     }
 

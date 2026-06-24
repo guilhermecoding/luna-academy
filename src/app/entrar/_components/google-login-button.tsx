@@ -13,7 +13,7 @@ import {
     logGoogleAuthError,
     warnGoogleAuthMisconfiguration,
 } from "@/lib/google-auth";
-import type { LoginTab } from "@/lib/login-session";
+import { persistLoginTab, type LoginTab } from "@/lib/login-session";
 
 type GoogleLoginButtonProps = {
     activeTab: LoginTab;
@@ -31,6 +31,7 @@ export default function GoogleLoginButton({ activeTab, enabled }: GoogleLoginBut
         }
 
         setLoading(true);
+        persistLoginTab(activeTab);
         try {
             const { error } = await authClient.signIn.social({
                 provider: "google",

@@ -22,6 +22,9 @@ import {
 import {
     fetchSessionUser,
     validateLoginSession,
+    resolveLoginTab,
+    clearPersistedLoginTab,
+    loginRedirectPath,
     type LoginTab,
 } from "@/lib/login-session";
 
@@ -39,10 +42,6 @@ const emptyLoginValues: LoginInput = {
 type LoginFormProps = {
     googleAuthEnabled: boolean;
 };
-
-function parseLoginTab(value: string | null): LoginTab {
-    return value === "admin" ? "admin" : "teacher";
-}
 
 export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
     const router = useRouter();
@@ -108,8 +107,11 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
         const firstName = validation.user.name?.trim().split(" ")[0] || "usuário";
         toast.message(`Bem vindo(a) de volta, ${firstName}!`);
 
-        router.push(activeTabValue === "admin" ? "/admin" : "/prof");
-        router.refresh();
+        const redirectPath = loginRedirectPath(validation.user, activeTabValue);
+        if (redirectPath) {
+            router.push(redirectPath);
+            router.refresh();
+        }
     }
 
     useEffect(() => {
@@ -118,7 +120,9 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
         }
 
         const params = new URLSearchParams(window.location.search);
-        const tabFromQuery = parseLoginTab(params.get("tab"));
+        const resolvedTab = resolveLoginTab(params.get("tab"));
+        setActiveTab(resolvedTab);
+
         const oauthProvider = params.get("oauth");
         const oauthError = params.get("error");
 
@@ -126,6 +130,7 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
             toast.error("Usuário não encontrado", {
                 description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
             });
+            clearPersistedLoginTab();
             window.history.replaceState({}, document.title, window.location.pathname);
             return;
         }
@@ -136,12 +141,14 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
                 logGoogleAuthError("oauth callback", oauthError);
             }
             toast.error(userMessage);
+            clearPersistedLoginTab();
             window.history.replaceState({}, document.title, window.location.pathname);
             return;
         }
 
         if (oauthProvider === "google") {
-            void completeLogin(tabFromQuery).finally(() => {
+            void completeLogin(resolvedTab).finally(() => {
+                clearPersistedLoginTab();
                 window.history.replaceState({}, document.title, window.location.pathname);
             });
         }
