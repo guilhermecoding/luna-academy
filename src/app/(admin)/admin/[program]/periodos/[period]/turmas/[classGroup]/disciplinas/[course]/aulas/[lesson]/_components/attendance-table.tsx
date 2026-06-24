@@ -31,10 +31,10 @@ export function AttendanceTable({
     const [attendances, setAttendances] = useState(initialAttendances);
     const [search, setSearch] = useState("");
     const [isPending, startTransition] = useTransition();
-    const [hasChanges, setHasChanges] = useState(false);
 
     // Mapa de mudanças locais
     const [localChanges, setLocalChanges] = useState<Record<string, boolean>>({});
+    const hasChanges = Object.keys(localChanges).length > 0;
 
     const filtered = useMemo(() => {
         if (!search.trim()) return attendances;
@@ -55,7 +55,6 @@ export function AttendanceTable({
                 a.id === attendanceId ? { ...a, isPresent: !current } : a,
             ),
         );
-        setHasChanges(true);
     }, [canWrite]);
 
     const markAllPresent = useCallback(() => {
@@ -63,14 +62,11 @@ export function AttendanceTable({
         const changes: Record<string, boolean> = {};
         setAttendances((prev) =>
             prev.map((a) => {
-                if (!a.isPresent) {
-                    changes[a.id] = true;
-                }
+                changes[a.id] = true;
                 return { ...a, isPresent: true };
             }),
         );
         setLocalChanges((prev) => ({ ...prev, ...changes }));
-        setHasChanges(true);
     }, [canWrite]);
 
     const markAllAbsent = useCallback(() => {
@@ -78,14 +74,11 @@ export function AttendanceTable({
         const changes: Record<string, boolean> = {};
         setAttendances((prev) =>
             prev.map((a) => {
-                if (a.isPresent) {
-                    changes[a.id] = false;
-                }
+                changes[a.id] = false;
                 return { ...a, isPresent: false };
             }),
         );
         setLocalChanges((prev) => ({ ...prev, ...changes }));
-        setHasChanges(true);
     }, [canWrite]);
 
     const saveChanges = useCallback(() => {
@@ -102,7 +95,6 @@ export function AttendanceTable({
             if (result.success) {
                 toast.success("Presenças salvas com sucesso!");
                 setLocalChanges({});
-                setHasChanges(false);
             } else {
                 toast.error(result.error || "Erro ao salvar presenças.");
             }
