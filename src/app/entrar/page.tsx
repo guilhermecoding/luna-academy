@@ -16,6 +16,9 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { APP_VERSION } from "@/lib/app-version";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import googleIcon from "@/assets/images/icons/google-icon.png";
 
 const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08];
 
@@ -48,31 +51,50 @@ export default async function LoginPage() {
 
             {/* Lado Direito - Formulário */}
             <div className="flex w-full flex-col items-center justify-center">
-                <div className="w-full space-y-4">
+                <div className="w-full flex flex-col justify-center items-center space-y-4">
                     {/* Header */}
-                    <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="flex w-full flex-col items-center text-center space-y-4">
                         <div className="flex flex-col items-center gap-2">
                             <div className="flex flex-row items-center gap-2">
-                                <GibbyAnimate className="size-24" />
+                                <GibbyAnimate className="w-5 h-5" />
+                                <Separator
+                                    orientation="vertical"
+                                    className="h-20 my-auto mr-1.5 border border-muted-foreground/50 shrink-0"
+                                />
                                 <CorporationLogo logoCorporation={logoCorporation} />
                             </div>
-                            <h2 className="font-silkscreen text-primary-theme text-6xl">LUNA</h2>
+                            <h2 className="font-silkscreen text-primary-theme text-5xl">LUNA</h2>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-muted-foreground text-lg font-medium">
+                            <p className="text-muted-foreground text-base font-medium">
                                 Bem-vindo(a) de volta!
                             </p>
                         </div>
                     </div>
 
                     {/* Form */}
-                    <div className="p-6 flex justify-center items-center">
+                    <div className="w-full px-6 py-1 flex flex-col justify-center items-center gap-4">
                         <LoginForm />
+                        <div className="flex w-full sm:w-3/5 max-w-sm flex-row justify-center items-center gap-4 overflow-hidden">
+                            <Separator className="w-full" />
+                            <span className="text-muted-foreground text-sm font-medium">OU</span>
+                            <Separator className="w-full" />
+                        </div>
+                        <div className="w-full sm:w-3/5 max-w-sm px-3 sm:px-0">
+                            <Button variant="outline" className="w-full bg-transparent hover:bg-background border border-muted-foreground/50 gap-2">
+                                <Image src={googleIcon}
+                                    alt="Google"
+                                    width={20}
+                                    height={20} className="w-5 h-auto object-contain"
+                                />
+                                Entre com o Google
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Footer opcional */}
-                    <p className="text-center text-xs text-muted-foreground">
-                        &copy; <CurrentYear /> Luna Academy - v{APP_VERSION}. Todos os direitos reservados.
+                    <p className="text-center w-full sm:w-3/5 flex justify-center items-center max-w-sm text-xs text-muted-foreground">
+                        &copy; <CurrentYear /> Luna Academy - v{APP_VERSION}. <br /> Todos os direitos reservados.
                     </p>
                 </div>
             </div>

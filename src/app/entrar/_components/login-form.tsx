@@ -10,9 +10,10 @@ import { Label } from "@/components/ui/label";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { IconLogin2, IconUserShield, IconSchool, IconLoader2, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconLogin2, IconUserShield, IconSchool, IconLoader2, IconEye, IconEyeOff, IconInfoCircle } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/@types/session-type";
+import TooltipText from "@/components/tooltip-text";
 
 const loginSchema = z.object({
     email: z.string().email("Este e-mail não é válido"),
@@ -144,7 +145,7 @@ export default function LoginForm() {
     }
 
     return (
-        <div className="w-full px-3 sm:px-0 sm:w-3/5 space-y-6">
+        <div className="w-full sm:w-3/5 max-w-sm px-3 sm:px-0 space-y-6">
             {/* TABS CUSTOMIZADAS */}
             <div className="flex p-1 bg-muted-foreground/10 rounded-xl border border-border/50">
                 <button
@@ -181,8 +182,11 @@ export default function LoginForm() {
             >
                 {/* EMAIL */}
                 <div className="w-full space-y-2">
-                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">
+                    <Label htmlFor="email" className="text-xs gap-1 font-bold uppercase tracking-wider text-muted-foreground ml-1">
                         E-mail
+                        <TooltipText text="Este é o e-mail cadastrado por um administrador da escola.">
+                            <IconInfoCircle className="w-3.5 h-3.5" />
+                        </TooltipText>
                     </Label>
                     <Controller
                         name="email"
