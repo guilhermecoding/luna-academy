@@ -69,10 +69,11 @@ async function LoginPageContent({
                         <div className="flex flex-col items-center gap-2">
                             <div className="flex flex-row items-center gap-4">
                                 <GibbyAnimate className="w-5 h-5" />
-                                <Separator
-                                    orientation="vertical"
-                                    className="h-20 my-auto mr-1.5 border border-muted-foreground/50 shrink-0"
-                                />
+                                {logoCorporation &&
+                                    <Separator
+                                        orientation="vertical"
+                                        className="h-20 my-auto mr-1.5 border border-muted-foreground/50 shrink-0"
+                                    />}
                                 <CorporationLogo logoCorporation={logoCorporation} />
                             </div>
                             <h2 className="font-silkscreen text-primary-theme text-5xl">LUNA</h2>
