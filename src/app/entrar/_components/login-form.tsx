@@ -55,12 +55,29 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
         control,
         handleSubmit,
         reset,
-        formState: { isValid, errors },
+        formState: { errors },
     } = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onChange",
         defaultValues: emptyLoginValues,
     });
+
+    const submitLogin = handleSubmit(onSubmit);
+
+    function handleFormKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
+        if (event.key !== "Enter" || event.nativeEvent.isComposing || loading) {
+            return;
+        }
+
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) {
+            return;
+        }
+
+        event.preventDefault();
+        void submitLogin();
+    }
 
     useEffect(() => {
         reset(emptyLoginValues);
@@ -188,7 +205,8 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
             </div>
 
             <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={submitLogin}
+                onKeyDown={handleFormKeyDown}
                 className="w-full space-y-5"
             >
                 <div className="w-full space-y-2">
@@ -206,6 +224,8 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
                                 {...field}
                                 id="email"
                                 type="email"
+                                enterKeyHint="go"
+                                autoComplete="email"
                                 placeholder={activeTab === "admin" ? "admin@luna.com" : "professor@luna.com"}
                                 className={cn(
                                     "h-12 rounded-xl border-2 px-4 outline-none transition-all focus:ring-0 bg-background",
@@ -232,6 +252,7 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
                                     {...field}
                                     id="password"
                                     type={showPassword ? "text" : "password"}
+                                    enterKeyHint="go"
                                     autoComplete="current-password"
                                     placeholder="••••••••"
                                     className={cn(
@@ -263,7 +284,7 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
                     <Button
                         type="submit"
                         className="w-full h-14 font-bold transition-all hover:scale-[1.01] active:scale-[0.99]"
-                        disabled={!isValid || loading}
+                        disabled={loading}
                         aria-busy={loading}
                     >
                         {loading ? (

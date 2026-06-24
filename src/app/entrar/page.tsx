@@ -56,12 +56,12 @@ export default async function LoginPage({
             </div>
 
             {/* Lado Direito - Formulário */}
-            <div className="flex w-full flex-col items-center justify-center">
-                <div className="w-full flex flex-col justify-center items-center space-y-4">
+            <div className="flex w-full flex-col items-center justify-start lg:justify-center py-3">
+                <div className="w-full flex flex-col justify-center items-center space-y-2">
                     {/* Header */}
                     <div className="flex w-full flex-col items-center text-center space-y-4">
                         <div className="flex flex-col items-center gap-2">
-                            <div className="flex flex-row items-center gap-2">
+                            <div className="flex flex-row items-center gap-4">
                                 <GibbyAnimate className="w-5 h-5" />
                                 <Separator
                                     orientation="vertical"
