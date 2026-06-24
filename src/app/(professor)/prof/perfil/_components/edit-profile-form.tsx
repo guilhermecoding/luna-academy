@@ -11,23 +11,30 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editProfileSchema, type EditProfileData, type EditProfileInput } from "../schema";
 import { IconCheck, IconCopy, IconLoader2 } from "@tabler/icons-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { authClient } from "@/lib/auth-client";
 import GoogleAccountLink from "@/components/google-account-link";
 import { Suspense } from "react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const PROFILE_FORM_ID = "edit-profile-form";
 
 export default function EditProfileForm({
     member,
     googleLinked,
     canUnlinkGoogle,
     googleAuthEnabled,
+    cancelHref,
 }: {
     member: User;
     googleLinked: boolean;
     canUnlinkGoogle: boolean;
     googleAuthEnabled: boolean;
+    cancelHref: string;
 }) {
     const router = useRouter();
     const [copied, setCopied] = useState(false);
@@ -104,7 +111,7 @@ export default function EditProfileForm({
 
     return (
         <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form id={PROFILE_FORM_ID} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                 {errors.root?.message && (
                     <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900 text-sm">
                         {errors.root.message}
@@ -292,21 +299,20 @@ export default function EditProfileForm({
                     </div>
                 </div>
 
-                <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row mt-4 border-t">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.back()}
-                        disabled={isSubmitting}
-                    >
-                        Cancelar
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting && <IconLoader2 className="size-4 mr-2 animate-spin" />}
-                        {isSubmitting ? "Salvando..." : "Salvar Alterações"}
-                    </Button>
-                </div>
             </form>
+
+            <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row mt-4 border-t">
+                <Link
+                    href={cancelHref}
+                    className={cn(buttonVariants({ variant: "outline" }), "h-9")}
+                >
+                    Cancelar
+                </Link>
+                <Button type="submit" form={PROFILE_FORM_ID} disabled={isSubmitting}>
+                    {isSubmitting && <IconLoader2 className="size-4 mr-2 animate-spin" />}
+                    {isSubmitting ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+            </div>
         </div>
     );
 }

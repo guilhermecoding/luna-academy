@@ -39,6 +39,7 @@ async function AdminEditMemberPageContent({
     const googleLinked = await isGoogleAccountLinked(member.id);
     const canUnlinkGoogle = await hasCredentialAccount(member.id);
     const googleAuthEnabled = isGoogleAuthConfigured();
+    const cancelHref = isEditingSelf ? "/admin" : "/admin/equipe";
 
     return (
         <Page>
@@ -57,6 +58,7 @@ async function AdminEditMemberPageContent({
                         googleLinked={googleLinked}
                         canUnlinkGoogle={canUnlinkGoogle}
                         googleAuthEnabled={googleAuthEnabled}
+                        cancelHref={cancelHref}
                     />
                 </Section>
             </Page>

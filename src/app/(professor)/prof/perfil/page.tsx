@@ -7,7 +7,23 @@ import { isGoogleAccountLinked, hasCredentialAccount } from "@/services/users/ac
 import { notFound } from "next/navigation";
 import EditProfileForm from "./_components/edit-profile-form";
 import { auth, isGoogleAuthConfigured } from "@/lib/auth";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
+import { getProgramsForTeacher } from "@/services/programs/programs.service";
+
+const ACTIVE_PROGRAM_COOKIE_NAME = "active_program_slug";
+
+async function getProfessorCancelHref(userId: string): Promise<string> {
+    const programs = await getProgramsForTeacher(userId);
+    if (programs.length === 0) {
+        return "/prof";
+    }
+
+    const cookieStore = await cookies();
+    const activeSlug = cookieStore.get(ACTIVE_PROGRAM_COOKIE_NAME)?.value;
+    const targetSlug = programs.find((program) => program.slug === activeSlug)?.slug ?? programs[0].slug;
+
+    return `/prof/${targetSlug}/periodos`;
+}
 
 export const metadata: Metadata = {
     title: "Meu Perfil",
@@ -31,6 +47,7 @@ export default async function ProfessorProfilePage() {
     const googleLinked = await isGoogleAccountLinked(session.user.id);
     const canUnlinkGoogle = await hasCredentialAccount(session.user.id);
     const googleAuthEnabled = isGoogleAuthConfigured();
+    const cancelHref = await getProfessorCancelHref(session.user.id);
 
     return (
         <Page>
@@ -47,6 +64,7 @@ export default async function ProfessorProfilePage() {
                     googleLinked={googleLinked}
                     canUnlinkGoogle={canUnlinkGoogle}
                     googleAuthEnabled={googleAuthEnabled}
+                    cancelHref={cancelHref}
                 />
             </Section>
         </Page>

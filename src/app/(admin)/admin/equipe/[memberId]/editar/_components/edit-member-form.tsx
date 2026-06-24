@@ -11,6 +11,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editMemberSchema, type EditMemberData, type EditMemberInput } from "../schema";
 import { IconAlertTriangle, IconCheck, IconCopy, IconLoader2, IconLock } from "@tabler/icons-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { maskCPF, maskPhone } from "@/lib/masks";
@@ -21,6 +22,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import Image from "next/image";
 import imgGibbyDuvida from "@/assets/images/logo-gibby-duvida.svg";
 import { deleteMemberAction } from "../actions";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const MEMBER_FORM_ID = "edit-member-form";
 
 export default function EditMemberForm({
     member,
@@ -29,6 +34,7 @@ export default function EditMemberForm({
     googleLinked,
     canUnlinkGoogle,
     googleAuthEnabled,
+    cancelHref,
 }: {
     member: User;
     isEditingSelf: boolean;
@@ -36,6 +42,7 @@ export default function EditMemberForm({
     googleLinked: boolean;
     canUnlinkGoogle: boolean;
     googleAuthEnabled: boolean;
+    cancelHref: string;
 }) {
     const lockSelfAdmin = isEditingSelf && member.isAdmin;
     const router = useRouter();
@@ -164,7 +171,7 @@ export default function EditMemberForm({
 
     return (
         <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form id={MEMBER_FORM_ID} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                 {errors.root?.message && (
                     <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900 text-sm">
                         {errors.root.message}
@@ -510,20 +517,20 @@ export default function EditMemberForm({
                 </div>
                 )}
 
-                <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row mt-4 border-t">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.back()}
-                        disabled={isSubmitting}
-                    >
-                        Cancelar
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting && <IconLoader2 className="size-4 mr-2 animate-spin" />}
-                        {isSubmitting ? "Salvando..." : "Salvar Alterações"}
-                    </Button>
-                </div>
+            </form>
+
+            <div className="flex flex-col-reverse justify-end gap-3 pt-4 sm:flex-row mt-4 border-t">
+                <Link
+                    href={cancelHref}
+                    className={cn(buttonVariants({ variant: "outline" }), "h-9")}
+                >
+                    Cancelar
+                </Link>
+                <Button type="submit" form={MEMBER_FORM_ID} disabled={isSubmitting}>
+                    {isSubmitting && <IconLoader2 className="size-4 mr-2 animate-spin" />}
+                    {isSubmitting ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+            </div>
 
                 {!isEditingSelf && canWrite && (
                     <div className="border border-destructive/25 bg-destructive/5 rounded-2xl p-4 sm:p-5 space-y-4 mt-6">
@@ -605,7 +612,6 @@ export default function EditMemberForm({
                         </Dialog>
                     </div>
                 )}
-            </form>
         </div>
     );
 }

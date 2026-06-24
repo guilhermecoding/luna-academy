@@ -44,6 +44,13 @@ export default function GoogleAccountLink({
     const [showUnlinkDialog, setShowUnlinkDialog] = useState(false);
 
     useEffect(() => {
+        const resetLoadingState = () => setLoading(false);
+        resetLoadingState();
+        window.addEventListener("pageshow", resetLoadingState);
+        return () => window.removeEventListener("pageshow", resetLoadingState);
+    }, []);
+
+    useEffect(() => {
         const hasLinkError = searchParams.get("google_error") === "1";
         const hasLinkSuccess = searchParams.get("google_linked") === "1";
 
