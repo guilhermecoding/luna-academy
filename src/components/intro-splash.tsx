@@ -73,7 +73,7 @@ export function IntroSplash() {
                         transition={{ duration: 0.35, ease: "easeOut" }}
                         className="flex flex-col items-center gap-4 text-center"
                     >
-                        <GibbyAnimate className="size-24" />
+                        <GibbyAnimate size={96} />
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}

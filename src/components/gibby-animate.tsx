@@ -7,20 +7,21 @@ const GIBBY_SIZE_PX = 76;
 
 interface GibbyAnimateProps {
     className?: string;
+    size?: number;
 }
 
-export default function GibbyAnimate({ className }: GibbyAnimateProps) {
+export default function GibbyAnimate({ className, size = GIBBY_SIZE_PX }: GibbyAnimateProps) {
     return (
         <div
             className={cn("inline-flex shrink-0", className)}
-            style={{ width: GIBBY_SIZE_PX, height: GIBBY_SIZE_PX }}
+            style={{ width: size, height: size }}
         >
             <DotLottieReact
                 src="/gibby-animate.lottie"
                 loop
                 autoplay
-                width={GIBBY_SIZE_PX}
-                height={GIBBY_SIZE_PX}
+                width={size}
+                height={size}
                 className="block size-full"
             />
         </div>
