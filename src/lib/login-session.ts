@@ -1,7 +1,7 @@
 import type { SessionUser } from "@/@types/session-type";
 
 export type LoginTab = "admin" | "teacher";
-export type SessionUserLogin = Omit<SessionUser, "id">;
+export type SessionUserLogin = Pick<SessionUser, "isAdmin" | "isTeacher" | "isActive" | "name">;
 
 export const LOGIN_TAB_COOKIE_NAME = "luna_login_tab";
 export const LOGIN_TAB_STORAGE_KEY = "luna_login_tab";

@@ -18,15 +18,16 @@ import { redirect } from "next/navigation";
 import { APP_VERSION } from "@/lib/app-version";
 import { Separator } from "@/components/ui/separator";
 import { LOGIN_TAB_COOKIE_NAME, loginRedirectPath } from "@/lib/login-session";
+import { Suspense } from "react";
 
 const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08];
 
-export default async function LoginPage({
+async function LoginPageContent({
     searchParams,
 }: {
-    searchParams: Promise<{ oauth?: string }>;
+    searchParams?: Promise<{ oauth?: string }>;
 }) {
-    const { oauth } = await searchParams;
+    const { oauth } = (await searchParams) ?? {};
     const isGoogleOAuthCallback = oauth === "google";
 
     const session = await auth.api.getSession({
@@ -89,11 +90,23 @@ export default async function LoginPage({
                     </div>
 
                     {/* Footer opcional */}
-                    <p className="text-center w-full sm:w-3/5 flex justify-center items-center max-w-sm text-xs text-muted-foreground">
+                    <p className="text-center mt-8 w-full sm:w-3/5 flex justify-center items-center max-w-sm text-xs text-muted-foreground">
                         &copy; <CurrentYear /> Luna Academy - v{APP_VERSION}. <br /> Todos os direitos reservados.
                     </p>
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function LoginPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ oauth?: string }>;
+}) {
+    return (
+        <Suspense fallback={null}>
+            <LoginPageContent searchParams={searchParams} />
+        </Suspense>
     );
 }
