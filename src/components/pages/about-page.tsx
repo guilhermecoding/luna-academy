@@ -4,7 +4,7 @@ import Section from "../section";
 import TitlePage from "../title-page";
 import { APP_VERSION } from "@/lib/app-version";
 import { Separator } from "../ui/separator";
-import { IconBrandGithubFilled, IconBrandLinkedinFilled, IconMailFilled } from "@tabler/icons-react";
+import { IconBrandGithubFilled, IconBrandLinkedinFilled, IconExternalLink, IconMailFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function AboutPage() {
@@ -47,7 +47,12 @@ export default function AboutPage() {
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm text-muted-foreground">Versão:</span>
-                        <span className="text-base font-bold">v{APP_VERSION}</span>
+                        <Link href="https://github.com/guilhermecoding/luna-academy/releases"
+                            className="text-base font-bold flex items-center gap-1 underline text-blue-400"
+                            target="_blank"
+                        >
+                            v{APP_VERSION} <IconExternalLink className="size-4" />
+                        </Link>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm text-muted-foreground">Data de lançamento:</span>
