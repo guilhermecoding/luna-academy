@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import prisma from "@/lib/prisma";
+import { aggregateCourseTeachers } from "@/lib/schedule-teacher-utils";
 
 // ─── Validações ────────────────────────────────────────────
 
@@ -24,15 +25,34 @@ function isValidCanonicalCode(key: string): boolean {
 
 // ─── Tipagem do Response ────────────────────────────────────
 
+interface Teachers {
+    titular: ProfessorItem | null;
+    assistants: ProfessorItem[];
+}
+
 interface ScheduleItem {
     dayOfWeek: string;
     startTime: string;
     endTime: string;
-    teacherName: string | null;
+    teachers: Teachers;
     room: {
         name: string | null;
         block: string | null;
     } | null;
+}
+
+interface ProfessorItem {
+    name: string;
+}
+
+function toTeachersResponse(
+    schedules: Parameters<typeof aggregateCourseTeachers>[0],
+): Teachers {
+    const { titular, assistants } = aggregateCourseTeachers(schedules);
+    return {
+        titular: titular ? { name: titular.name } : null,
+        assistants: assistants.map((a) => ({ name: a.name })),
+    };
 }
 
 interface CourseItem {
@@ -40,6 +60,7 @@ interface CourseItem {
     name: string;
     subjectName: string;
     shift: string;
+    teachers: Teachers;
     room: {
         name: string | null;
         block: string | null;
@@ -258,8 +279,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             data: { accessedAt: new Date() },
         });
 
-        updateTag(`period:${period.id}:indicators`);
-        updateTag(`period:${period.id}:sad-access`);
+        revalidateTag(`period:${period.id}:indicators`, "days");
+        revalidateTag(`period:${period.id}:sad-access`, "minutes");
 
         // 8. Verificar se o aluno possui ao menos uma matrícula em turma deste período
         const enrollmentCount = await prisma.enrollment.count({
@@ -340,6 +361,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                         },
                         schedules: {
                             select: {
+                                teacherId: true,
                                 dayOfWeek: true,
                                 timeSlot: {
                                     select: {
@@ -348,7 +370,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                                     },
                                 },
                                 teacher: {
-                                    select: { name: true },
+                                    select: { id: true, name: true },
+                                },
+                                assistants: {
+                                    select: {
+                                        assistantId: true,
+                                        assistant: {
+                                            select: { id: true, name: true },
+                                        },
+                                    },
                                 },
                                 room: {
                                     select: {
@@ -391,29 +421,30 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                 shift: cg.shift,
                 groupLink: cg.groupLink,
                 courses: cg.courses.map((course) => ({
-                    code: course.code,
-                    name: course.name,
-                    subjectName: course.subject.name,
-                    shift: course.shift,
-                    room: course.room
-                        ? {
-                            name: course.room.name,
-                            block: course.room.block,
-                            campus: {
-                                name: course.room.campus.name,
-                                address: course.room.campus.address,
-                            },
-                        }
-                        : null,
-                    schedules: course.schedules.map((s) => ({
-                        dayOfWeek: s.dayOfWeek,
-                        startTime: s.timeSlot.startTime,
-                        endTime: s.timeSlot.endTime,
-                        teacherName: s.teacher?.name ?? null,
-                        room: s.room
-                            ? { name: s.room.name, block: s.room.block }
+                        code: course.code,
+                        name: course.name,
+                        subjectName: course.subject.name,
+                        shift: course.shift,
+                        teachers: toTeachersResponse(course.schedules),
+                        room: course.room
+                            ? {
+                                name: course.room.name,
+                                block: course.room.block,
+                                campus: {
+                                    name: course.room.campus.name,
+                                    address: course.room.campus.address,
+                                },
+                            }
                             : null,
-                    })),
+                        schedules: course.schedules.map((s) => ({
+                            dayOfWeek: s.dayOfWeek,
+                            startTime: s.timeSlot.startTime,
+                            endTime: s.timeSlot.endTime,
+                            teachers: toTeachersResponse([s]),
+                            room: s.room
+                                ? { name: s.room.name, block: s.room.block }
+                                : null,
+                        })),
                 })),
             })),
         };

@@ -8,7 +8,7 @@ Plataforma de gestão acadêmica para instituições de ensino. Gerencie, acompa
 
 ## O que é
 
-A **LUNA ACADEMY** é um sistema de gestão acadêmica que centraliza a operação escolar — desde a configuração curricular até o registro de aulas e frequência. A aplicação oferece dois portais principais:
+O **LUNA ACADEMY** é um sistema de gestão acadêmica que centraliza a operação escolar — desde a configuração curricular até o registro de aulas e frequência. A aplicação oferece dois portais principais:
 
 - **Painel administrativo** (`/admin`) — configuração de programas, matrizes curriculares, períodos letivos, turmas, alunos, equipe e instituições.
 - **Portal do professor** (`/prof`) — acompanhamento de turmas, disciplinas e registro de aulas com chamada e frequência.

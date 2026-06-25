@@ -20,7 +20,7 @@ export default function Providers({
     return (
         <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             enableColorScheme={false}
             disableTransitionOnChange
@@ -33,7 +33,6 @@ export default function Providers({
                 showSpinner={false}
                 easing="ease"
                 speed={200}
-                shadow="0 0 10px #432DD7,0 0 5px #432DD7"
             />
             <Suspense fallback={null}>
                 <SidebarProvider>

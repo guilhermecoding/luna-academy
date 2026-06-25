@@ -5,12 +5,14 @@ import { Metadata } from "next";
 import { getTeachers } from "@/services/users/teachers.service";
 import CreateAdminForm from "./_components/create-admin-form";
 import { WritePageGuard } from "@/components/write-page-guard";
+import { Suspense } from "react";
+import SkeletonForm from "@/components/skeletons/skeleton-form";
 
 export const metadata: Metadata = {
     title: "Novo Administrador",
 };
 
-export default async function NewAdminPage() {
+async function NewAdminPageContent() {
     const teachers = await getTeachers();
 
     return (
@@ -28,5 +30,19 @@ export default async function NewAdminPage() {
                 </Section>
             </Page>
         </WritePageGuard>
+    );
+}
+
+export default function NewAdminPage() {
+    return (
+        <Suspense fallback={
+            <Page>
+                <Section>
+                    <SkeletonForm />
+                </Section>
+            </Page>
+        }>
+            <NewAdminPageContent />
+        </Suspense>
     );
 }

@@ -141,8 +141,8 @@ export default function LessonCardList({
                                     </span>
                                 )}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 overflow-hidden">
-                                <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground whitespace-nowrap">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
+                                <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] sm:text-sm text-muted-foreground min-w-0">
                                     <IconCalendarEvent className="size-3 sm:size-3.5 shrink-0" />
                                     <span className="capitalize">{formatWeekDay(lesson.date)}</span>
                                     <span>•</span>
@@ -150,7 +150,7 @@ export default function LessonCardList({
                                 </span>
 
                                 {lesson.timeSlot && (
-                                    <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground whitespace-nowrap">
+                                    <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground shrink-0">
                                         <IconClock className="size-3 sm:size-3.5 shrink-0" />
                                         {lesson.timeSlot.startTime} - {lesson.timeSlot.endTime}
                                     </span>
@@ -205,15 +205,15 @@ export default function LessonCardList({
                         <h3 className="font-medium text-muted-foreground text-sm sm:text-base truncate">
                             Aula prevista — não registrada
                         </h3>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 overflow-hidden">
-                            <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground whitespace-nowrap">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
+                            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] sm:text-sm text-muted-foreground min-w-0">
                                 <IconCalendarEvent className="size-3 sm:size-3.5 shrink-0" />
                                 <span className="capitalize">{formatWeekDay(upcoming.date + "T00:00:00Z")}</span>
                                 <span>•</span>
                                 <span>{formatDate(upcoming.date + "T00:00:00Z")}</span>
                             </span>
 
-                            <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground whitespace-nowrap">
+                            <span className="flex items-center gap-1.5 text-[10px] sm:text-sm text-muted-foreground shrink-0">
                                 <IconClock className="size-3 sm:size-3.5 shrink-0" />
                                 {upcoming.startTime} - {upcoming.endTime}
                             </span>

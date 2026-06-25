@@ -7,12 +7,26 @@ import z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { IconLogin2, IconUserShield, IconSchool, IconLoader2, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconLogin2, IconUserShield, IconSchool, IconLoader2, IconEye, IconEyeOff, IconInfoCircle } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import type { SessionUser } from "@/@types/session-type";
+import TooltipText from "@/components/tooltip-text";
+import GoogleLoginButton from "./google-login-button";
+import {
+    logGoogleAuthError,
+    mapGoogleOAuthQueryError,
+} from "@/lib/google-auth";
+import {
+    fetchSessionUser,
+    validateLoginSession,
+    resolveLoginTab,
+    clearPersistedLoginTab,
+    loginRedirectPath,
+    type LoginTab,
+} from "@/lib/login-session";
 
 const loginSchema = z.object({
     email: z.string().email("Este e-mail não é válido"),
@@ -25,35 +39,44 @@ const emptyLoginValues: LoginInput = {
     password: "",
 };
 
-type SessionUserLogin = Omit<SessionUser, "id">;
-/**
- * Aba Professor: somente quem tem vínculo `isTeacher` no cadastro (inclui admin que também é professor).
- * Aba Admin: somente quem tem vínculo `isAdmin` no cadastro.
- */
-function sessionMatchesTab(activeTab: "admin" | "teacher", user: SessionUserLogin): boolean {
-    if (activeTab === "teacher") {
-        return user.isTeacher === true;
-    }
-    return user.isAdmin === true;
-}
+type LoginFormProps = {
+    googleAuthEnabled: boolean;
+};
 
-export default function LoginForm() {
+export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<"admin" | "teacher">("teacher");
+    const [activeTab, setActiveTab] = useState<LoginTab>("teacher");
     const [showPassword, setShowPassword] = useState(false);
 
     const {
         control,
         handleSubmit,
         reset,
-        formState: { isValid, errors },
+        formState: { errors },
     } = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onChange",
         defaultValues: emptyLoginValues,
     });
+
+    const submitLogin = handleSubmit(onSubmit);
+
+    function handleFormKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
+        if (event.key !== "Enter" || event.nativeEvent.isComposing || loading) {
+            return;
+        }
+
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) {
+            return;
+        }
+
+        event.preventDefault();
+        void submitLogin();
+    }
 
     useEffect(() => {
         reset(emptyLoginValues);
@@ -61,21 +84,77 @@ export default function LoginForm() {
         setShowPassword(false);
     }, [pathname, reset]);
 
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get("error") === "account_disabled") {
-                toast.error("Usuário não encontrado", {
-                    description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
+    async function completeLogin(activeTabValue: LoginTab) {
+        const user = await fetchSessionUser();
+        const validation = validateLoginSession(user, activeTabValue);
+
+        if (!validation.ok) {
+            await authClient.signOut();
+
+            if (validation.reason === "no_user") {
+                toast.error("Não foi possível validar o perfil", {
+                    description: "Tente novamente em instantes.",
                 });
-                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
             }
+
+            toast.error("Usuário não encontrado", {
+                description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
+            });
+            return;
         }
+
+        const firstName = validation.user.name?.trim().split(" ")[0] || "usuário";
+        toast.message(`Bem vindo(a) de volta, ${firstName}!`);
+
+        const redirectPath = loginRedirectPath(validation.user, activeTabValue);
+        if (redirectPath) {
+            router.push(redirectPath);
+            router.refresh();
+        }
+    }
+
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const resolvedTab = resolveLoginTab(params.get("tab"));
+        setActiveTab(resolvedTab);
+
+        const oauthProvider = params.get("oauth");
+        const oauthError = params.get("error");
+
+        if (params.get("error") === "account_disabled") {
+            toast.error("Usuário não encontrado", {
+                description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
+            });
+            clearPersistedLoginTab();
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
+
+        if (oauthError) {
+            const { userMessage, shouldLog } = mapGoogleOAuthQueryError(oauthError);
+            if (shouldLog) {
+                logGoogleAuthError("oauth callback", oauthError);
+            }
+            toast.error(userMessage);
+            clearPersistedLoginTab();
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
+
+        if (oauthProvider === "google") {
+            void completeLogin(resolvedTab).finally(() => {
+                clearPersistedLoginTab();
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // ---------------------
-    // SUBMIT DO LOGIN
-    // ---------------------
     async function onSubmit(values: LoginInput) {
         setLoading(true);
         try {
@@ -91,49 +170,7 @@ export default function LoginForm() {
                 return;
             }
 
-            const sessionRes = await fetch("/api/auth/get-session", {
-                credentials: "include",
-                cache: "no-store",
-            });
-            const sessionBody = sessionRes.ok ? await sessionRes.json() : null;
-            const user =
-                sessionBody &&
-                    typeof sessionBody === "object" &&
-                    "user" in sessionBody &&
-                    sessionBody.user &&
-                    typeof sessionBody.user === "object"
-                    ? (sessionBody.user as SessionUserLogin)
-                    : null;
-
-            if (!user) {
-                await authClient.signOut();
-                toast.error("Não foi possível validar o perfil", {
-                    description: "Tente novamente em instantes.",
-                });
-                return;
-            }
-
-            if (!user.isActive) {
-                await authClient.signOut();
-                toast.error("Usuário não encontrado", {
-                    description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
-                });
-                return;
-            }
-
-            if (!sessionMatchesTab(activeTab, user)) {
-                await authClient.signOut();
-                toast.error("Usuário não encontrado", {
-                    description: "Ops! Não sabemos quem é você... Talvez suas credenciais estejam inválidas. Tente novamente.",
-                });
-                return;
-            }
-
-            const firstName = user.name?.trim().split(" ")[0] || "usuário";
-            toast.message(`Bem vindo(a) de volta, ${firstName}!`);
-
-            router.push(activeTab === "admin" ? "/admin" : "/prof");
-            router.refresh();
+            await completeLogin(activeTab);
         } catch {
             toast.error("Erro inesperado", {
                 description: "Ocorreu um problema do nosso lado. Tente novamente em instantes.",
@@ -144,8 +181,7 @@ export default function LoginForm() {
     }
 
     return (
-        <div className="w-full px-3 sm:px-0 sm:w-3/5 space-y-6">
-            {/* TABS CUSTOMIZADAS */}
+        <div className="w-full sm:w-3/5 max-w-sm px-3 sm:px-0 space-y-6">
             <div className="flex p-1 bg-muted-foreground/10 rounded-xl border border-border/50">
                 <button
                     type="button"
@@ -176,13 +212,16 @@ export default function LoginForm() {
             </div>
 
             <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={submitLogin}
+                onKeyDown={handleFormKeyDown}
                 className="w-full space-y-5"
             >
-                {/* EMAIL */}
                 <div className="w-full space-y-2">
-                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">
+                    <Label htmlFor="email" className="text-xs gap-1 font-bold uppercase tracking-wider text-muted-foreground ml-1">
                         E-mail
+                        <TooltipText text="Este é o e-mail cadastrado por um administrador da escola.">
+                            <IconInfoCircle className="w-3.5 h-3.5" />
+                        </TooltipText>
                     </Label>
                     <Controller
                         name="email"
@@ -192,6 +231,8 @@ export default function LoginForm() {
                                 {...field}
                                 id="email"
                                 type="email"
+                                enterKeyHint="go"
+                                autoComplete="email"
                                 placeholder={activeTab === "admin" ? "admin@luna.com" : "professor@luna.com"}
                                 className={cn(
                                     "h-12 rounded-xl border-2 px-4 outline-none transition-all focus:ring-0 bg-background",
@@ -205,7 +246,6 @@ export default function LoginForm() {
                     )}
                 </div>
 
-                {/* SENHA */}
                 <div className="w-full space-y-2">
                     <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">
                         Senha
@@ -219,6 +259,7 @@ export default function LoginForm() {
                                     {...field}
                                     id="password"
                                     type={showPassword ? "text" : "password"}
+                                    enterKeyHint="go"
                                     autoComplete="current-password"
                                     placeholder="••••••••"
                                     className={cn(
@@ -246,12 +287,11 @@ export default function LoginForm() {
                     )}
                 </div>
 
-                {/* BOTÃO */}
                 <div className="pt-2">
                     <Button
                         type="submit"
                         className="w-full h-14 font-bold transition-all hover:scale-[1.01] active:scale-[0.99]"
-                        disabled={!isValid || loading}
+                        disabled={loading}
                         aria-busy={loading}
                     >
                         {loading ? (
@@ -268,6 +308,17 @@ export default function LoginForm() {
                     </Button>
                 </div>
             </form>
+
+            {googleAuthEnabled && (
+                <>
+                    <div className="flex w-full flex-row justify-center items-center gap-4 overflow-hidden">
+                        <Separator className="w-full" />
+                        <span className="text-muted-foreground text-sm font-medium">OU</span>
+                        <Separator className="w-full" />
+                    </div>
+                    <GoogleLoginButton activeTab={activeTab} enabled={googleAuthEnabled} />
+                </>
+            )}
         </div>
     );
 }

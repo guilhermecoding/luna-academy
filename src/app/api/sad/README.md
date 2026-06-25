@@ -114,6 +114,12 @@ Retornado quando o aluno possui ao menos uma matrícula em turma do período (`s
           "name": "Matemática - 1º Ano A",
           "subjectName": "Matemática",
           "shift": "MORNING",
+          "teachers": {
+            "titular": { "name": "Prof. João Silva" },
+            "assistants": [
+              { "name": "Prof. Maria Santos" }
+            ]
+          },
           "room": {
             "name": "Sala 101",
             "block": "A",
@@ -127,7 +133,10 @@ Retornado quando o aluno possui ao menos uma matrícula em turma do período (`s
               "dayOfWeek": "MONDAY",
               "startTime": "08:00",
               "endTime": "09:40",
-              "teacherName": "Prof. João Silva",
+              "teachers": {
+                "titular": { "name": "Prof. João Silva" },
+                "assistants": []
+              },
               "room": {
                 "name": "Sala 101",
                 "block": "A"
@@ -163,6 +172,11 @@ Retornado quando o aluno possui ao menos uma matrícula em turma do período (`s
 | `courses[].name` | `string` | Nome da disciplina ofertada. |
 | `courses[].subjectName` | `string` | Nome na matriz curricular. |
 | `courses[].shift` | `string` | Turno da disciplina. |
+| `courses[].teachers` | `object` | Professores da disciplina (agregados dos slots de horário). |
+| `courses[].teachers.titular` | `object \| null` | Professor titular. `null` quando não houver. |
+| `courses[].teachers.titular.name` | `string` | Nome do professor titular. |
+| `courses[].teachers.assistants` | `array` | Assistentes vinculados aos slots. Array vazio quando não houver. |
+| `courses[].teachers.assistants[].name` | `string` | Nome do professor assistente. |
 | `courses[].room` | `object \| null` | Sala padrão da disciplina. |
 | `courses[].room.campus.name` | `string` | Nome do campus. |
 | `courses[].room.campus.address` | `string` | Endereço do campus. |
@@ -170,7 +184,11 @@ Retornado quando o aluno possui ao menos uma matrícula em turma do período (`s
 | `schedules[].dayOfWeek` | `string` | `MONDAY` a `SUNDAY`. |
 | `schedules[].startTime` | `string` | Horário de início. |
 | `schedules[].endTime` | `string` | Horário de término. |
-| `schedules[].teacherName` | `string \| null` | Nome do professor. |
+| `schedules[].teachers` | `object` | Professores do slot de horário. |
+| `schedules[].teachers.titular` | `object \| null` | Professor titular do slot. `null` quando não houver. |
+| `schedules[].teachers.titular.name` | `string` | Nome do professor titular. |
+| `schedules[].teachers.assistants` | `array` | Assistentes do slot. Array vazio quando não houver. |
+| `schedules[].teachers.assistants[].name` | `string` | Nome do professor assistente. |
 | `schedules[].room` | `object \| null` | Sala do horário (pode diferir da sala padrão). |
 
 ---
@@ -312,4 +330,5 @@ else:
 - O email é comparado em lowercase após trim.
 - Datas retornadas no formato `YYYY-MM-DD`.
 - Horários (`startTime`, `endTime`) seguem o formato dos `TimeSlots` do programa.
+- Professores assistentes são vinculados ao slot de horário (`Schedule`); o campo `courses[].teachers` agrega titular e assistentes de todos os slots da disciplina.
 - A busca de turmas, disciplinas, horários e salas usa uma query otimizada com `select` aninhado do Prisma.

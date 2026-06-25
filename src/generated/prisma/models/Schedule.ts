@@ -225,7 +225,6 @@ export type ScheduleOrderByWithRelationInput = {
 export type ScheduleWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   courseId_dayOfWeek_timeSlotId?: Prisma.ScheduleCourseIdDayOfWeekTimeSlotIdCompoundUniqueInput
-  roomId_dayOfWeek_timeSlotId?: Prisma.ScheduleRoomIdDayOfWeekTimeSlotIdCompoundUniqueInput
   AND?: Prisma.ScheduleWhereInput | Prisma.ScheduleWhereInput[]
   OR?: Prisma.ScheduleWhereInput[]
   NOT?: Prisma.ScheduleWhereInput | Prisma.ScheduleWhereInput[]
@@ -241,7 +240,7 @@ export type ScheduleWhereUniqueInput = Prisma.AtLeast<{
   room?: Prisma.XOR<Prisma.RoomNullableScalarRelationFilter, Prisma.RoomWhereInput> | null
   teacher?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   timeSlot?: Prisma.XOR<Prisma.TimeSlotScalarRelationFilter, Prisma.TimeSlotWhereInput>
-}, "id" | "courseId_dayOfWeek_timeSlotId" | "roomId_dayOfWeek_timeSlotId">
+}, "id" | "courseId_dayOfWeek_timeSlotId">
 
 export type ScheduleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -355,12 +354,6 @@ export type ScheduleOrderByRelationAggregateInput = {
 
 export type ScheduleCourseIdDayOfWeekTimeSlotIdCompoundUniqueInput = {
   courseId: string
-  dayOfWeek: $Enums.DayOfWeek
-  timeSlotId: string
-}
-
-export type ScheduleRoomIdDayOfWeekTimeSlotIdCompoundUniqueInput = {
-  roomId: string
   dayOfWeek: $Enums.DayOfWeek
   timeSlotId: string
 }

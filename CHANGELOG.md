@@ -5,6 +5,47 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.0] - 2026-06-25
+
+### Adicionado
+
+- Login social com Google (Better Auth), habilitado quando `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` estão configurados
+- Botão "Entre com o Google" na página de login, com callback OAuth e tratamento de erros (conta não vinculada, e-mail divergente, etc.)
+- Componente `GoogleAccountLink` para vincular e desvincular conta Google no perfil do professor e na edição de membros da equipe
+- Utilitários `google-auth.ts` e `login-session.ts` (abas de login, cookie/sessionStorage, redirecionamento pós-login por perfil)
+- Gestão de abas **Administrador** / **Professor(a)** no login, com redirecionamento respeitando a aba selecionada
+- Mensagem de boas-vindas personalizada com o primeiro nome do usuário após login
+- Novas miniaturas na página de login (`Imagem_09`, `Imagem_11`, `Imagem_12`) e atualização das imagens existentes
+- API SAD: campo `teachers` (titular + assistentes) em `courses[]` e `schedules[]`, substituindo `teacherName` por slot
+- Serviço `accounts.service.ts` para consulta de vínculo com provedor Google
+- Estados de carregamento com `Suspense` e `SkeletonForm` nas páginas de criação de administrador e professor
+- Variáveis `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` documentadas em `.env.example`
+- Link da versão na página "Sobre" apontando para as releases no GitHub
+
+### Alterado
+
+- Tema padrão da aplicação: **claro** quando não há preferência salva (antes seguia o sistema)
+- Script de inicialização de tema (`theme-script.ts`) alinhado ao novo padrão; opção "Sistema" continua disponível no menu do usuário
+- Página de login refatorada com carregamento assíncrono (`Suspense`), layout responsivo e separador condicional entre formulário e Google
+- Formulário de login com melhorias de UX (tooltip informativo, fluxo OAuth)
+- `GibbyAnimate` com prop `size` personalizável e tamanho padrão reduzido; sombra removida
+- `LessonCardList`: data e horário das aulas passam a quebrar linha em telas estreitas (sem corte por `truncate`)
+- API SAD: invalidação de cache com `revalidateTag` e perfis de vida (`days` / `minutes`) em vez de `updateTag`
+- Formulários de edição de perfil e de membro: botão **Cancelar** com link de retorno configurável
+- Documentação da API SAD (`README.md`) atualizada para a nova estrutura de professores por slot
+
+### Corrigido
+
+- `AttendanceTable`: estado de alterações pendentes derivado de `localChanges` (evita botão **Salvar Presenças** sem ação)
+- **Todos Presentes** / **Todos Ausentes** passam a registrar todos os alunos para permitir fechar a chamada mesmo quando todos já estão presentes por padrão
+- Formatação de texto na tabela de acesso SAD do painel admin
+- Tratamento de erros na vinculação de conta Google (mensagens amigáveis e logs condicionais)
+- Erro de formatação no `README.md`
+
+### Removido
+
+- Campo `schedules[].teacherName` na resposta da API SAD (substituído por `schedules[].teachers`)
+
 ## [1.5.0] - 2026-06-23
 
 ### Adicionado

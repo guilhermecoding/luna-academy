@@ -57,7 +57,7 @@ const formatAccessTime = (date: Date) => {
         minute: "2-digit",
     }).format(accessedAt);
 
-    return `visto em ${dateStr} às ${timeStr}`;
+    return `Visto em ${dateStr} às ${timeStr}`;
 };
 
 const columns: ColumnDef<SADAccessItem>[] = [
@@ -114,7 +114,7 @@ const columns: ColumnDef<SADAccessItem>[] = [
                 ) : (
                     <Badge variant="outline" className="text-muted-foreground font-normal border-dashed px-3 py-1">
                         <IconClock className="size-3 mr-1.5 opacity-50" />
-                        ainda não visto
+                        Ainda não visto
                     </Badge>
                 )}
             </div>
