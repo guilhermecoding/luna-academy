@@ -6,8 +6,10 @@ import {
     Text,
     View,
 } from "@react-pdf/renderer";
+import { getCorporationName } from "@/lib/corporation-name";
 import { getPdfLogoSrc } from "@/lib/export/pdf/assets";
 import { registerPdfFonts } from "@/lib/export/pdf/fonts";
+import { PdfGeneratedFooter } from "@/lib/export/pdf/generated-footer";
 import { PdfTable } from "@/lib/export/pdf/table";
 import {
     STUDENTS_EXPORT_COLUMNS,
@@ -59,16 +61,6 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto",
         fontWeight: "medium",
     },
-    footer: {
-        position: "absolute",
-        bottom: 24,
-        left: 32,
-        right: 32,
-        fontSize: 8,
-        color: "#94a3b8",
-        textAlign: "center",
-        fontFamily: "Roboto",
-    },
     teachersBlock: {
         marginBottom: 12,
         gap: 4,
@@ -104,7 +96,7 @@ export function StudentsListPdfDocument({
                         <Text style={styles.title}>{title}</Text>
                         <Text style={styles.subtitle}>{subtitle}</Text>
                         <Text style={styles.instituteName}>
-                            Instituto Uberhub Educação
+                            {getCorporationName()}
                         </Text>
                     </View>
                     <PdfImage src={getPdfLogoSrc()} style={styles.logoLuna} />
@@ -112,7 +104,7 @@ export function StudentsListPdfDocument({
                 {teachers && (
                     <View style={styles.teachersBlock}>
                         <Text style={styles.teachersLine}>
-                            Professor titular: {teachers.titular ?? "—"}
+                            Professor(es) titular(es): {teachers.titular ?? "—"}
                         </Text>
                         <Text style={styles.teachersLine}>
                             Assistentes: {teachers.assistants.length > 0 ? teachers.assistants.join(", ") : "—"}
@@ -120,9 +112,7 @@ export function StudentsListPdfDocument({
                     </View>
                 )}
                 <PdfTable columns={STUDENTS_EXPORT_COLUMNS} rows={rows} />
-                <Text style={styles.footer} fixed>
-                    Gerado em {generatedAt} · Luna Academy
-                </Text>
+                <PdfGeneratedFooter generatedAt={generatedAt} />
             </Page>
         </Document>
     );

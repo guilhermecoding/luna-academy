@@ -1,16 +1,11 @@
+import { formatExportGeneratedAt } from "@/lib/export/format-generated-at";
+import { ClassGroupStudentsPdfDocument } from "@/lib/export/pdf/class-group-students-document";
 import { StudentsListPdfDocument } from "@/lib/export/pdf/students-list-document";
 import { renderToBuffer } from "@react-pdf/renderer";
 import {
     getStudentsByClassGroupForExport,
     getStudentsByPeriodForExport,
 } from "@/services/export/students-csv.export";
-
-function formatGeneratedAt() {
-    return new Date().toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-    });
-}
 
 export type PeriodStudentsPdfMeta = {
     periodId: string;
@@ -27,7 +22,7 @@ export type ClassGroupStudentsPdfMeta = {
 
 export async function buildPeriodStudentsPdf(meta: PeriodStudentsPdfMeta): Promise<Buffer> {
     const rows = await getStudentsByPeriodForExport(meta.periodId);
-    const generatedAt = formatGeneratedAt();
+    const generatedAt = formatExportGeneratedAt();
 
     const buffer = await renderToBuffer(
         <StudentsListPdfDocument
@@ -43,12 +38,13 @@ export async function buildPeriodStudentsPdf(meta: PeriodStudentsPdfMeta): Promi
 
 export async function buildClassGroupStudentsPdf(meta: ClassGroupStudentsPdfMeta): Promise<Buffer> {
     const rows = await getStudentsByClassGroupForExport(meta.classGroupId);
-    const generatedAt = formatGeneratedAt();
+    const generatedAt = formatExportGeneratedAt();
 
     const buffer = await renderToBuffer(
-        <StudentsListPdfDocument
-            title={`Alunos da turma ${meta.classGroupName}`}
-            subtitle={`${meta.programName} · ${meta.periodName}`}
+        <ClassGroupStudentsPdfDocument
+            classGroupName={meta.classGroupName}
+            programName={meta.programName}
+            periodName={meta.periodName}
             generatedAt={generatedAt}
             rows={rows}
         />,

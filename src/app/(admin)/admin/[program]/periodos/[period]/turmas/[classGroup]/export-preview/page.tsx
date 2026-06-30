@@ -4,6 +4,7 @@ import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
 import { ButtonLink } from "@/components/ui/button-link";
 import { StudentsPdfPreview } from "@/components/export/students-pdf-preview";
+import { formatExportGeneratedAt } from "@/lib/export/format-generated-at";
 import { requireAdmin } from "@/lib/auth-guards";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
@@ -45,10 +46,7 @@ async function ClassGroupExportPreviewPageContent({
         getStudentsByClassGroupForExport(classGroupData.id),
     ]);
 
-    const generatedAt = new Date().toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-    });
+    const generatedAt = formatExportGeneratedAt();
     const exportPdfUrl = `/api/admin/${program}/periodos/${period}/turmas/${classGroup}/alunos/export?format=pdf`;
     const backUrl = `/admin/${program}/periodos/${period}/turmas/${classGroup}`;
     const programName = programData?.name ?? program;
