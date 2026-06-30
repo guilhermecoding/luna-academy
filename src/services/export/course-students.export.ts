@@ -24,10 +24,10 @@ export type CourseStudentsExportMeta = {
 export function getCourseTeachersForExport(
     schedules: CourseWithRelations["schedules"],
 ): CourseTeachersExport {
-    const { titular, assistants } = aggregateCourseTeachers(schedules);
+    const { titulares, assistants } = aggregateCourseTeachers(schedules);
 
     return {
-        titular: titular?.name ?? null,
+        titular: titulares.length > 0 ? titulares.map((t) => t.name).join("; ") : null,
         assistants: assistants.map((assistant) => assistant.name),
     };
 }

@@ -48,9 +48,11 @@ interface ProfessorItem {
 function toTeachersResponse(
     schedules: Parameters<typeof aggregateCourseTeachers>[0],
 ): Teachers {
-    const { titular, assistants } = aggregateCourseTeachers(schedules);
+    const { titulares, assistants } = aggregateCourseTeachers(schedules);
     return {
-        titular: titular ? { name: titular.name } : null,
+        titular: titulares.length > 0
+            ? { name: titulares.map((t) => t.name).join(", ") }
+            : null,
         assistants: assistants.map((a) => ({ name: a.name })),
     };
 }

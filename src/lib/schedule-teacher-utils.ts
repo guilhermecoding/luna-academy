@@ -147,7 +147,7 @@ export function formatCourseTeachersSummary(
 }
 
 export type CourseTeachersAggregate = {
-    titular: { id: string; name: string } | null;
+    titulares: { id: string; name: string }[];
     assistants: { id: string; name: string }[];
 };
 
@@ -158,16 +158,16 @@ export function aggregateCourseTeachers(
         assistants?: { assistantId: string; assistant?: TeacherWithAccess | null }[];
     }[],
 ): CourseTeachersAggregate {
-    let titular: { id: string; name: string } | null = null;
+    const titulares = new Map<string, string>();
     const assistants = new Map<string, string>();
 
     for (const schedule of schedules) {
         if (
             schedule.teacherId &&
             isTeacherSystemAccessEnabled(schedule.teacher) &&
-            !titular
+            !titulares.has(schedule.teacherId)
         ) {
-            titular = { id: schedule.teacher!.id, name: schedule.teacher!.name };
+            titulares.set(schedule.teacherId, schedule.teacher!.name);
         }
 
         for (const a of schedule.assistants ?? []) {
@@ -177,11 +177,15 @@ export function aggregateCourseTeachers(
         }
     }
 
+    const titularIds = new Set(titulares.keys());
     const assistantList = Array.from(assistants.entries())
-        .filter(([id]) => id !== titular?.id)
+        .filter(([id]) => !titularIds.has(id))
         .map(([id, name]) => ({ id, name }));
 
-    return { titular, assistants: assistantList };
+    return {
+        titulares: Array.from(titulares.entries()).map(([id, name]) => ({ id, name })),
+        assistants: assistantList,
+    };
 }
 
 export function getCourseTeachersModalTitle(totalTeachers: number): string {
