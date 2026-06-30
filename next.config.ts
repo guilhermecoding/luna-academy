@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
     ...(process.env.NEXT_PUBLIC_BUILD_MODE === "production" && {
         output: "standalone",
     }),
+    poweredByHeader: false,
 };
 
 
