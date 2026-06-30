@@ -3,6 +3,7 @@
 import { PDFViewer } from "@react-pdf/renderer";
 import { StudentsListPdfDocument } from "@/lib/export/pdf/students-list-document";
 import type { StudentExportRow } from "@/services/export/students-export.config";
+import type { CourseTeachersExport } from "@/services/export/course-students.export";
 import { useSyncExternalStore } from "react";
 
 function useIsClient() {
@@ -18,6 +19,7 @@ export type StudentsPdfPreviewProps = {
     subtitle: string;
     generatedAt: string;
     rows: StudentExportRow[];
+    teachers?: CourseTeachersExport;
 };
 
 export function StudentsPdfPreview({
@@ -25,6 +27,7 @@ export function StudentsPdfPreview({
     subtitle,
     generatedAt,
     rows,
+    teachers,
 }: StudentsPdfPreviewProps) {
     const isClient = useIsClient();
 
@@ -48,6 +51,7 @@ export function StudentsPdfPreview({
                 subtitle={subtitle}
                 generatedAt={generatedAt}
                 rows={rows}
+                teachers={teachers}
             />
         </PDFViewer>
     );

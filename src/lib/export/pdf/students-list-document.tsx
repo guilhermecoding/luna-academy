@@ -13,6 +13,7 @@ import {
     STUDENTS_EXPORT_COLUMNS,
     type StudentExportRow,
 } from "@/services/export/students-export.config";
+import type { CourseTeachersExport } from "@/services/export/course-students.export";
 
 registerPdfFonts();
 
@@ -68,6 +69,15 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontFamily: "Roboto",
     },
+    teachersBlock: {
+        marginBottom: 12,
+        gap: 4,
+    },
+    teachersLine: {
+        fontSize: 9,
+        color: "#475569",
+        fontFamily: "Roboto",
+    },
 });
 
 export type StudentsListPdfDocumentProps = {
@@ -75,6 +85,7 @@ export type StudentsListPdfDocumentProps = {
     subtitle: string;
     generatedAt: string;
     rows: StudentExportRow[];
+    teachers?: CourseTeachersExport;
 };
 
 export function StudentsListPdfDocument({
@@ -82,6 +93,7 @@ export function StudentsListPdfDocument({
     subtitle,
     generatedAt,
     rows,
+    teachers,
 }: StudentsListPdfDocumentProps) {
     return (
         <Document>
@@ -97,6 +109,16 @@ export function StudentsListPdfDocument({
                     </View>
                     <PdfImage src={getPdfLogoSrc()} style={styles.logoLuna} />
                 </View>
+                {teachers && (
+                    <View style={styles.teachersBlock}>
+                        <Text style={styles.teachersLine}>
+                            Professor titular: {teachers.titular ?? "—"}
+                        </Text>
+                        <Text style={styles.teachersLine}>
+                            Assistentes: {teachers.assistants.length > 0 ? teachers.assistants.join(", ") : "—"}
+                        </Text>
+                    </View>
+                )}
                 <PdfTable columns={STUDENTS_EXPORT_COLUMNS} rows={rows} />
                 <Text style={styles.footer} fixed>
                     Gerado em {generatedAt} · Luna Academy

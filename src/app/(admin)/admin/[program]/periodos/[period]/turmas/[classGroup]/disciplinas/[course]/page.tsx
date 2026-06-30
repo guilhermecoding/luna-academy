@@ -1,3 +1,4 @@
+import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
@@ -104,6 +105,10 @@ async function AdminCoursePageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
+                        <ExportStudentsDropdown
+                            exportPath={`/api/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}/alunos/export`}
+                            ariaLabel="Exportar alunos da disciplina"
+                        />
                         {canWrite && (
                             <ButtonLink
                                 className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
