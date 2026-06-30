@@ -370,13 +370,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                                     },
                                 },
                                 teacher: {
-                                    select: { id: true, name: true },
+                                    select: { id: true, name: true, isActive: true },
                                 },
                                 assistants: {
                                     select: {
                                         assistantId: true,
                                         assistant: {
-                                            select: { id: true, name: true },
+                                            select: { id: true, name: true, isActive: true },
                                         },
                                     },
                                 },

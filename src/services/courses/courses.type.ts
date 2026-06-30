@@ -6,6 +6,7 @@ const scheduleInclude = {
         select: {
             id: true,
             name: true,
+            isActive: true,
         },
     },
     assistants: {
@@ -15,6 +16,7 @@ const scheduleInclude = {
                 select: {
                     id: true,
                     name: true,
+                    isActive: true,
                 },
             },
         },

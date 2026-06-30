@@ -25,6 +25,10 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { Suspense } from "react";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 import { generateUpcomingLessons } from "@/lib/lesson-schedule-utils";
+import {
+    formatCourseTeachersSummary,
+    getScheduleTeacherDisplayName,
+} from "@/lib/schedule-teacher-utils";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -62,7 +66,7 @@ async function AdminCoursePageContent({
         getLessonsByCourseId(courseData.id),
     ]);
 
-    const teacher = courseData.schedules.find((s) => s.teacher)?.teacher?.name || "Não atribuído";
+    const teacher = formatCourseTeachersSummary(courseData.schedules);
     const basePath = `/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}`;
 
     const schedulesWithTimeSlot = courseData.schedules.filter((s) => s.timeSlot);
@@ -87,7 +91,7 @@ async function AdminCoursePageContent({
         startTime: s.timeSlot.startTime,
         endTime: s.timeSlot.endTime,
         teacherId: s.teacherId,
-        teacherName: s.teacher?.name || null,
+        teacherName: getScheduleTeacherDisplayName(s.teacher),
     }));
 
     return (

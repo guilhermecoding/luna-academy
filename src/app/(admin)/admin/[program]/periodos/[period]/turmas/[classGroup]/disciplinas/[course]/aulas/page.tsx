@@ -12,6 +12,7 @@ import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 import { generateUpcomingLessons, type LessonFilter } from "@/lib/lesson-schedule-utils";
+import { getScheduleTeacherDisplayName } from "@/lib/schedule-teacher-utils";
 import { CreateLessonSheet } from "../_components/create-lesson-dialog";
 import { LessonsFilteredList } from "../_components/lessons-filtered-list";
 import { IconCalendarEvent } from "@tabler/icons-react";
@@ -78,7 +79,7 @@ async function AdminClassGroupCourseLessonsPageContent({
         startTime: s.timeSlot.startTime,
         endTime: s.timeSlot.endTime,
         teacherId: s.teacherId,
-        teacherName: s.teacher?.name || null,
+        teacherName: getScheduleTeacherDisplayName(s.teacher),
     }));
 
     return (

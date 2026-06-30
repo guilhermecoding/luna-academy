@@ -22,7 +22,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
-import { filterSchedulesForTeacher, isTeacherAssignedToCourse } from "@/lib/schedule-teacher-utils";
+import { filterSchedulesForTeacher, getScheduleTeacherDisplayName, isTeacherAssignedToCourse } from "@/lib/schedule-teacher-utils";
 import { generateUpcomingLessons } from "@/lib/lesson-schedule-utils";
 
 export const metadata: Metadata = {
@@ -101,7 +101,7 @@ async function ProfCoursePageContent({
         startTime: s.timeSlot.startTime,
         endTime: s.timeSlot.endTime,
         teacherId: s.teacherId,
-        teacherName: s.teacher?.name || null,
+        teacherName: getScheduleTeacherDisplayName(s.teacher),
     }));
 
     return (

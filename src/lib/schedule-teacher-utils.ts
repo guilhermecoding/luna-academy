@@ -5,6 +5,25 @@ export type ScheduleTeacherEntry = {
     role: ScheduleTeacherRole;
 };
 
+type TeacherWithAccess = {
+    id: string;
+    name: string;
+    isActive?: boolean;
+};
+
+export function isTeacherSystemAccessEnabled(
+    teacher?: { isActive?: boolean } | null,
+): boolean {
+    return !!teacher && teacher.isActive !== false;
+}
+
+export function getScheduleTeacherDisplayName(
+    teacher?: { name: string; isActive?: boolean } | null,
+): string | null {
+    if (!isTeacherSystemAccessEnabled(teacher)) return null;
+    return teacher!.name;
+}
+
 export type ScheduleWithTeachers = {
     id: string;
     teacherId: string | null;
@@ -98,23 +117,26 @@ export function formatScheduleTeachersLabel(
 export function formatCourseTeachersSummary(
     schedules: {
         teacherId: string | null;
-        teacher?: { id: string; name: string } | null;
-        assistants?: { assistantId: string; assistant?: { id: string; name: string } }[];
+        teacher?: TeacherWithAccess | null;
+        assistants?: { assistantId: string; assistant?: TeacherWithAccess | null }[];
     }[],
 ): string {
     const parts: string[] = [];
     const seen = new Set<string>();
 
     for (const schedule of schedules) {
-        if (schedule.teacherId && schedule.teacher && !seen.has(schedule.teacherId)) {
+        if (
+            schedule.teacherId &&
+            isTeacherSystemAccessEnabled(schedule.teacher) &&
+            !seen.has(schedule.teacherId)
+        ) {
             seen.add(schedule.teacherId);
-            parts.push(`${schedule.teacher.name} (Titular)`);
+            parts.push(`${schedule.teacher!.name} (Titular)`);
         }
         for (const a of schedule.assistants ?? []) {
-            if (!seen.has(a.assistantId)) {
+            if (!seen.has(a.assistantId) && isTeacherSystemAccessEnabled(a.assistant)) {
                 seen.add(a.assistantId);
-                const name = a.assistant?.name ?? "Assistente";
-                parts.push(`${name} (Assistente)`);
+                parts.push(`${a.assistant!.name} (Assistente)`);
             }
         }
     }
@@ -132,21 +154,25 @@ export type CourseTeachersAggregate = {
 export function aggregateCourseTeachers(
     schedules: {
         teacherId: string | null;
-        teacher?: { id: string; name: string } | null;
-        assistants?: { assistantId: string; assistant?: { id: string; name: string } }[];
+        teacher?: TeacherWithAccess | null;
+        assistants?: { assistantId: string; assistant?: TeacherWithAccess | null }[];
     }[],
 ): CourseTeachersAggregate {
     let titular: { id: string; name: string } | null = null;
     const assistants = new Map<string, string>();
 
     for (const schedule of schedules) {
-        if (schedule.teacherId && schedule.teacher && !titular) {
-            titular = { id: schedule.teacher.id, name: schedule.teacher.name };
+        if (
+            schedule.teacherId &&
+            isTeacherSystemAccessEnabled(schedule.teacher) &&
+            !titular
+        ) {
+            titular = { id: schedule.teacher!.id, name: schedule.teacher!.name };
         }
 
         for (const a of schedule.assistants ?? []) {
-            if (!assistants.has(a.assistantId)) {
-                assistants.set(a.assistantId, a.assistant?.name ?? "Assistente");
+            if (!assistants.has(a.assistantId) && isTeacherSystemAccessEnabled(a.assistant)) {
+                assistants.set(a.assistantId, a.assistant!.name);
             }
         }
     }
