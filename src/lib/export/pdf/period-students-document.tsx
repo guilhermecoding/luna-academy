@@ -1,0 +1,105 @@
+import {
+    Document,
+    Image as PdfImage,
+    Page, StyleSheet,
+    Text,
+    View,
+} from "@react-pdf/renderer";
+import { getPdfLogoSrc } from "@/lib/export/pdf/assets";
+import { registerPdfFonts } from "@/lib/export/pdf/fonts";
+import { PdfTable } from "@/lib/export/pdf/table";
+import {
+    PERIOD_STUDENTS_EXPORT_COLUMNS,
+    type PeriodStudentExportRow,
+} from "@/services/export/students-export.config";
+
+registerPdfFonts();
+
+const styles = StyleSheet.create({
+    header: {
+        alignItems: "center",
+        gap: 8,
+        display: "flex",
+        flexDirection: "row",
+        marginBottom: 16,
+    },
+    page: {
+        padding: 32,
+        fontFamily: "Roboto",
+        fontSize: 10,
+        color: "#1e293b",
+    },
+    logoLuna: {
+        width: 64,
+    },
+    logoCorporation: {
+        width: 64,
+    },
+    titleContainer: {
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    title: {
+        fontSize: 16,
+        fontWeight: "bold",
+        marginBottom: 4,
+        fontFamily: "Roboto",
+    },
+    subtitle: {
+        fontSize: 10,
+        color: "#64748b",
+        marginBottom: 16,
+        fontFamily: "Roboto",
+    },
+    footer: {
+        position: "absolute",
+        bottom: 24,
+        left: 32,
+        right: 32,
+        fontSize: 8,
+        color: "#94a3b8",
+        textAlign: "center",
+        fontFamily: "Roboto",
+    },
+});
+
+export type PeriodStudentsPdfDocumentProps = {
+    programName: string;
+    periodName: string;
+    generatedAt: string;
+    rows: PeriodStudentExportRow[];
+};
+
+export function PeriodStudentsPdfDocument({
+    programName,
+    periodName,
+    generatedAt,
+    rows,
+}: PeriodStudentsPdfDocumentProps) {
+    return (
+        <Document>
+            <Page size="A4" orientation="landscape" style={styles.page}>
+                <View style={styles.header}>
+                    <PdfImage src={getPdfLogoSrc()} style={styles.logoLuna} />
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title}>Alunos de {periodName}</Text>
+                        <Text style={styles.subtitle}>
+                            {programName}
+                        </Text>
+                    </View>
+                    <PdfImage src={getPdfLogoSrc()} style={styles.logoLuna} />
+                </View>
+                <PdfTable columns={PERIOD_STUDENTS_EXPORT_COLUMNS} rows={rows} />
+                <Text style={styles.footer}>
+                    Total: {rows.length} aluno(s) · Luna Academy
+                </Text>
+                <Text style={styles.subtitle}>
+                    {programName} · {periodName} · Gerado em {generatedAt}
+                </Text>
+            </Page>
+        </Document>
+    );
+}

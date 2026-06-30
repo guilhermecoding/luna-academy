@@ -44,7 +44,7 @@ export function ExportStudentsDropdown({
                 <DropdownMenuItem
                     className="flex items-center gap-2 cursor-pointer py-2"
                     onSelect={() => {
-                        // TODO: exportar PDF
+                        window.location.href = `${exportCsvUrl}?format=pdf`;
                     }}
                 >
                     <IconFileTypePdf className="size-4 text-muted-foreground" />

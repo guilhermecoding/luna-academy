@@ -1,4 +1,4 @@
-import { IconSchool, IconPlus, IconUserCircle } from "@tabler/icons-react";
+import { IconSchool, IconPlus, IconUserCircle, IconEye } from "@tabler/icons-react";
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
@@ -58,7 +58,7 @@ async function AdminPeriodStudentsPageContent({
                             description="Gerencie todos os alunos matriculados ou em espera neste período. Você pode selecionar alunos para desvinculá-los."
                         />
                     </div>
-                    <div className="flex flex-col sm:flex-row flex-1 gap-6 justify-end items-end">
+                    <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
                         <ExportStudentsDropdown programSlug={program} periodSlug={period} />
                         {canWrite && (
                             <ButtonLink

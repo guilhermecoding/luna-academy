@@ -1,10 +1,8 @@
+import type { ExportColumnDef } from "@/lib/export/columns";
+
 const UTF8_BOM = "\uFEFF";
 
-export type CsvColumnDef<T> = {
-    key: string;
-    header: string;
-    value: (row: T) => string | number | null | undefined;
-};
+export type CsvColumnDef<T> = ExportColumnDef<T>;
 
 export function escapeCsvValue(value: string, delimiter: string): string {
     const needsQuotes = value.includes(delimiter) || value.includes("\"") || value.includes("\n") || value.includes("\r");

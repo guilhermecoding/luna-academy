@@ -1,51 +1,17 @@
-import { calculateAge } from "@/lib/date-utils";
-import { type CsvColumnDef, serializeCsv } from "@/lib/export/csv";
-import { maskCPF, maskPhone } from "@/lib/masks";
+import { serializeCsv } from "@/lib/export/csv";
 import prisma from "@/lib/prisma";
+import {
+    PERIOD_STUDENTS_EXPORT_COLUMNS,
+    type PeriodStudentExportRow,
+} from "@/services/export/students-export.config";
 
-export type PeriodStudentExportRow = {
-    name: string;
-    lunaId: string | null;
-    cpf: string;
-    studentPhone: string;
-    email: string;
-    birthDate: Date;
-};
+export type { PeriodStudentExportRow } from "@/services/export/students-export.config";
+export {
+    PERIOD_STUDENTS_EXPORT_COLUMNS,
+    PERIOD_STUDENTS_CSV_COLUMNS,
+} from "@/services/export/students-export.config";
 
-export const PERIOD_STUDENTS_CSV_COLUMNS: CsvColumnDef<PeriodStudentExportRow>[] = [
-    {
-        key: "name",
-        header: "Nome",
-        value: (row) => row.name,
-    },
-    {
-        key: "lunaId",
-        header: "Matrícula",
-        value: (row) => row.lunaId ?? "---",
-    },
-    {
-        key: "cpf",
-        header: "CPF",
-        value: (row) => maskCPF(row.cpf),
-    },
-    {
-        key: "studentPhone",
-        header: "Telefone",
-        value: (row) => maskPhone(row.studentPhone),
-    },
-    {
-        key: "email",
-        header: "E-mail",
-        value: (row) => row.email,
-    },
-    {
-        key: "age",
-        header: "Idade",
-        value: (row) => calculateAge(row.birthDate),
-    },
-];
-
-async function getStudentsByPeriodForExport(periodId: string): Promise<PeriodStudentExportRow[]> {
+export async function getStudentsByPeriodForExport(periodId: string): Promise<PeriodStudentExportRow[]> {
     const studentsPeriods = await prisma.studentPeriod.findMany({
         where: {
             periodId,
@@ -74,5 +40,5 @@ async function getStudentsByPeriodForExport(periodId: string): Promise<PeriodStu
 
 export async function buildPeriodStudentsCsv(periodId: string): Promise<string> {
     const rows = await getStudentsByPeriodForExport(periodId);
-    return serializeCsv(rows, PERIOD_STUDENTS_CSV_COLUMNS);
+    return serializeCsv(rows, PERIOD_STUDENTS_EXPORT_COLUMNS);
 }

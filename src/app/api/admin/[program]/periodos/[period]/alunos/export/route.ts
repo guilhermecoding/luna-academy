@@ -1,11 +1,14 @@
 import { requireAdmin } from "@/lib/auth-guards";
 import { createCsvResponse } from "@/lib/export/csv";
+import { createPdfResponse } from "@/lib/export/pdf";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
+import { getProgramBySlug } from "@/services/programs/programs.service";
 import { buildPeriodStudentsCsv } from "@/services/export/students-csv.export";
+import { buildPeriodStudentsPdf } from "@/services/export/students-pdf.export";
 import { NextResponse } from "next/server";
 
 export async function GET(
-    _request: Request,
+    request: Request,
     { params }: { params: Promise<{ program: string; period: string }> },
 ) {
     const authResult = await requireAdmin();
@@ -20,8 +23,20 @@ export async function GET(
         return NextResponse.json({ error: "Período não encontrado" }, { status: 404 });
     }
 
-    const csv = await buildPeriodStudentsCsv(periodData.id);
-    const filename = `alunos-${period}-${new Date().toISOString().slice(0, 10)}.csv`;
+    const format = new URL(request.url).searchParams.get("format");
+    const dateSuffix = new Date().toISOString().slice(0, 10);
 
-    return createCsvResponse(csv, filename);
+    if (format === "pdf") {
+        const programData = await getProgramBySlug(program);
+        const buffer = await buildPeriodStudentsPdf({
+            periodId: periodData.id,
+            periodName: periodData.name,
+            programName: programData?.name ?? program,
+        });
+
+        return createPdfResponse(buffer, `alunos-${period}-${dateSuffix}.pdf`);
+    }
+
+    const csv = await buildPeriodStudentsCsv(periodData.id);
+    return createCsvResponse(csv, `alunos-${period}-${dateSuffix}.csv`);
 }
