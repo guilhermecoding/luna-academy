@@ -9,22 +9,24 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ExportStudentsDropdown({
-    programSlug,
-    periodSlug,
-}: {
-    programSlug: string;
-    periodSlug: string;
-}) {
-    const exportCsvUrl = `/api/admin/${programSlug}/periodos/${periodSlug}/alunos/export`;
+export type ExportStudentsDropdownProps = {
+    exportPath: string;
+    ariaLabel?: string;
+    className?: string;
+};
 
+export function ExportStudentsDropdown({
+    exportPath,
+    ariaLabel = "Exportar alunos",
+    className,
+}: ExportStudentsDropdownProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="dashed"
-                    className="w-full sm:w-auto"
-                    aria-label="Exportar alunos"
+                    className={className ?? "w-full sm:w-auto"}
+                    aria-label={ariaLabel}
                 >
                     <IconFileDownload className="size-5 mr-1" />
                     Exportar
@@ -35,7 +37,7 @@ export function ExportStudentsDropdown({
                 <DropdownMenuItem
                     className="flex items-center gap-2 cursor-pointer py-2"
                     onSelect={() => {
-                        window.location.href = exportCsvUrl;
+                        window.location.href = exportPath;
                     }}
                 >
                     <IconFileTypeCsv className="size-4 text-muted-foreground" />
@@ -44,7 +46,7 @@ export function ExportStudentsDropdown({
                 <DropdownMenuItem
                     className="flex items-center gap-2 cursor-pointer py-2"
                     onSelect={() => {
-                        window.location.href = `${exportCsvUrl}?format=pdf`;
+                        window.location.href = `${exportPath}?format=pdf`;
                     }}
                 >
                     <IconFileTypePdf className="size-4 text-muted-foreground" />

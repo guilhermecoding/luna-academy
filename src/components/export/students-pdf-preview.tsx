@@ -1,8 +1,8 @@
 "use client";
 
 import { PDFViewer } from "@react-pdf/renderer";
-import { PeriodStudentsPdfDocument } from "@/lib/export/pdf/period-students-document";
-import type { PeriodStudentExportRow } from "@/services/export/students-export.config";
+import { StudentsListPdfDocument } from "@/lib/export/pdf/students-list-document";
+import type { StudentExportRow } from "@/services/export/students-export.config";
 import { useSyncExternalStore } from "react";
 
 function useIsClient() {
@@ -13,19 +13,19 @@ function useIsClient() {
     );
 }
 
-export type PeriodStudentsPdfPreviewProps = {
-    programName: string;
-    periodName: string;
+export type StudentsPdfPreviewProps = {
+    title: string;
+    subtitle: string;
     generatedAt: string;
-    rows: PeriodStudentExportRow[];
+    rows: StudentExportRow[];
 };
 
-export function PeriodStudentsPdfPreview({
-    programName,
-    periodName,
+export function StudentsPdfPreview({
+    title,
+    subtitle,
     generatedAt,
     rows,
-}: PeriodStudentsPdfPreviewProps) {
+}: StudentsPdfPreviewProps) {
     const isClient = useIsClient();
 
     if (!isClient) {
@@ -43,9 +43,9 @@ export function PeriodStudentsPdfPreview({
             style={{ minHeight: "calc(100vh - 140px)", border: "none" }}
             showToolbar
         >
-            <PeriodStudentsPdfDocument
-                programName={programName}
-                periodName={periodName}
+            <StudentsListPdfDocument
+                title={title}
+                subtitle={subtitle}
                 generatedAt={generatedAt}
                 rows={rows}
             />

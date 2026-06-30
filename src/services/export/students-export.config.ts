@@ -2,7 +2,7 @@ import { calculateAge } from "@/lib/date-utils";
 import type { ExportColumnDef } from "@/lib/export/columns";
 import { maskCPF, maskPhone } from "@/lib/masks";
 
-export type PeriodStudentExportRow = {
+export type StudentExportRow = {
     name: string;
     lunaId: string | null;
     cpf: string;
@@ -11,7 +11,10 @@ export type PeriodStudentExportRow = {
     birthDate: Date | string;
 };
 
-export const PERIOD_STUDENTS_EXPORT_COLUMNS: ExportColumnDef<PeriodStudentExportRow>[] = [
+/** @deprecated Use StudentExportRow */
+export type PeriodStudentExportRow = StudentExportRow;
+
+export const STUDENTS_EXPORT_COLUMNS: ExportColumnDef<StudentExportRow>[] = [
     {
         key: "name",
         header: "Nome",
@@ -50,5 +53,8 @@ export const PERIOD_STUDENTS_EXPORT_COLUMNS: ExportColumnDef<PeriodStudentExport
     },
 ];
 
-/** @deprecated Use PERIOD_STUDENTS_EXPORT_COLUMNS */
-export const PERIOD_STUDENTS_CSV_COLUMNS = PERIOD_STUDENTS_EXPORT_COLUMNS;
+/** @deprecated Use STUDENTS_EXPORT_COLUMNS */
+export const PERIOD_STUDENTS_EXPORT_COLUMNS = STUDENTS_EXPORT_COLUMNS;
+
+/** @deprecated Use STUDENTS_EXPORT_COLUMNS */
+export const PERIOD_STUDENTS_CSV_COLUMNS = STUDENTS_EXPORT_COLUMNS;

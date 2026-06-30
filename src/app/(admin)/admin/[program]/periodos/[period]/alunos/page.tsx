@@ -13,7 +13,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
-import { ExportStudentsDropdown } from "./_components/export-students-dropdown";
+import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 
 export const metadata: Metadata = {
     title: "Alunos do Período",
@@ -59,7 +59,9 @@ async function AdminPeriodStudentsPageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
-                        <ExportStudentsDropdown programSlug={program} periodSlug={period} />
+                        <ExportStudentsDropdown
+                            exportPath={`/api/admin/${program}/periodos/${period}/alunos/export`}
+                        />
                         {canWrite && (
                             <ButtonLink
                                 className="w-full sm:w-auto h-11"

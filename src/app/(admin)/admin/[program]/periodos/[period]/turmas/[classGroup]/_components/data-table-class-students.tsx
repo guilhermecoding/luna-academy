@@ -25,6 +25,7 @@ import { unlinkStudentsFromClassGroupAction } from "@/app/(admin)/admin/alunos/a
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useCanWrite } from "@/components/write-access-provider";
+import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -33,6 +34,7 @@ interface DataTableProps<TData, TValue> {
     periodId: string;
     classGroupId: string;
     canWrite?: boolean;
+    exportPath?: string;
 }
 
 export function DataTableClassStudents<TData, TValue>({
@@ -42,6 +44,7 @@ export function DataTableClassStudents<TData, TValue>({
     periodId,
     classGroupId,
     canWrite: canWriteProp,
+    exportPath,
 }: DataTableProps<TData, TValue>) {
     const canWriteFromContext = useCanWrite();
     const canWrite = canWriteProp ?? canWriteFromContext;
@@ -121,7 +124,13 @@ export function DataTableClassStudents<TData, TValue>({
                     </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-4 w-full">
+                    {exportPath && (
+                        <ExportStudentsDropdown
+                            exportPath={exportPath}
+                            ariaLabel="Exportar alunos da turma"
+                        />
+                    )}
                     <div className="w-full sm:max-w-sm flex flex-row items-center gap-2 px-5 py-1 rounded-full border border-input bg-background transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
                         <IconSearch className="size-4 shrink-0" />
                         <Input

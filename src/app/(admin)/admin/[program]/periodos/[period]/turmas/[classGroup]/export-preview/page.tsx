@@ -5,21 +5,22 @@ import TitlePage from "@/components/title-page";
 import { ButtonLink } from "@/components/ui/button-link";
 import { StudentsPdfPreview } from "@/components/export/students-pdf-preview";
 import { requireAdmin } from "@/lib/auth-guards";
+import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getProgramBySlug } from "@/services/programs/programs.service";
-import { getStudentsByPeriodForExport } from "@/services/export/students-csv.export";
+import { getStudentsByClassGroupForExport } from "@/services/export/students-csv.export";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
-    title: "Pré-visualização PDF - Alunos do Período",
+    title: "Pré-visualização PDF - Alunos da Turma",
 };
 
-async function ExportPreviewPageContent({
+async function ClassGroupExportPreviewPageContent({
     params,
-}: PageProps<"/admin/[program]/periodos/[period]/alunos/export-preview">) {
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/export-preview">) {
     if (process.env.NODE_ENV !== "development") {
         notFound();
     }
@@ -27,24 +28,29 @@ async function ExportPreviewPageContent({
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
 
-    const { program, period } = await params;
+    const { program, period, classGroup } = await params;
 
     const periodData = await getPeriodByProgramAndSlug(program, period);
     if (!periodData) {
         notFound();
     }
 
+    const classGroupData = await getClassGroupByPeriodIdAndSlug(periodData.id, classGroup);
+    if (!classGroupData) {
+        notFound();
+    }
+
     const [programData, rows] = await Promise.all([
         getProgramBySlug(program),
-        getStudentsByPeriodForExport(periodData.id),
+        getStudentsByClassGroupForExport(classGroupData.id),
     ]);
 
     const generatedAt = new Date().toLocaleString("pt-BR", {
         dateStyle: "short",
         timeStyle: "short",
     });
-    const exportPdfUrl = `/api/admin/${program}/periodos/${period}/alunos/export?format=pdf`;
-    const backUrl = `/admin/${program}/periodos/${period}/alunos`;
+    const exportPdfUrl = `/api/admin/${program}/periodos/${period}/turmas/${classGroup}/alunos/export?format=pdf`;
+    const backUrl = `/admin/${program}/periodos/${period}/turmas/${classGroup}`;
     const programName = programData?.name ?? program;
 
     const serializedRows = rows.map((row) => ({
@@ -61,7 +67,7 @@ async function ExportPreviewPageContent({
                     <div>
                         <TitlePage
                             title="Pré-visualização do PDF"
-                            description={`Alunos do período ${periodData.name}`}
+                            description={`Alunos da turma ${classGroupData.name}`}
                         />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -84,8 +90,8 @@ async function ExportPreviewPageContent({
                 </div>
                 <div className="rounded-2xl border border-surface-border overflow-hidden bg-muted/30" style={{ height: "calc(100vh - 220px)" }}>
                     <StudentsPdfPreview
-                        title={`Alunos de ${periodData.name}`}
-                        subtitle={programName}
+                        title={`Alunos da turma ${classGroupData.name}`}
+                        subtitle={`${programName} · ${periodData.name}`}
                         generatedAt={generatedAt}
                         rows={serializedRows}
                     />
@@ -95,13 +101,13 @@ async function ExportPreviewPageContent({
     );
 }
 
-export default function ExportPreviewPage({
+export default function ClassGroupExportPreviewPage({
     params,
     searchParams,
-}: PageProps<"/admin/[program]/periodos/[period]/alunos/export-preview">) {
+}: PageProps<"/admin/[program]/periodos/[period]/turmas/[classGroup]/export-preview">) {
     return (
         <Suspense fallback={<PageSkeleton />}>
-            <ExportPreviewPageContent params={params} searchParams={searchParams} />
+            <ClassGroupExportPreviewPageContent params={params} searchParams={searchParams} />
         </Suspense>
     );
 }
