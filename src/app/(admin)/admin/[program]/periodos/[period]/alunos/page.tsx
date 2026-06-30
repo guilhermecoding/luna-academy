@@ -58,8 +58,8 @@ async function AdminPeriodStudentsPageContent({
                             description="Gerencie todos os alunos matriculados ou em espera neste período. Você pode selecionar alunos para desvinculá-los."
                         />
                     </div>
-                    <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
-                        <ExportStudentsDropdown />
+                    <div className="flex flex-col sm:flex-row flex-1 gap-6 justify-end items-end">
+                        <ExportStudentsDropdown programSlug={program} periodSlug={period} />
                         {canWrite && (
                             <ButtonLink
                                 className="w-full sm:w-auto h-11"

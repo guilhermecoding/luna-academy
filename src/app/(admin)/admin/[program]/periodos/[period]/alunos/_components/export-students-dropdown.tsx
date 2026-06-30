@@ -9,7 +9,15 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ExportStudentsDropdown() {
+export function ExportStudentsDropdown({
+    programSlug,
+    periodSlug,
+}: {
+    programSlug: string;
+    periodSlug: string;
+}) {
+    const exportCsvUrl = `/api/admin/${programSlug}/periodos/${periodSlug}/alunos/export`;
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -20,14 +28,14 @@ export function ExportStudentsDropdown() {
                 >
                     <IconFileDownload className="size-5 mr-1" />
                     Exportar
-                    <IconChevronDown className="size-4 ml-1 opacity-60" />
+                    <IconChevronDown className="size-4 ml-1" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 rounded-xl border-surface-border p-1.5">
                 <DropdownMenuItem
                     className="flex items-center gap-2 cursor-pointer py-2"
                     onSelect={() => {
-                        // TODO: exportar CSV
+                        window.location.href = exportCsvUrl;
                     }}
                 >
                     <IconFileTypeCsv className="size-4 text-muted-foreground" />
