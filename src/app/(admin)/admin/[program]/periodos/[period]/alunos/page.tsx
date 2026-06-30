@@ -1,4 +1,4 @@
-import { IconSchool, IconPlus, IconUserCircle, IconEye } from "@tabler/icons-react";
+import { IconSchool, IconPlus, IconUserCircle } from "@tabler/icons-react";
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";

@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     },
     page: {
         padding: 32,
+        paddingBottom: 48,
         fontFamily: "Roboto",
         fontSize: 10,
         color: "#1e293b",
@@ -93,11 +94,8 @@ export function PeriodStudentsPdfDocument({
                     <PdfImage src={getPdfLogoSrc()} style={styles.logoLuna} />
                 </View>
                 <PdfTable columns={PERIOD_STUDENTS_EXPORT_COLUMNS} rows={rows} />
-                <Text style={styles.footer}>
-                    Total: {rows.length} aluno(s) · Luna Academy
-                </Text>
-                <Text style={styles.subtitle}>
-                    {programName} · {periodName} · Gerado em {generatedAt}
+                <Text style={styles.footer} fixed>
+                    Gerado em {generatedAt} · Luna Academy
                 </Text>
             </Page>
         </Document>

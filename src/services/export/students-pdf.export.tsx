@@ -10,7 +10,10 @@ export type PeriodStudentsPdfMeta = {
 
 export async function buildPeriodStudentsPdf(meta: PeriodStudentsPdfMeta): Promise<Buffer> {
     const rows = await getStudentsByPeriodForExport(meta.periodId);
-    const generatedAt = new Date().toLocaleDateString("pt-BR");
+    const generatedAt = new Date().toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+    });
 
     const buffer = await renderToBuffer(
         <PeriodStudentsPdfDocument

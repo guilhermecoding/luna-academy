@@ -35,7 +35,10 @@ async function ExportPreviewPageContent({
         getStudentsByPeriodForExport(periodData.id),
     ]);
 
-    const generatedAt = new Date().toLocaleDateString("pt-BR");
+    const generatedAt = new Date().toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+    });
     const exportPdfUrl = `/api/admin/${program}/periodos/${period}/alunos/export?format=pdf`;
     const backUrl = `/admin/${program}/periodos/${period}/alunos`;
 
