@@ -52,8 +52,13 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 10,
         color: "#64748b",
-        marginBottom: 16,
         fontFamily: "Roboto",
+    },
+    instituteName: {
+        fontSize: 12,
+        color: "#1e293b",
+        fontFamily: "Roboto",
+        fontWeight: "medium",
     },
     footer: {
         position: "absolute",
@@ -89,6 +94,9 @@ export function PeriodStudentsPdfDocument({
                         <Text style={styles.title}>Alunos de {periodName}</Text>
                         <Text style={styles.subtitle}>
                             {programName}
+                        </Text>
+                        <Text style={styles.instituteName}>
+                            Instituto Uberhub Educação
                         </Text>
                     </View>
                     <PdfImage src={getPdfLogoSrc()} style={styles.logoLuna} />
