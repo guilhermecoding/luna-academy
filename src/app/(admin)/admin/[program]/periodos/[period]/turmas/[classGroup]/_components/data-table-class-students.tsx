@@ -124,22 +124,7 @@ export function DataTableClassStudents<TData, TValue>({
                     </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row items-center justify-end gap-4 w-full">
-                    {exportPath && (
-                        <ExportStudentsDropdown
-                            exportPath={exportPath}
-                            ariaLabel="Exportar alunos da turma"
-                        />
-                    )}
-                    <div className="w-full sm:max-w-sm flex flex-row items-center gap-2 px-5 py-1 rounded-full border border-input bg-background transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
-                        <IconSearch className="size-4 shrink-0" />
-                        <Input
-                            placeholder="Pesquisar..."
-                            value={query}
-                            onChange={(event) => setQuery(event.target.value)}
-                            className="border-none bg-transparent shadow-none outline-none focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                        />
-                    </div>
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 w-full">
                     {canWrite && hasSelection && (
                         <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto animate-in fade-in zoom-in duration-200">
                             <Button
@@ -154,6 +139,22 @@ export function DataTableClassStudents<TData, TValue>({
                             </Button>
                         </div>
                     )}
+
+                    {exportPath && (
+                        <ExportStudentsDropdown
+                            exportPath={exportPath}
+                            ariaLabel="Exportar alunos da turma"
+                        />
+                    )}
+                    <div className="w-full sm:max-w-sm h-14 flex flex-row items-center gap-2 px-6 py-1 rounded-full border border-input bg-background transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
+                        <IconSearch className="size-4 shrink-0" />
+                        <Input
+                            placeholder="Pesquisar..."
+                            value={query}
+                            onChange={(event) => setQuery(event.target.value)}
+                            className="border-none bg-transparent shadow-none outline-none focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                    </div>
                 </div>
             </div>
 
