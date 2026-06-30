@@ -20,6 +20,10 @@ export const metadata: Metadata = {
 async function ExportPreviewPageContent({
     params,
 }: PageProps<"/admin/[program]/periodos/[period]/alunos/export-preview">) {
+    if (process.env.NODE_ENV !== "development") {
+        notFound();
+    }
+
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
 
