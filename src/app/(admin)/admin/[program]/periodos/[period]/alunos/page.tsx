@@ -1,4 +1,4 @@
-import { IconSchool, IconChartBar, IconPlus, IconUserCircle } from "@tabler/icons-react";
+import { IconSchool, IconPlus, IconUserCircle } from "@tabler/icons-react";
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
@@ -13,6 +13,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import { ExportStudentsDropdown } from "./_components/export-students-dropdown";
 
 export const metadata: Metadata = {
     title: "Alunos do Período",
@@ -58,6 +59,7 @@ async function AdminPeriodStudentsPageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
+                        <ExportStudentsDropdown />
                         {canWrite && (
                             <ButtonLink
                                 className="w-full sm:w-auto h-11"
