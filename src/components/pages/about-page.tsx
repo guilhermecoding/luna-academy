@@ -48,7 +48,7 @@ export default function AboutPage() {
                     <div className="flex flex-col">
                         <span className="text-sm text-muted-foreground">Versão:</span>
                         <Link href="https://github.com/guilhermecoding/luna-academy/releases"
-                            className="text-base font-bold flex items-center gap-1 underline text-blue-400"
+                            className="text-base font-bold flex items-center gap-1 underline text-blue-400 w-max"
                             target="_blank"
                         >
                             v{APP_VERSION} <IconExternalLink className="size-4" />
@@ -64,26 +64,26 @@ export default function AboutPage() {
                             João Guiherme Araújo Viana
                         </span>
                         <Link href="https://www.linkedin.com/in/jo%C3%A3o-guilherme-ara%C3%BAjo-viana/"
-                            className="text-base text-blue-500 hover:underline font-bold flex items-center gap-1"
+                            className="text-base text-blue-500 hover:underline font-bold flex items-center gap-1 w-max"
                             target="_blank"
                         >
-                            <IconBrandLinkedinFilled className="size-4" /> LinkedIn
+                            <IconBrandLinkedinFilled className="size-4" /> LinkedIn <IconExternalLink className="size-4" />
                         </Link>
                         <Link href="https://github.com/guilhermecoding"
-                            className="text-base text-gray-500 hover:underline font-bold flex items-center gap-1"
+                            className="text-base text-gray-500 hover:underline font-bold flex items-center gap-1 w-max"
                             target="_blank"
                         >
-                            <IconBrandGithubFilled className="size-4" /> GitHub
+                            <IconBrandGithubFilled className="size-4" /> GitHub <IconExternalLink className="size-4" />
                         </Link>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm text-muted-foreground">Contato:</span>
                         <Link href="mailto:joaoguilhermearaujo1617@gmail.com"
-                            className="text-base text-red-500 hover:underline font-bold flex items-center gap-1"
+                            className="text-base text-red-500 hover:underline font-bold flex items-center gap-1 w-max"
                             target="_blank"
                         >
                             <IconMailFilled className="size-4" />
-                            joaoguilhermearaujo1617@gmail.com
+                            joaoguilhermearaujo1617@gmail.com <IconExternalLink className="size-4" />
                         </Link>
                     </div>
                     <div className="flex flex-col">
