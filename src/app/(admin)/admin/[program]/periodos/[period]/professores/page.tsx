@@ -5,7 +5,7 @@ import TitlePage from "@/components/title-page";
 import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 import { getTeachersByPeriod } from "@/services/users/teachers.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
-import { TeachersTable } from "@/app/(admin)/admin/equipe/professores/_components/teachers-table";
+import { PeriodTeachersTable } from "./_components/period-teachers-table";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -59,8 +59,9 @@ async function AdminPeriodTeachersPageContent({
 
             <Section className="mt-8">
                 <div className="bg-surface border border-surface-border p-6 rounded-3xl">
-                    <TeachersTable
+                    <PeriodTeachersTable
                         data={teachersList}
+                        periodId={periodData.id}
                         title={
                             <h2 className="text-xl flex flex-row items-center gap-2 font-bold text-foreground">
                                 <IconSchool className="size-6" />
