@@ -1,5 +1,4 @@
 import { StyleSheet, Text } from "@react-pdf/renderer";
-import { getCorporationName } from "@/lib/corporation-name";
 
 const styles = StyleSheet.create({
     footer: {
