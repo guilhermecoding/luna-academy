@@ -58,7 +58,7 @@ async function AdminPeriodPageContent({
                             description={`De ${new Date(periodData.startDate).toLocaleDateString("pt-BR")} à ${new Date(periodData.endDate).toLocaleDateString("pt-BR")}`}
                         />
                     </div>
-                    <div className="w-full grid grid-cols-1 @md/main:grid-cols-2 @3xl/main:grid-cols-4 gap-2 @4xl/main:gap-6">
+                    <div className="w-full grid grid-cols-1 @md/main:grid-cols-2 @4xl/main:grid-cols-5 gap-2 @4xl/main:gap-6">
                         {canWrite && (
                             <ButtonLink className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11"
                                 href={`/admin/${program}/periodos/${period}/editar`}
