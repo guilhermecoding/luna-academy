@@ -1,3 +1,4 @@
+import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 import Page from "@/components/page";
 import Section from "@/components/section";
 import { IconSchool, IconPlus, IconUserCheck, IconUserX } from "@tabler/icons-react";
@@ -44,7 +45,11 @@ async function AdminTeachersPageContent({
                             description="Gerencie os professores da sua instituição."
                         />
                     </div>
-                    <div className="flex flex-1 justify-end items-end">
+                    <div className="flex flex-col sm:flex-row flex-1 gap-2 justify-end items-end">
+                        <ExportStudentsDropdown
+                            exportPath="/api/admin/equipe/professores/export"
+                            ariaLabel="Exportar professores"
+                        />
                         {canWrite && (
                             <ButtonLink className="w-full sm:w-auto" href="/admin/equipe/professores/novo">
                                 <IconPlus className="size-4" />

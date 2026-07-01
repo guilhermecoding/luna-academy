@@ -78,6 +78,10 @@ async function AdminPeriodPageContent({
                             <IconSchool className="size-5 mr-2" />
                             Alunos
                         </ButtonLink>
+                        <ButtonLink className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/professores`}>
+                            <IconUsers className="size-5 mr-2" />
+                            Professores
+                        </ButtonLink>
                         <ButtonLink className="col-span-4 @sm/main:col-span-1 bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid h-11" href={`/admin/${program}/periodos/${period}/sad`}>
                             <IconReportSearch className="size-5 mr-2" />
                             SAD

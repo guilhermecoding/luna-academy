@@ -1,4 +1,5 @@
 import { StyleSheet, Text } from "@react-pdf/renderer";
+import { getCorporationName } from "@/lib/corporation-name";
 
 const styles = StyleSheet.create({
     footer: {
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
 export function PdfGeneratedFooter({ generatedAt }: { generatedAt: string }) {
     return (
         <Text style={styles.footer} fixed>
-            Gerado em {generatedAt} · Luna Academy
+            Gerado em {generatedAt} · {getCorporationName()}
         </Text>
     );
 }

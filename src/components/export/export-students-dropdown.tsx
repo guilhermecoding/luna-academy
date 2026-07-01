@@ -12,12 +12,14 @@ import {
 export type ExportStudentsDropdownProps = {
     exportPath: string;
     ariaLabel?: string;
+    label?: string;
     className?: string;
 };
 
 export function ExportStudentsDropdown({
     exportPath,
     ariaLabel = "Exportar alunos",
+    label = "Exportar",
     className,
 }: ExportStudentsDropdownProps) {
     return (
@@ -29,7 +31,7 @@ export function ExportStudentsDropdown({
                     aria-label={ariaLabel}
                 >
                     <IconFileDownload className="size-5 mr-1" />
-                    Exportar
+                    {label}
                     <IconChevronDown className="size-4 ml-1" />
                 </Button>
             </DropdownMenuTrigger>

@@ -31,6 +31,25 @@ export async function getTeachers(query?: string) {
     });
 }
 
+export async function getTeachersByPeriod(periodId: string, query?: string) {
+    return await prisma.user.findMany({
+        where: {
+            isTeacher: true,
+            OR: [
+                { schedules: { some: { course: { periodId } } } },
+                { scheduleAssistants: { some: { schedule: { course: { periodId } } } } },
+            ],
+            ...(query ? {
+                name: {
+                    contains: query,
+                    mode: "insensitive" as Prisma.QueryMode,
+                },
+            } : {}),
+        },
+        orderBy: { name: "asc" },
+    });
+}
+
 export async function getTeacherStats() {
     "use cache";
     cacheLife("minutes");
