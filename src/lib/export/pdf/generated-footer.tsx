@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
 export function PdfGeneratedFooter({ generatedAt }: { generatedAt: string }) {
     return (
         <Text style={styles.footer} fixed>
-            Gerado em {generatedAt} · {getCorporationName()}
+            Gerado em {generatedAt} · Luna Academy
         </Text>
     );
 }
