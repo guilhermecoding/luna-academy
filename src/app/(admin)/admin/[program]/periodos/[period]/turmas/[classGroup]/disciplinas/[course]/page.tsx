@@ -110,14 +110,8 @@ async function AdminCoursePageContent({
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
                         <ExportStudentsDropdown
-                            exportPath={`/api/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}/professores/export`}
-                            ariaLabel="Exportar professores da disciplina"
-                            label="Exportar professores"
-                        />
-                        <ExportStudentsDropdown
                             exportPath={`/api/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}/alunos/export`}
                             ariaLabel="Exportar alunos da disciplina"
-                            label="Exportar alunos"
                         />
                         {canWrite && (
                             <ButtonLink

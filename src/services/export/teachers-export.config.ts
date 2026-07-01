@@ -11,10 +11,6 @@ export type TeacherExportRow = {
     birthDate: Date | string;
 };
 
-export type CourseTeacherExportRow = TeacherExportRow & {
-    role: string;
-};
-
 export const TEACHERS_EXPORT_COLUMNS: ExportColumnDef<TeacherExportRow>[] = [
     {
         key: "name",
@@ -52,17 +48,6 @@ export const TEACHERS_EXPORT_COLUMNS: ExportColumnDef<TeacherExportRow>[] = [
         width: "10%",
         value: (row) => calculateAge(row.birthDate),
     },
-];
-
-export const COURSE_TEACHERS_EXPORT_COLUMNS: ExportColumnDef<CourseTeacherExportRow>[] = [
-    ...TEACHERS_EXPORT_COLUMNS.slice(0, 1),
-    {
-        key: "role",
-        header: "Vínculo",
-        width: "12%",
-        value: (row) => row.role,
-    },
-    ...TEACHERS_EXPORT_COLUMNS.slice(1),
 ];
 
 const teacherExportSelect = {
