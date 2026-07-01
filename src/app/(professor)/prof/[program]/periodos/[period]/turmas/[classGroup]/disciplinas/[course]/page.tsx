@@ -1,6 +1,7 @@
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
+import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 import InfoBoxPeriod from "@/app/(admin)/admin/[program]/periodos/[period]/_components/info-box-period";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
@@ -118,7 +119,12 @@ async function ProfCoursePageContent({
                             description={`Disciplina ${courseData.name} da turma ${classGroupData.name}.`}
                         />
                     </div>
-                    {/* Botão de Editar Disciplina foi removido para o perfil de Professor */}
+                    <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
+                        <ExportStudentsDropdown
+                            exportPath={`/api/prof/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}/alunos/export`}
+                            ariaLabel="Exportar alunos da disciplina"
+                        />
+                    </div>
                 </div>
             </Section>
 
