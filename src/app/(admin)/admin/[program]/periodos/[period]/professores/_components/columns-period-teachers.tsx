@@ -90,6 +90,7 @@ export function createPeriodTeacherColumns(opts: {
         },
         {
             id: "actions",
+            header: "Turmas/Disciplinas",
             cell: ({ row }) => {
                 return (
                     <div className="flex justify-end">
