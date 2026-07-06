@@ -1,12 +1,12 @@
 "use client";
 
-import { Toaster } from "@/components/ui/sonner";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "@/components/theme-provider";
+import { IntroAwareTopLoader } from "@/components/intro-aware-top-loader";
 import { ThemeColorSchemeSync } from "@/components/theme-color-scheme-sync";
+import { ThemeProvider } from "@/components/theme-provider";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense } from "react";
-import NextTopLoader from "nextjs-toploader";
 
 /**
  * Componente de Providers para fornecer contextos globais.
@@ -27,13 +27,7 @@ export default function Providers({
             storageKey="theme"
         >
             <ThemeColorSchemeSync />
-            <NextTopLoader
-                color="#432DD7"
-                height={4}
-                showSpinner={false}
-                easing="ease"
-                speed={200}
-            />
+            <IntroAwareTopLoader />
             <Suspense fallback={null}>
                 <SidebarProvider>
                     <TooltipProvider>

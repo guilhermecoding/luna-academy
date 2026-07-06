@@ -3,17 +3,17 @@
 import { DualArc } from "@/components/dual-arc";
 import GibbyAnimate from "@/components/gibby-animate";
 import { APP_VERSION } from "@/lib/app-version";
+import {
+    INTRO_STORAGE_KEY,
+    notifyIntroSplashListeners,
+    subscribeIntroSplash,
+} from "@/lib/intro-splash-state";
 import { IconHeartFilled } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-const INTRO_STORAGE_KEY = "luna-intro-shown";
 const INTRO_DURATION_MS = 2400;
 const LOADING_DELAY_MS = 7000;
-
-function subscribe() {
-    return () => { };
-}
 
 function getIntroAlreadyShown() {
     return sessionStorage.getItem(INTRO_STORAGE_KEY) === "1";
@@ -25,7 +25,7 @@ function getServerIntroAlreadyShown() {
 
 export function IntroSplash() {
     const introAlreadyShown = useSyncExternalStore(
-        subscribe,
+        subscribeIntroSplash,
         getIntroAlreadyShown,
         getServerIntroAlreadyShown,
     );
@@ -40,6 +40,7 @@ export function IntroSplash() {
 
         const dismissTimer = window.setTimeout(() => {
             sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
+            notifyIntroSplashListeners();
             setDismissed(true);
         }, INTRO_DURATION_MS);
 
