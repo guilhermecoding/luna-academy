@@ -1,5 +1,5 @@
 import type { Period } from "@/generated/prisma/client";
-import { requireAdminWrite, requireTeacherWrite } from "@/lib/auth-guards";
+import { requireAdminWrite, requireTeacher, requireTeacherWrite } from "@/lib/auth-guards";
 import prisma from "@/lib/prisma";
 import {
     filterSchedulesForTeacher,
@@ -102,15 +102,42 @@ export async function requireTeacherActivePeriod(
     return { ok: true, period: access.period };
 }
 
+type ResolvedClassGroupContext = {
+    period: Period;
+    classGroup: NonNullable<Awaited<ReturnType<typeof getClassGroupByPeriodIdAndSlug>>>;
+};
+
 type ResolvedCourseContext = {
     period: Period;
     classGroup: NonNullable<Awaited<ReturnType<typeof getClassGroupByPeriodIdAndSlug>>>;
     course: NonNullable<Awaited<ReturnType<typeof getCourseByPeriodIdAndCode>>>;
 };
 
+type TeacherClassGroupExportAccess =
+    | { ok: true; session: GuardOk["session"]; resolved: ResolvedClassGroupContext }
+    | GuardFail;
+
+type TeacherCourseExportAccess =
+    | { ok: true; session: GuardOk["session"]; resolved: ResolvedCourseContext }
+    | GuardFail;
+
 type CourseMutationAccess =
     | { ok: true; session: GuardOk["session"]; resolved: ResolvedCourseContext }
     | GuardFail;
+
+async function resolveClassGroupBySlugs(
+    programSlug: string,
+    periodSlug: string,
+    classGroupSlug: string,
+): Promise<ResolvedClassGroupContext | { error: string }> {
+    const period = await getPeriodByProgramAndSlug(programSlug, periodSlug);
+    if (!period) return { error: "Período não encontrado." };
+
+    const classGroup = await getClassGroupByPeriodIdAndSlug(period.id, classGroupSlug);
+    if (!classGroup) return { error: "Turma não encontrada." };
+
+    return { period, classGroup };
+}
 
 async function resolveCourseBySlugs(
     programSlug: string,
@@ -130,6 +157,79 @@ async function resolveCourseBySlugs(
     }
 
     return { period, classGroup, course };
+}
+
+/**
+ * Permite exportação de alunos da turma para professor alocado em ao menos uma disciplina.
+ */
+export async function requireTeacherClassGroupExportAccess(
+    programSlug: string,
+    periodSlug: string,
+    classGroupSlug: string,
+): Promise<TeacherClassGroupExportAccess> {
+    const teacherResult = await requireTeacher();
+    if (!teacherResult.ok) {
+        return teacherResult;
+    }
+
+    const periodAccess = await requireTeacherActivePeriod(
+        programSlug,
+        periodSlug,
+        teacherResult.session.user.id,
+    );
+    if (!periodAccess.ok) {
+        return periodAccess;
+    }
+
+    const resolved = await resolveClassGroupBySlugs(programSlug, periodSlug, classGroupSlug);
+    if ("error" in resolved) {
+        return { ok: false, error: resolved.error };
+    }
+
+    const hasAccess = resolved.classGroup.courses.some((course) =>
+        isTeacherAssignedToCourse(course, teacherResult.session.user.id),
+    );
+
+    if (!hasAccess) {
+        return { ok: false, error: "Não autorizado." };
+    }
+
+    return { ok: true, session: teacherResult.session, resolved };
+}
+
+/**
+ * Permite exportação de alunos da disciplina para professor alocado no slot.
+ */
+export async function requireTeacherCourseExportAccess(
+    programSlug: string,
+    periodSlug: string,
+    classGroupSlug: string,
+    courseCode: string,
+): Promise<TeacherCourseExportAccess> {
+    const teacherResult = await requireTeacher();
+    if (!teacherResult.ok) {
+        return teacherResult;
+    }
+
+    const periodAccess = await requireTeacherActivePeriod(
+        programSlug,
+        periodSlug,
+        teacherResult.session.user.id,
+    );
+    if (!periodAccess.ok) {
+        return periodAccess;
+    }
+
+    const resolved = await resolveCourseBySlugs(programSlug, periodSlug, classGroupSlug, courseCode);
+    if ("error" in resolved) {
+        return { ok: false, error: resolved.error };
+    }
+
+    if (!isTeacherAssignedToCourse(resolved.course, teacherResult.session.user.id)) {
+        return { ok: false, error: "Não autorizado." };
+    }
+
+    return { ok: true, session: teacherResult.session, resolved };
 }
 
 export function getTeacherVisibleScheduleIds(

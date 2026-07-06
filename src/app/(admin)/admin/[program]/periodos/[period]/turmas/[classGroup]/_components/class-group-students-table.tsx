@@ -10,12 +10,14 @@ export function ClassGroupStudentsTable({
     periodId,
     classGroupId,
     canWrite,
+    exportPath,
 }: {
     data: StudentListItem[];
     title?: React.ReactNode;
     periodId: string;
     classGroupId: string;
     canWrite?: boolean;
+    exportPath?: string;
 }) {
     const columns = useClassGroupStudentColumns();
     return (
@@ -26,6 +28,7 @@ export function ClassGroupStudentsTable({
             periodId={periodId}
             classGroupId={classGroupId}
             canWrite={canWrite}
+            exportPath={exportPath}
         />
     );
 }

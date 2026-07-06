@@ -48,9 +48,11 @@ interface ProfessorItem {
 function toTeachersResponse(
     schedules: Parameters<typeof aggregateCourseTeachers>[0],
 ): Teachers {
-    const { titular, assistants } = aggregateCourseTeachers(schedules);
+    const { titulares, assistants } = aggregateCourseTeachers(schedules);
     return {
-        titular: titular ? { name: titular.name } : null,
+        titular: titulares.length > 0
+            ? { name: titulares.map((t) => t.name).join(", ") }
+            : null,
         assistants: assistants.map((a) => ({ name: a.name })),
     };
 }
@@ -370,13 +372,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                                     },
                                 },
                                 teacher: {
-                                    select: { id: true, name: true },
+                                    select: { id: true, name: true, isActive: true },
                                 },
                                 assistants: {
                                     select: {
                                         assistantId: true,
                                         assistant: {
-                                            select: { id: true, name: true },
+                                            select: { id: true, name: true, isActive: true },
                                         },
                                     },
                                 },

@@ -136,6 +136,7 @@ async function ProfClassPageContent({
                     data={studentsList}
                     periodId={periodData.id}
                     classGroupId={classGroupData.id}
+                    exportPath={`/api/prof/${program}/periodos/${period}/turmas/${classGroupSlug}/alunos/export`}
                 />
             </Section>
         </Page>

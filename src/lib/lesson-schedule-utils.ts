@@ -1,5 +1,6 @@
 import { DayOfWeek } from "@/generated/prisma/enums";
 import type { LessonListItem } from "@/services/lessons/lessons.service";
+import { getScheduleTeacherDisplayName } from "@/lib/schedule-teacher-utils";
 
 export const dayOfWeekToJs: Record<DayOfWeek, number> = {
     SUNDAY: 0,
@@ -26,7 +27,7 @@ export type ScheduleWithTimeSlot = {
     dayOfWeek: DayOfWeek;
     timeSlotId: string;
     timeSlot: { id: string; name: string; startTime: string; endTime: string };
-    teacher: { id: string; name: string } | null;
+    teacher: { id: string; name: string; isActive?: boolean } | null;
 };
 
 export type ScheduleOption = {
@@ -87,7 +88,7 @@ export function generateUpcomingLessons(
                         timeSlotName: schedule.timeSlot.name,
                         startTime: schedule.timeSlot.startTime,
                         endTime: schedule.timeSlot.endTime,
-                        teacherName: schedule.teacher?.name || null,
+                        teacherName: getScheduleTeacherDisplayName(schedule.teacher),
                     });
                 }
             }
