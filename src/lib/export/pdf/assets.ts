@@ -5,7 +5,8 @@ export function getPdfLogoSrc(): string {
         return "/luna-logo-full.png";
     }
 
-    return path.join(process.cwd(), "public", "luna-logo-full.png");
+    // Caminho relativo ao cwd: evita que url.parse trate "C:\..." como protocolo no Windows.
+    return path.join("public", "luna-logo-full.png");
 }
 
 export function getPdfFontPath(filename: string): string {
