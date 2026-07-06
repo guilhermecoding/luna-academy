@@ -10,9 +10,7 @@ import thumb03 from "@/assets/images/thumbs-login-page/Imagem_03.webp";
 import thumb04 from "@/assets/images/thumbs-login-page/Imagem_04.webp";
 import thumb05 from "@/assets/images/thumbs-login-page/Imagem_05.webp";
 import thumb06 from "@/assets/images/thumbs-login-page/Imagem_06.webp";
-import thumb07 from "@/assets/images/thumbs-login-page/Imagem_07.webp";
 import thumb08 from "@/assets/images/thumbs-login-page/Imagem_08.webp";
-import thumb09 from "@/assets/images/thumbs-login-page/Imagem_09.webp";
 import thumb11 from "@/assets/images/thumbs-login-page/Imagem_11.webp";
 import thumb12 from "@/assets/images/thumbs-login-page/Imagem_12.webp";
 import { auth, isGoogleAuthConfigured } from "@/lib/auth";
@@ -23,7 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { LOGIN_TAB_COOKIE_NAME, loginRedirectPath } from "@/lib/login-session";
 import { Suspense } from "react";
 
-const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb07, thumb08, thumb09, thumb11, thumb12];
+const loginThumbs = [thumb01, thumb02, thumb03, thumb04, thumb05, thumb06, thumb08, thumb11, thumb12];
 
 async function LoginPageContent({
     searchParams,
