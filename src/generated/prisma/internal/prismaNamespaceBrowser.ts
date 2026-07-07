@@ -350,7 +350,8 @@ export const StudentPeriodScalarFieldEnum = {
   periodId: 'periodId',
   status: 'status',
   createdAt: 'createdAt',
-  accessedAt: 'accessedAt'
+  accessedAt: 'accessedAt',
+  accessedManually: 'accessedManually'
 } as const
 
 export type StudentPeriodScalarFieldEnum = (typeof StudentPeriodScalarFieldEnum)[keyof typeof StudentPeriodScalarFieldEnum]

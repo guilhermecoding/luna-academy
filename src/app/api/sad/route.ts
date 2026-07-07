@@ -278,7 +278,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                     periodId: period.id,
                 },
             },
-            data: { accessedAt: new Date() },
+            data: { accessedAt: new Date(), accessedManually: false },
         });
 
         revalidateTag(`period:${period.id}:indicators`, "days");

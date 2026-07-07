@@ -13,7 +13,7 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "SAD - Acessos ao Portal",
-    description: "Monitore quem já visualizou o resultado no ciclo.",
+    description: "Monitore quem já visualizou o resultado do período.",
 };
 
 interface SADPageProps
@@ -78,6 +78,7 @@ async function AdminSADPageContent({
             <Section className="mt-8">
                 <SADAccessTable
                     data={allStudents}
+                    periodId={period.id}
                     currentFilter={filter}
                 />
             </Section>
