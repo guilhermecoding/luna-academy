@@ -5,6 +5,23 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.0] - 2026-07-06
+
+### Adicionado
+
+- Exportação de listas em **CSV** e **PDF** para alunos (período, turma e disciplina) e professores, no painel admin e no portal do professor
+- Página SAD: botão para marcar ou retirar manualmente a visualização do resultado por aluno, com confirmação do Gibby
+- Indicador visual (ícone **M**) no horário de acesso quando a visualização foi registrada manualmente pelo administrador
+- Botão **Entrar** desabilitado na página de login enquanto e-mail ou senha estiverem vazios
+
+### Alterado
+
+- Primeira abertura do site: a splash screen não é mais sobreposta pelo carregamento global da aplicação
+
+### Corrigido
+
+- Logo da Luna nos documentos PDF exportados
+
 ## [1.6.0] - 2026-06-25
 
 ### Adicionado
