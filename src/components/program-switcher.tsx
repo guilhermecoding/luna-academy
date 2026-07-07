@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { Program } from "@/generated/prisma/client";
+import { getCorporationName } from "@/lib/corporation-name";
 import { usePathname } from "next/navigation";
 
 const ACTIVE_PROGRAM_STORAGE_KEY = "active_program_slug";
@@ -94,8 +95,7 @@ export function ProgramSwitcher({
         return null;
     }
 
-    // Obtém o nome da corporação a partir da variável de ambiente, ou usa um valor padrão se não estiver definida
-    const corporation = process.env.NEXT_PUBLIC_NAME_CORPORATION || "Luna Edu";
+    const corporation = getCorporationName();
 
     return (
         <SidebarMenu>

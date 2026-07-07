@@ -806,7 +806,11 @@ export async function getSADAccessList(periodId: string, filter?: "VIEWED" | "NO
             ...(filter === "NOT_VIEWED" ? { accessedAt: null } : {}),
         },
         select: {
+            id: true,
+            studentId: true,
+            periodId: true,
             accessedAt: true,
+            accessedManually: true,
             student: {
                 select: {
                     id: true,

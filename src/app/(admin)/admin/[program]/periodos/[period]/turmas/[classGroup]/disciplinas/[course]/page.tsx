@@ -1,3 +1,4 @@
+import { ExportStudentsDropdown } from "@/components/export/export-students-dropdown";
 import Page from "@/components/page";
 import Section from "@/components/section";
 import TitlePage from "@/components/title-page";
@@ -24,6 +25,10 @@ import PageSkeleton from "@/components/skeletons/page-skeleton";
 import { Suspense } from "react";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
 import { generateUpcomingLessons } from "@/lib/lesson-schedule-utils";
+import {
+    formatCourseTeachersSummary,
+    getScheduleTeacherDisplayName,
+} from "@/lib/schedule-teacher-utils";
 
 export const metadata: Metadata = {
     title: "Detalhes da Disciplina",
@@ -61,7 +66,7 @@ async function AdminCoursePageContent({
         getLessonsByCourseId(courseData.id),
     ]);
 
-    const teacher = courseData.schedules.find((s) => s.teacher)?.teacher?.name || "Não atribuído";
+    const teacher = formatCourseTeachersSummary(courseData.schedules);
     const basePath = `/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}`;
 
     const schedulesWithTimeSlot = courseData.schedules.filter((s) => s.timeSlot);
@@ -86,7 +91,7 @@ async function AdminCoursePageContent({
         startTime: s.timeSlot.startTime,
         endTime: s.timeSlot.endTime,
         teacherId: s.teacherId,
-        teacherName: s.teacher?.name || null,
+        teacherName: getScheduleTeacherDisplayName(s.teacher),
     }));
 
     return (
@@ -104,6 +109,10 @@ async function AdminCoursePageContent({
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
+                        <ExportStudentsDropdown
+                            exportPath={`/api/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/disciplinas/${courseCode}/alunos/export`}
+                            ariaLabel="Exportar alunos da disciplina"
+                        />
                         {canWrite && (
                             <ButtonLink
                                 className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"

@@ -62,8 +62,8 @@ function CourseTeachersCell({
     schedules: CourseWithRelations["schedules"];
 }) {
     const [open, setOpen] = useState(false);
-    const { titular, assistants } = aggregateCourseTeachers(schedules);
-    const totalTeachers = (titular ? 1 : 0) + assistants.length;
+    const { titulares, assistants } = aggregateCourseTeachers(schedules);
+    const totalTeachers = titulares.length + assistants.length;
 
     if (totalTeachers === 0) {
         return (
@@ -73,15 +73,27 @@ function CourseTeachersCell({
         );
     }
 
-    if (!titular) {
-        if (assistants.length === 1) {
-            return (
-                <span className="text-sm sm:text-base text-foreground whitespace-nowrap">
-                    {assistants[0].name} (Assistente)
-                </span>
-            );
-        }
+    if (totalTeachers === 1) {
+        const isTitular = titulares.length === 1;
+        const name = isTitular ? titulares[0].name : assistants[0].name;
+        return (
+            <span className="text-sm sm:text-base text-foreground whitespace-nowrap">
+                {name} ({isTitular ? "Titular" : "Assistente"})
+            </span>
+        );
+    }
 
+    const dialog = (
+        <CourseTeachersDialog
+            open={open}
+            onOpenChange={setOpen}
+            titulares={titulares}
+            assistants={assistants}
+            totalTeachers={totalTeachers}
+        />
+    );
+
+    if (titulares.length === 0) {
         return (
             <>
                 <span className="inline-flex items-center gap-1 text-sm sm:text-base text-foreground whitespace-nowrap">
@@ -94,43 +106,31 @@ function CourseTeachersCell({
                         [+{assistants.length}]
                     </button>
                 </span>
-                <CourseTeachersDialog
-                    open={open}
-                    onOpenChange={setOpen}
-                    titular={null}
-                    assistants={assistants}
-                    totalTeachers={totalTeachers}
-                />
+                {dialog}
             </>
         );
     }
 
+    const extrasCount = totalTeachers - 1;
+
     return (
         <>
             <span className="inline-flex items-center gap-1 text-sm sm:text-base text-foreground whitespace-nowrap">
-                <span>{titular.name} (Titular)</span>
-                {assistants.length > 0 && (
+                <span>{titulares[0].name} (Titular)</span>
+                {extrasCount > 0 && (
                     <>
-                        <span>e</span>
+                        {titulares.length === 1 && assistants.length > 0 && <span>e</span>}
                         <button
                             type="button"
                             onClick={() => setOpen(true)}
                             className="text-primary font-medium hover:cursor-pointer hover:bg-muted/80 border border-surface-border px-2 py-0.5 rounded-sm"
                         >
-                            +{assistants.length}
+                            +{extrasCount}
                         </button>
                     </>
                 )}
             </span>
-            {assistants.length > 0 && (
-                <CourseTeachersDialog
-                    open={open}
-                    onOpenChange={setOpen}
-                    titular={titular}
-                    assistants={assistants}
-                    totalTeachers={totalTeachers}
-                />
-            )}
+            {extrasCount > 0 && dialog}
         </>
     );
 }
@@ -138,13 +138,13 @@ function CourseTeachersCell({
 function CourseTeachersDialog({
     open,
     onOpenChange,
-    titular,
+    titulares,
     assistants,
     totalTeachers,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    titular: { id: string; name: string } | null;
+    titulares: { id: string; name: string }[];
     assistants: { id: string; name: string }[];
     totalTeachers: number;
 }) {
@@ -160,30 +160,40 @@ function CourseTeachersDialog({
                 </DialogDescription>
 
                 <div className="space-y-4">
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                         <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                            Titular:
+                            {titulares.length === 1 ? "Titular:" : "Titulares:"}
                         </p>
-                        <p className="text-xl font-bold">
-                            {titular?.name ?? "Não atribuído"}
-                        </p>
-                    </div>
-
-                    <Separator className="my-4" />
-
-                    {assistants.length > 0 && (
-                        <div className="space-y-2">
-                            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                                {assistants.length === 1 ? "Assistente:" : "Assistentes:"}
-                            </p>
+                        {titulares.length === 0 ? (
+                            <p className="text-xl font-bold">Não atribuído</p>
+                        ) : (
                             <ul className="space-y-1">
-                                {assistants.map((assistant) => (
-                                    <li key={assistant.id} className="text-lg font-bold">
-                                        {assistant.name}
+                                {titulares.map((titular) => (
+                                    <li key={titular.id} className="text-xl font-bold">
+                                        {titular.name}
                                     </li>
                                 ))}
                             </ul>
-                        </div>
+                        )}
+                    </div>
+
+                    {assistants.length > 0 && (
+                        <>
+                            <Separator className="my-4" />
+
+                            <div className="space-y-2">
+                                <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                    {assistants.length === 1 ? "Assistente:" : "Assistentes:"}
+                                </p>
+                                <ul className="space-y-1">
+                                    {assistants.map((assistant) => (
+                                        <li key={assistant.id} className="text-lg font-bold">
+                                            {assistant.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </>
                     )}
                 </div>
 

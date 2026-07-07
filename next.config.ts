@@ -28,9 +28,11 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns,
     },
+    serverExternalPackages: ["@react-pdf/renderer"],
     ...(process.env.NEXT_PUBLIC_BUILD_MODE === "production" && {
         output: "standalone",
     }),
+    poweredByHeader: false,
 };
 
 

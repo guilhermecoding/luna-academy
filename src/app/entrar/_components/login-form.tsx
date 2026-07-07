@@ -54,6 +54,7 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
@@ -63,9 +64,12 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
     });
 
     const submitLogin = handleSubmit(onSubmit);
+    const email = watch("email");
+    const password = watch("password");
+    const isSubmitDisabled = loading || !email.trim() || !password.trim();
 
     function handleFormKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
-        if (event.key !== "Enter" || event.nativeEvent.isComposing || loading) {
+        if (event.key !== "Enter" || event.nativeEvent.isComposing || isSubmitDisabled) {
             return;
         }
 
@@ -291,7 +295,7 @@ export default function LoginForm({ googleAuthEnabled }: LoginFormProps) {
                     <Button
                         type="submit"
                         className="w-full h-14 font-bold transition-all hover:scale-[1.01] active:scale-[0.99]"
-                        disabled={loading}
+                        disabled={isSubmitDisabled}
                         aria-busy={loading}
                     >
                         {loading ? (

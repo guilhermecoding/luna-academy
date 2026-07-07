@@ -147,6 +147,7 @@ async function AdminClassPageContent({
                     data={studentsList}
                     periodId={periodData.id}
                     classGroupId={classGroupData.id}
+                    exportPath={`/api/admin/${program}/periodos/${period}/turmas/${classGroupSlug}/alunos/export`}
                 />
             </Section>
         </Page>

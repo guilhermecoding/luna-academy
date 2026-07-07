@@ -4,6 +4,7 @@ import { Prisma, SystemRole, UserGenre } from "@/generated/prisma/client";
 import { generateLunaId } from "@/lib/generate-luna-id";
 import { auth } from "@/lib/auth";
 import { sendWelcomeEmail } from "@/lib/mail";
+import { scheduleTeacherFilter } from "@/lib/schedule-teacher-utils";
 
 type CreateTeacherPayload = Pick<
     Prisma.UserCreateInput,
@@ -20,6 +21,84 @@ export async function getTeachers(query?: string) {
     return await prisma.user.findMany({
         where: {
             isTeacher: true,
+            ...(query ? {
+                name: {
+                    contains: query,
+                    mode: "insensitive" as Prisma.QueryMode,
+                },
+            } : {}),
+        },
+        orderBy: { name: "asc" },
+    });
+}
+
+export type TeacherPeriodAssignment = {
+    id: string;
+    name: string;
+    slug: string;
+    courses: { name: string }[];
+};
+
+export async function getTeacherPeriodAssignments(
+    periodId: string,
+    teacherId: string,
+): Promise<TeacherPeriodAssignment[]> {
+    const courses = await prisma.course.findMany({
+        where: {
+            periodId,
+            classGroupId: { not: null },
+            schedules: {
+                some: scheduleTeacherFilter(teacherId),
+            },
+        },
+        select: {
+            name: true,
+            classGroup: {
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                },
+            },
+        },
+        orderBy: [
+            { classGroup: { name: "asc" } },
+            { name: "asc" },
+        ],
+    });
+
+    const byClassGroup = new Map<string, TeacherPeriodAssignment>();
+
+    for (const course of courses) {
+        const classGroup = course.classGroup;
+        if (!classGroup) continue;
+
+        const existing = byClassGroup.get(classGroup.id);
+        if (existing) {
+            existing.courses.push({ name: course.name });
+        } else {
+            byClassGroup.set(classGroup.id, {
+                id: classGroup.id,
+                name: classGroup.name,
+                slug: classGroup.slug,
+                courses: [{ name: course.name }],
+            });
+        }
+    }
+
+    return [...byClassGroup.values()].sort((a, b) =>
+        a.name.localeCompare(b.name, "pt-BR"),
+    );
+}
+
+export async function getTeachersByPeriod(periodId: string, query?: string) {
+    return await prisma.user.findMany({
+        where: {
+            isTeacher: true,
+            OR: [
+                { schedules: { some: { course: { periodId } } } },
+                { scheduleAssistants: { some: { schedule: { course: { periodId } } } } },
+            ],
             ...(query ? {
                 name: {
                     contains: query,

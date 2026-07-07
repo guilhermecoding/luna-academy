@@ -60,7 +60,12 @@ export function ScheduleTeachersSheet({
 
     const selectedIds = useMemo(() => new Set(value.map((t) => t.teacherId)), [value]);
 
-    const label = formatScheduleTeachersLabel(value, teacherNames);
+    const visibleValue = useMemo(
+        () => value.filter((entry) => teacherNames.has(entry.teacherId)),
+        [value, teacherNames],
+    );
+
+    const label = formatScheduleTeachersLabel(visibleValue, teacherNames);
 
     const toggleTeacher = (teacherId: string, checked: boolean) => {
         if (checked) {
@@ -102,7 +107,7 @@ export function ScheduleTeachersSheet({
                 onClick={() => setOpen(true)}
                 className={cn(
                     "h-8 min-w-0 rounded-lg bg-background w-full justify-between px-3 py-0 text-sm font-normal overflow-hidden",
-                    !value.length && "text-muted-foreground",
+                    !visibleValue.length && "text-muted-foreground",
                 )}
             >
                 <span className="truncate">
@@ -130,11 +135,11 @@ export function ScheduleTeachersSheet({
                         />
                     </div>
 
-                    {value.length > 0 && (
+                    {visibleValue.length > 0 && (
                         <div className="space-y-2 px-1">
                             <Label className="text-xs text-muted-foreground">Selecionados</Label>
                             <div className="flex flex-col gap-2">
-                                {value.map((entry) => {
+                                {visibleValue.map((entry) => {
                                     const teacher = teachers.find((t) => t.id === entry.teacherId);
                                     if (!teacher) return null;
                                     return (

@@ -337,8 +337,9 @@ model StudentPeriod {
   periodId   String    @map("period_id") @db.Uuid
   status     String    @default("WAITING")
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  accessedAt DateTime? @map("accessed_at") @db.Timestamptz(6)
-  period     Period    @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  accessedAt       DateTime? @map("accessed_at") @db.Timestamptz(6)
+  accessedManually Boolean   @default(false) @map("accessed_manually")
+  period           Period    @relation(fields: [periodId], references: [id], onDelete: Cascade)
   student    Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, periodId])
