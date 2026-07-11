@@ -56,24 +56,28 @@ async function LoginPageContent({
     const googleAuthEnabled = isGoogleAuthConfigured();
 
     return (
-        <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-surface">
+        <main className="relative min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-surface">
+            <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-[url('/bg-login.svg')] bg-cover bg-center bg-no-repeat opacity-60"
+            />
             {/* Lado Esquerdo - Imagem (Escondido em Mobile) */}
-            <div className="hidden lg:block relative overflow-hidden pointer-events-none">
+            <div className="relative z-10 hidden lg:block overflow-hidden pointer-events-none">
                 <Image src={randomThumb} alt="Background" fill sizes="50vw" className="object-cover" priority />
             </div>
 
             {/* Lado Direito - Formulário */}
-            <div className="flex w-full flex-col items-center justify-start lg:justify-center py-3">
+            <div className="relative z-10 flex w-full h-min-screen flex-col items-center justify-center py-3">
                 <div className="w-full flex flex-col justify-center items-center space-y-2">
                     {/* Header */}
                     <div className="flex w-full flex-col items-center text-center space-y-4">
                         <div className="flex flex-col items-center gap-2">
                             <div className="flex flex-row items-center gap-4">
-                                <GibbyAnimate className="w-5 h-5" />
+                                <GibbyAnimate size={68} />
                                 {logoCorporation &&
                                     <Separator
                                         orientation="vertical"
-                                        className="h-20 my-auto mr-1.5 border border-muted-foreground/50 shrink-0"
+                                        className="h-16 my-auto mr-1 border border-muted-foreground/50 shrink-0"
                                     />}
                                 <CorporationLogo logoCorporation={logoCorporation} />
                             </div>

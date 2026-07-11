@@ -50,7 +50,7 @@ async function AdminSADPageContent({
                 </div>
                 <TitlePage
                     title="Acessos ao Portal"
-                    description={`Monitore quem já visualizou o resultado no ciclo ${period.name}.`}
+                    description={`Monitore quem já visualizou o resultado do período ${period.name}.`}
                 />
             </Section>
 
