@@ -5,6 +5,23 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.1] - 2026-07-11
+
+### Adicionado
+
+- Plano de fundo SVG (`bg-login.svg`) na página de login, com opacidade reduzida para não competir com o formulário
+
+### Alterado
+
+- Ícones do PWA (`manifest`) e favicon atualizados
+- Subtítulo da página SAD: "ciclo" → "período"
+- `AdminProgramPage`: redirecionamento envolvido em `Suspense` para evitar bloqueio de rota
+
+### Corrigido
+
+- Lista SAD desatualizada após enturmar ou desenturmar alunos (invalidação da tag de cache `sad-access`)
+- Data e horário das exportações PDF/CSV gerados em UTC no servidor; agora usam `APP_TIMEZONE` (`NEXT_PUBLIC_APP_TIMEZONE` com fallback) no rodapé "Gerado em" e no sufixo do nome do arquivo
+
 ## [1.7.0] - 2026-07-06
 
 ### Adicionado
