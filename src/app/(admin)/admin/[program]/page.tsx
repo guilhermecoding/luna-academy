@@ -1,9 +1,21 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function AdminProgramPage({
+async function AdminProgramPageContent({
     params,
-}: PageProps<"/admin/[program]">) {
+}: Omit<PageProps<"/admin/[program]">, "searchParams">) {
     const { program } = await params;
     redirect(`/admin/${program}/periodos`);
     return null;
 }
+
+
+export default function AdminProgramPage({
+    params,
+}: PageProps<"/admin/[program]">) {
+    return (
+        <Suspense fallback={null}>
+            <AdminProgramPageContent params={params} />
+        </Suspense>
+    );
+}   

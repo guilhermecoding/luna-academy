@@ -1,4 +1,5 @@
 import { createCsvResponse } from "@/lib/export/csv";
+import { formatExportDateSuffix } from "@/lib/export/format-generated-at";
 import { createPdfResponse } from "@/lib/export/pdf";
 import { requireTeacherCourseExportAccess } from "@/lib/teacher-period-guards";
 import { getProgramBySlug } from "@/services/programs/programs.service";
@@ -60,7 +61,7 @@ export async function GET(
     };
 
     const format = new URL(request.url).searchParams.get("format");
-    const dateSuffix = new Date().toISOString().slice(0, 10);
+    const dateSuffix = formatExportDateSuffix();
 
     if (format === "pdf") {
         const buffer = await buildCourseStudentsPdf(meta);

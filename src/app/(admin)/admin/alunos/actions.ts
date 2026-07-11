@@ -338,6 +338,7 @@ export async function unlinkStudentsFromPeriodAction(studentIds: string[], perio
         updateTag(`period:${periodId}:students-count`);
         updateTag(`period:${periodId}:indicators`);
         updateTag(`period:${periodId}:class-groups`);
+        updateTag(`period:${periodId}:sad-access`);
         updateTag(`period:${periodId}`);
         updateTag(`program:${periodId}:periods`);
 
@@ -365,6 +366,7 @@ export async function enrollStudentsInClassGroupAction(studentIds: string[], cla
         updateTag(`period:${periodId}:indicators`);
         updateTag(`period:${periodId}:available-students`);
         updateTag(`period:${periodId}:class-groups`);
+        updateTag(`period:${periodId}:sad-access`);
         updateTag(`class-group:${classGroupId}:students-list`);
         updateTag(`class-group:${classGroupId}:students-count`);
 
@@ -421,6 +423,7 @@ export async function unlinkStudentsFromClassGroupAction(studentIds: string[], c
         updateTag(`period:${periodId}:indicators`);
         updateTag(`period:${periodId}:available-students`);
         updateTag(`period:${periodId}:class-groups`);
+        updateTag(`period:${periodId}:sad-access`);
         updateTag(`class-group:${classGroupId}:students-list`);
         updateTag(`class-group:${classGroupId}:students-count`);
 
