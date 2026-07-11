@@ -5,6 +5,7 @@ import TitlePage from "@/components/title-page";
 import { ButtonLink } from "@/components/ui/button-link";
 import { StudentsPdfPreview } from "@/components/export/students-pdf-preview";
 import { requireAdmin } from "@/lib/auth-guards";
+import { formatExportGeneratedAt } from "@/lib/export/format-generated-at";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getProgramBySlug } from "@/services/programs/programs.service";
 import { getStudentsByPeriodForExport } from "@/services/export/students-csv.export";
@@ -39,10 +40,7 @@ async function ExportPreviewPageContent({
         getStudentsByPeriodForExport(periodData.id),
     ]);
 
-    const generatedAt = new Date().toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-    });
+    const generatedAt = formatExportGeneratedAt();
     const exportPdfUrl = `/api/admin/${program}/periodos/${period}/alunos/export?format=pdf`;
     const backUrl = `/admin/${program}/periodos/${period}/alunos`;
     const programName = programData?.name ?? program;
