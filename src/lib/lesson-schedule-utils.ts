@@ -1,6 +1,7 @@
 import { DayOfWeek } from "@/generated/prisma/enums";
 import type { LessonListItem } from "@/services/lessons/lessons.service";
 import { getScheduleTeacherDisplayName } from "@/lib/schedule-teacher-utils";
+import getDayKeyInTimeZone, { APP_TIMEZONE } from "@/lib/get-day-key-in-time-zone";
 
 export const dayOfWeekToJs: Record<DayOfWeek, number> = {
     SUNDAY: 0,
@@ -11,6 +12,37 @@ export const dayOfWeekToJs: Record<DayOfWeek, number> = {
     FRIDAY: 5,
     SATURDAY: 6,
 };
+
+function dateFromDayKey(key: number): Date {
+    const s = String(key);
+    const year = s.slice(0, 4);
+    const month = s.slice(4, 6);
+    const day = s.slice(6, 8);
+    return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
+}
+
+/** Expande um dayOfWeek em datas UTC (@db.Date) no intervalo do período, no timezone da app. */
+export function expandScheduleDates(
+    dayOfWeek: DayOfWeek,
+    periodStart: Date,
+    periodEnd: Date,
+): Date[] {
+    const targetJsDay = dayOfWeekToJs[dayOfWeek];
+    const start = dateFromDayKey(getDayKeyInTimeZone(periodStart, APP_TIMEZONE));
+    const end = dateFromDayKey(getDayKeyInTimeZone(periodEnd, APP_TIMEZONE));
+
+    const dates: Date[] = [];
+    const cursor = new Date(start);
+
+    while (cursor <= end) {
+        if (cursor.getUTCDay() === targetJsDay) {
+            dates.push(new Date(cursor));
+        }
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+
+    return dates;
+}
 
 export type UpcomingLesson = {
     date: string;
@@ -55,11 +87,15 @@ export function generateUpcomingLessons(
 ): UpcomingLesson[] {
     if (schedules.length === 0) return [];
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayKey = getDayKeyInTimeZone(new Date(), APP_TIMEZONE);
+    const periodStartKey = getDayKeyInTimeZone(periodStart, APP_TIMEZONE);
+    const startKey = Math.max(periodStartKey, todayKey);
+    const endKey = getDayKeyInTimeZone(periodEnd, APP_TIMEZONE);
 
-    const start = new Date(Math.max(periodStart.getTime(), today.getTime()));
-    const end = new Date(periodEnd);
+    if (startKey > endKey) return [];
+
+    const start = dateFromDayKey(startKey);
+    const end = dateFromDayKey(endKey);
 
     const occupiedKeys = new Set(
         existingLessons

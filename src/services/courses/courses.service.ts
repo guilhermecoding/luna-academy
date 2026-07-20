@@ -5,6 +5,10 @@ import {
     resolveScheduleRoomId,
     type ScheduleSlot,
 } from "@/lib/schedule-conflict-utils";
+import {
+    markLessonsRemovedFromSchedules,
+    syncLessonsFromSchedules,
+} from "@/services/lessons/lessons.service";
 import { cacheLife, cacheTag } from "next/cache";
 import { CourseWithRelations, scheduleInclude } from "./courses.type";
 
@@ -15,6 +19,10 @@ export type ScheduleInput = {
     assistantIds?: string[];
     roomId?: string | null;
 };
+
+function scheduleKey(dayOfWeek: DayOfWeek | string, timeSlotId: string) {
+    return `${dayOfWeek}_${timeSlotId}`;
+}
 
 function buildScheduleCreateData(schedules: ScheduleInput[]) {
     return schedules.map((s) => ({
@@ -92,6 +100,102 @@ async function assertNoScheduleConflicts(
             throw new Error(conflict);
         }
     }
+}
+
+/**
+ * Sync incremental: preserva IDs dos slots que permanecem; marca aulas ao remover slot.
+ */
+async function syncCourseSchedules(
+    tx: Prisma.TransactionClient,
+    courseId: string,
+    schedules: ScheduleInput[],
+) {
+    const existing = await tx.schedule.findMany({
+        where: { courseId },
+        select: {
+            id: true,
+            dayOfWeek: true,
+            timeSlotId: true,
+        },
+    });
+
+    const desiredKeys = new Set(
+        schedules.map((s) => scheduleKey(s.dayOfWeek, s.timeSlotId)),
+    );
+    const existingByKey = new Map(
+        existing.map((s) => [scheduleKey(s.dayOfWeek, s.timeSlotId), s] as const),
+    );
+
+    const toRemove = existing.filter(
+        (s) => !desiredKeys.has(scheduleKey(s.dayOfWeek, s.timeSlotId)),
+    );
+
+    if (toRemove.length > 0) {
+        await markLessonsRemovedFromSchedules(
+            tx,
+            toRemove.map((s) => s.id),
+        );
+        await tx.schedule.deleteMany({
+            where: { id: { in: toRemove.map((s) => s.id) } },
+        });
+    }
+
+    for (const input of schedules) {
+        const key = scheduleKey(input.dayOfWeek, input.timeSlotId);
+        const current = existingByKey.get(key);
+
+        if (current) {
+            await tx.scheduleAssistant.deleteMany({ where: { scheduleId: current.id } });
+            await tx.schedule.update({
+                where: { id: current.id },
+                data: {
+                    teacherId: input.teacherId || null,
+                    roomId: input.roomId || null,
+                    assistants:
+                        input.assistantIds && input.assistantIds.length > 0
+                            ? {
+                                  create: input.assistantIds.map((assistantId) => ({
+                                      assistantId,
+                                  })),
+                              }
+                            : undefined,
+                },
+            });
+        } else {
+            await tx.schedule.create({
+                data: {
+                    courseId,
+                    dayOfWeek: input.dayOfWeek,
+                    timeSlotId: input.timeSlotId,
+                    teacherId: input.teacherId || null,
+                    roomId: input.roomId || null,
+                    assistants:
+                        input.assistantIds && input.assistantIds.length > 0
+                            ? {
+                                  create: input.assistantIds.map((assistantId) => ({
+                                      assistantId,
+                                  })),
+                              }
+                            : undefined,
+                },
+            });
+        }
+    }
+}
+
+async function syncCourseLessonsFromPeriod(
+    tx: Prisma.TransactionClient,
+    courseId: string,
+    periodId: string,
+) {
+    const period = await tx.period.findUnique({
+        where: { id: periodId },
+        select: { startDate: true, endDate: true },
+    });
+
+    if (!period) return;
+
+    await syncLessonsFromSchedules(tx, courseId, period.startDate, period.endDate);
 }
 
 /**
@@ -194,22 +298,29 @@ export async function getCourseByPeriodIdAndCode(periodId: string, code: string)
 }
 
 /**
- * Mapeia erros de unicidade (P2002) do Schedule para mensagens amigáveis.
- * As constraints do Prisma incluem o nome dos campos violados.
+ * Mapeia erros de unicidade (P2002) do Schedule/Lesson para mensagens amigáveis.
  */
-function mapScheduleUniqueError(error: Prisma.PrismaClientKnownRequestError): string {
+function mapUniqueError(error: Prisma.PrismaClientKnownRequestError): string {
     const target = error.meta?.target as string[] | undefined;
     const targetStr = target?.join(",") ?? "";
 
+    if (targetStr.includes("time_slot_id") && targetStr.includes("date")) {
+        return "Já existe uma aula nesta data e horário.";
+    }
+
+    if (targetStr.includes("course_id") && targetStr.includes("day_of_week")) {
+        return "Esta turma já possui um horário neste dia e faixa.";
+    }
+
     if (targetStr.includes("course_id")) {
-        return "Esta turma já possui uma aula cadastrada neste dia e horário.";
+        return "Já existe um registro conflitante para esta disciplina.";
     }
 
     return "Conflito de horário detectado. Verifique os horários selecionados.";
 }
 
 /**
- * Cria uma nova turma com horários opcionais.
+ * Cria uma nova turma com horários opcionais e gera as aulas do período.
  */
 export async function createCourse(data: {
     name: string;
@@ -228,34 +339,40 @@ export async function createCourse(data: {
             data.schedules ?? [],
         );
 
-        const course = await prisma.course.create({
-            data: {
-                name: data.name,
-                code: data.code,
-                periodId: data.periodId,
-                subjectId: data.subjectId,
-                roomId: data.roomId || null,
-                shift: data.shift,
-                classGroupId: data.classGroupId || null,
-                schedules: data.schedules && data.schedules.length > 0
-                    ? {
-                        create: buildScheduleCreateData(data.schedules),
-                    }
-                    : undefined,
-            },
-        });
-        return course;
+        return await prisma.$transaction(async (tx) => {
+            const course = await tx.course.create({
+                data: {
+                    name: data.name,
+                    code: data.code,
+                    periodId: data.periodId,
+                    subjectId: data.subjectId,
+                    roomId: data.roomId || null,
+                    shift: data.shift,
+                    classGroupId: data.classGroupId || null,
+                    schedules: data.schedules && data.schedules.length > 0
+                        ? {
+                            create: buildScheduleCreateData(data.schedules),
+                        }
+                        : undefined,
+                },
+            });
+
+            if (data.schedules && data.schedules.length > 0) {
+                await syncCourseLessonsFromPeriod(tx, course.id, data.periodId);
+            }
+
+            return course;
+        }, { timeout: 60_000 });
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-            throw new Error(mapScheduleUniqueError(error));
+            throw new Error(mapUniqueError(error));
         }
         throw error;
     }
 }
 
 /**
- * Atualiza os dados de uma turma e seus horários.
- * Usa deleteMany + createMany para substituir os schedules.
+ * Atualiza turma e faz sync incremental da grade + aulas do período.
  */
 export async function updateCourse(
     id: string,
@@ -286,14 +403,8 @@ export async function updateCourse(
             id,
         );
 
-        const course = await prisma.$transaction(async (tx) => {
-            // Remove todos os schedules antigos (assistants cascade)
-            await tx.schedule.deleteMany({
-                where: { courseId: id },
-            });
-
-            // Atualiza a turma e cria novos schedules
-            return await tx.course.update({
+        return await prisma.$transaction(async (tx) => {
+            const course = await tx.course.update({
                 where: { id },
                 data: {
                     name: data.name,
@@ -302,19 +413,18 @@ export async function updateCourse(
                     roomId: data.roomId || null,
                     shift: data.shift,
                     classGroupId: data.classGroupId || null,
-                    schedules: data.schedules && data.schedules.length > 0
-                        ? {
-                            create: buildScheduleCreateData(data.schedules),
-                        }
-                        : undefined,
                 },
             });
-        });
-        return course;
+
+            await syncCourseSchedules(tx, id, data.schedules ?? []);
+            await syncCourseLessonsFromPeriod(tx, id, currentCourse.periodId);
+
+            return course;
+        }, { timeout: 60_000 });
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2002") {
-                throw new Error(mapScheduleUniqueError(error));
+                throw new Error(mapUniqueError(error));
             }
             if (error.code === "P2025") {
                 throw new Error("Turma não encontrada.");
@@ -345,4 +455,30 @@ export async function deleteCourse(id: string): Promise<Course> {
         }
         throw error;
     }
+}
+
+/**
+ * Sincroniza aulas a partir da grade atual (para botão na página de aulas / cursos legados).
+ */
+export async function syncCourseLessons(courseId: string): Promise<{ created: number; relinked: number }> {
+    const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        select: {
+            id: true,
+            period: { select: { startDate: true, endDate: true } },
+        },
+    });
+
+    if (!course) {
+        throw new Error("Disciplina não encontrada.");
+    }
+
+    return await prisma.$transaction(async (tx) => {
+        return await syncLessonsFromSchedules(
+            tx,
+            course.id,
+            course.period.startDate,
+            course.period.endDate,
+        );
+    }, { timeout: 60_000 });
 }
