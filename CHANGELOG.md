@@ -5,6 +5,25 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.3] - 2026-07-20
+
+### Adicionado
+
+- Geração automática de aulas ao salvar a grade horária da disciplina, cobrindo o intervalo do período letivo
+- Botão para registrar/sincronizar todas as aulas da grade na página de aulas
+- Badge **Removida** em aulas cujo horário foi retirado da grade (a aula permanece no histórico)
+- Criação de registros de presença sob demanda ao abrir a chamada, quando a aula ainda não tiver lista
+
+### Alterado
+
+- Grade horária da disciplina passa a ser atualizada de forma incremental (slots mantidos não são recriados do zero)
+- Edição de data e horário de aulas com validação de conflito na mesma disciplina (data + horário já existentes)
+- Projeção de aulas previstas alinhada ao fuso horário da aplicação
+
+### Corrigido
+
+- Aulas previstas que não apareciam por inconsistência entre data local e UTC na geração do calendário
+
 ## [1.7.2] - 2026-07-19
 
 ### Alterado
