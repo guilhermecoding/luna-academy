@@ -136,47 +136,47 @@ export async function getClassGroupSlugsByIds(classGroupIds: string[]): Promise<
 }
 
 /**
- * Cria um novo grupo (turma física) e auto-gera as turmas disciplinares
- * baseado nas disciplinas da Matriz (Degree) + Série (basePeriod).
- *
- * Ex: Criar "1º Ano A" com Matriz "Ensino Médio" + basePeriod 1
- * → busca todas as disciplinas do 1º ano do Ensino Médio
- * → cria um Course para cada uma, vinculado ao grupo.
+ * Cria um novo grupo (turma física) e gera as turmas disciplinares
+ * a partir das disciplinas selecionadas da Matriz (Degree).
  */
 export async function createClassGroup(data: {
     name: string;
     slug: string;
     periodId: string;
     degreeId: string;
-    basePeriod: number;
     shift: Shift;
     groupLink?: string;
+    subjectIds: string[];
 }): Promise<ClassGroup> {
     try {
         return await prisma.$transaction(async (tx) => {
-            // 1. Criar o grupo
+            const uniqueSubjectIds = [...new Set(data.subjectIds)];
+
+            const subjects = await tx.subject.findMany({
+                where: {
+                    id: { in: uniqueSubjectIds },
+                    degreeId: data.degreeId,
+                },
+                orderBy: { name: "asc" },
+            });
+
+            if (subjects.length !== uniqueSubjectIds.length) {
+                throw new Error(
+                    "Uma ou mais disciplinas selecionadas não pertencem à matriz curricular.",
+                );
+            }
+
             const group = await tx.classGroup.create({
                 data: {
                     name: data.name,
                     slug: data.slug,
                     periodId: data.periodId,
                     degreeId: data.degreeId,
-                    basePeriod: data.basePeriod,
                     shift: data.shift,
                     groupLink: data.groupLink,
                 },
             });
 
-            // 2. Buscar disciplinas da Matriz + Série
-            const subjects = await tx.subject.findMany({
-                where: {
-                    degreeId: data.degreeId,
-                    basePeriod: data.basePeriod,
-                },
-                orderBy: { name: "asc" },
-            });
-
-            // 3. Auto-gerar turmas disciplinares
             if (subjects.length > 0) {
                 await tx.course.createMany({
                     data: subjects.map((subject) => ({

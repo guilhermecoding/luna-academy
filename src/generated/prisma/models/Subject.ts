@@ -28,12 +28,10 @@ export type AggregateSubject = {
 
 export type SubjectAvgAggregateOutputType = {
   workload: number | null
-  basePeriod: number | null
 }
 
 export type SubjectSumAggregateOutputType = {
   workload: number | null
-  basePeriod: number | null
 }
 
 export type SubjectMinAggregateOutputType = {
@@ -42,7 +40,6 @@ export type SubjectMinAggregateOutputType = {
   name: string | null
   code: string | null
   workload: number | null
-  basePeriod: number | null
   degreeId: string | null
 }
 
@@ -52,7 +49,6 @@ export type SubjectMaxAggregateOutputType = {
   name: string | null
   code: string | null
   workload: number | null
-  basePeriod: number | null
   degreeId: string | null
 }
 
@@ -62,7 +58,6 @@ export type SubjectCountAggregateOutputType = {
   name: number
   code: number
   workload: number
-  basePeriod: number
   degreeId: number
   _all: number
 }
@@ -70,12 +65,10 @@ export type SubjectCountAggregateOutputType = {
 
 export type SubjectAvgAggregateInputType = {
   workload?: true
-  basePeriod?: true
 }
 
 export type SubjectSumAggregateInputType = {
   workload?: true
-  basePeriod?: true
 }
 
 export type SubjectMinAggregateInputType = {
@@ -84,7 +77,6 @@ export type SubjectMinAggregateInputType = {
   name?: true
   code?: true
   workload?: true
-  basePeriod?: true
   degreeId?: true
 }
 
@@ -94,7 +86,6 @@ export type SubjectMaxAggregateInputType = {
   name?: true
   code?: true
   workload?: true
-  basePeriod?: true
   degreeId?: true
 }
 
@@ -104,7 +95,6 @@ export type SubjectCountAggregateInputType = {
   name?: true
   code?: true
   workload?: true
-  basePeriod?: true
   degreeId?: true
   _all?: true
 }
@@ -201,7 +191,6 @@ export type SubjectGroupByOutputType = {
   name: string
   code: string
   workload: number | null
-  basePeriod: number | null
   degreeId: string
   _count: SubjectCountAggregateOutputType | null
   _avg: SubjectAvgAggregateOutputType | null
@@ -234,7 +223,6 @@ export type SubjectWhereInput = {
   name?: Prisma.StringFilter<"Subject"> | string
   code?: Prisma.StringFilter<"Subject"> | string
   workload?: Prisma.IntNullableFilter<"Subject"> | number | null
-  basePeriod?: Prisma.IntNullableFilter<"Subject"> | number | null
   degreeId?: Prisma.UuidFilter<"Subject"> | string
   courses?: Prisma.CourseListRelationFilter
   degree?: Prisma.XOR<Prisma.DegreeScalarRelationFilter, Prisma.DegreeWhereInput>
@@ -246,7 +234,6 @@ export type SubjectOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   workload?: Prisma.SortOrderInput | Prisma.SortOrder
-  basePeriod?: Prisma.SortOrderInput | Prisma.SortOrder
   degreeId?: Prisma.SortOrder
   courses?: Prisma.CourseOrderByRelationAggregateInput
   degree?: Prisma.DegreeOrderByWithRelationInput
@@ -261,7 +248,6 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Subject"> | Date | string
   name?: Prisma.StringFilter<"Subject"> | string
   workload?: Prisma.IntNullableFilter<"Subject"> | number | null
-  basePeriod?: Prisma.IntNullableFilter<"Subject"> | number | null
   degreeId?: Prisma.UuidFilter<"Subject"> | string
   courses?: Prisma.CourseListRelationFilter
   degree?: Prisma.XOR<Prisma.DegreeScalarRelationFilter, Prisma.DegreeWhereInput>
@@ -273,7 +259,6 @@ export type SubjectOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   workload?: Prisma.SortOrderInput | Prisma.SortOrder
-  basePeriod?: Prisma.SortOrderInput | Prisma.SortOrder
   degreeId?: Prisma.SortOrder
   _count?: Prisma.SubjectCountOrderByAggregateInput
   _avg?: Prisma.SubjectAvgOrderByAggregateInput
@@ -291,7 +276,6 @@ export type SubjectScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   code?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   workload?: Prisma.IntNullableWithAggregatesFilter<"Subject"> | number | null
-  basePeriod?: Prisma.IntNullableWithAggregatesFilter<"Subject"> | number | null
   degreeId?: Prisma.UuidWithAggregatesFilter<"Subject"> | string
 }
 
@@ -301,7 +285,6 @@ export type SubjectCreateInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   courses?: Prisma.CourseCreateNestedManyWithoutSubjectInput
   degree: Prisma.DegreeCreateNestedOneWithoutSubjectsInput
 }
@@ -312,7 +295,6 @@ export type SubjectUncheckedCreateInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   degreeId: string
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutSubjectInput
 }
@@ -323,7 +305,6 @@ export type SubjectUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   courses?: Prisma.CourseUpdateManyWithoutSubjectNestedInput
   degree?: Prisma.DegreeUpdateOneRequiredWithoutSubjectsNestedInput
 }
@@ -334,7 +315,6 @@ export type SubjectUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   degreeId?: Prisma.StringFieldUpdateOperationsInput | string
   courses?: Prisma.CourseUncheckedUpdateManyWithoutSubjectNestedInput
 }
@@ -345,7 +325,6 @@ export type SubjectCreateManyInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   degreeId: string
 }
 
@@ -355,7 +334,6 @@ export type SubjectUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type SubjectUncheckedUpdateManyInput = {
@@ -364,7 +342,6 @@ export type SubjectUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   degreeId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -384,13 +361,11 @@ export type SubjectCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   workload?: Prisma.SortOrder
-  basePeriod?: Prisma.SortOrder
   degreeId?: Prisma.SortOrder
 }
 
 export type SubjectAvgOrderByAggregateInput = {
   workload?: Prisma.SortOrder
-  basePeriod?: Prisma.SortOrder
 }
 
 export type SubjectMaxOrderByAggregateInput = {
@@ -399,7 +374,6 @@ export type SubjectMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   workload?: Prisma.SortOrder
-  basePeriod?: Prisma.SortOrder
   degreeId?: Prisma.SortOrder
 }
 
@@ -409,13 +383,11 @@ export type SubjectMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   workload?: Prisma.SortOrder
-  basePeriod?: Prisma.SortOrder
   degreeId?: Prisma.SortOrder
 }
 
 export type SubjectSumOrderByAggregateInput = {
   workload?: Prisma.SortOrder
-  basePeriod?: Prisma.SortOrder
 }
 
 export type SubjectScalarRelationFilter = {
@@ -485,7 +457,6 @@ export type SubjectCreateWithoutDegreeInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   courses?: Prisma.CourseCreateNestedManyWithoutSubjectInput
 }
 
@@ -495,7 +466,6 @@ export type SubjectUncheckedCreateWithoutDegreeInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -534,7 +504,6 @@ export type SubjectScalarWhereInput = {
   name?: Prisma.StringFilter<"Subject"> | string
   code?: Prisma.StringFilter<"Subject"> | string
   workload?: Prisma.IntNullableFilter<"Subject"> | number | null
-  basePeriod?: Prisma.IntNullableFilter<"Subject"> | number | null
   degreeId?: Prisma.UuidFilter<"Subject"> | string
 }
 
@@ -544,7 +513,6 @@ export type SubjectCreateWithoutCoursesInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   degree: Prisma.DegreeCreateNestedOneWithoutSubjectsInput
 }
 
@@ -554,7 +522,6 @@ export type SubjectUncheckedCreateWithoutCoursesInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
   degreeId: string
 }
 
@@ -580,7 +547,6 @@ export type SubjectUpdateWithoutCoursesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   degree?: Prisma.DegreeUpdateOneRequiredWithoutSubjectsNestedInput
 }
 
@@ -590,7 +556,6 @@ export type SubjectUncheckedUpdateWithoutCoursesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   degreeId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -600,7 +565,6 @@ export type SubjectCreateManyDegreeInput = {
   name: string
   code: string
   workload?: number | null
-  basePeriod?: number | null
 }
 
 export type SubjectUpdateWithoutDegreeInput = {
@@ -609,7 +573,6 @@ export type SubjectUpdateWithoutDegreeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   courses?: Prisma.CourseUpdateManyWithoutSubjectNestedInput
 }
 
@@ -619,7 +582,6 @@ export type SubjectUncheckedUpdateWithoutDegreeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   courses?: Prisma.CourseUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -629,7 +591,6 @@ export type SubjectUncheckedUpdateManyWithoutDegreeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   workload?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  basePeriod?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -669,7 +630,6 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name?: boolean
   code?: boolean
   workload?: boolean
-  basePeriod?: boolean
   degreeId?: boolean
   courses?: boolean | Prisma.Subject$coursesArgs<ExtArgs>
   degree?: boolean | Prisma.DegreeDefaultArgs<ExtArgs>
@@ -682,7 +642,6 @@ export type SubjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   code?: boolean
   workload?: boolean
-  basePeriod?: boolean
   degreeId?: boolean
   degree?: boolean | Prisma.DegreeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subject"]>
@@ -693,7 +652,6 @@ export type SubjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   code?: boolean
   workload?: boolean
-  basePeriod?: boolean
   degreeId?: boolean
   degree?: boolean | Prisma.DegreeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subject"]>
@@ -704,11 +662,10 @@ export type SubjectSelectScalar = {
   name?: boolean
   code?: boolean
   workload?: boolean
-  basePeriod?: boolean
   degreeId?: boolean
 }
 
-export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "name" | "code" | "workload" | "basePeriod" | "degreeId", ExtArgs["result"]["subject"]>
+export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "name" | "code" | "workload" | "degreeId", ExtArgs["result"]["subject"]>
 export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   courses?: boolean | Prisma.Subject$coursesArgs<ExtArgs>
   degree?: boolean | Prisma.DegreeDefaultArgs<ExtArgs>
@@ -733,7 +690,6 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     name: string
     code: string
     workload: number | null
-    basePeriod: number | null
     degreeId: string
   }, ExtArgs["result"]["subject"]>
   composites: {}
@@ -1165,7 +1121,6 @@ export interface SubjectFieldRefs {
   readonly name: Prisma.FieldRef<"Subject", 'String'>
   readonly code: Prisma.FieldRef<"Subject", 'String'>
   readonly workload: Prisma.FieldRef<"Subject", 'Int'>
-  readonly basePeriod: Prisma.FieldRef<"Subject", 'Int'>
   readonly degreeId: Prisma.FieldRef<"Subject", 'String'>
 }
     

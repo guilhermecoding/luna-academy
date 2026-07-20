@@ -41,7 +41,7 @@ async function NewClassContent({
                 <Section>
                     <BaseForm
                         title="Nova Turma"
-                        description={"Selecione a Matriz e a Série. O sistema criará automaticamente as disciplinas ofertadas."}
+                        description="Selecione a matriz e marque as disciplinas que serão ofertadas nesta turma."
                     >
                         <div className="mt-6">
                             <Suspense fallback={<SkeletonForm />}>
@@ -57,7 +57,6 @@ async function NewClassContent({
                                         id: s.id,
                                         name: s.name,
                                         code: s.code,
-                                        basePeriod: s.basePeriod,
                                         degreeId: s.degreeId,
                                     }))}
                                 />

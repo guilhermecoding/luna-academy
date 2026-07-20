@@ -134,7 +134,6 @@ model Subject {
   name       String
   code       String   @unique
   workload   Int?
-  basePeriod Int?     @map("base_period") @db.SmallInt
   degreeId   String   @map("degree_id") @db.Uuid
   courses    Course[]
   degree     Degree   @relation(fields: [degreeId], references: [id])
@@ -221,7 +220,6 @@ model ClassGroup {
   slug       String
   periodId   String   @map("period_id") @db.Uuid
   degreeId   String   @map("degree_id") @db.Uuid
-  basePeriod Int      @map("base_period") @db.SmallInt
   shift      Shift
   groupLink  String?  @map("group_link")
   degree     Degree   @relation(fields: [degreeId], references: [id])

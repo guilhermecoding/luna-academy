@@ -49,10 +49,10 @@ export async function createClassGroupSubjectAction(
             return { success: false, error: "Disciplina curricular não encontrada." };
         }
 
-        if (subject.degreeId !== classGroup.degreeId || subject.basePeriod !== classGroup.basePeriod) {
+        if (subject.degreeId !== classGroup.degreeId) {
             return {
                 success: false,
-                error: "A disciplina selecionada não pertence a matriz e série desta turma.",
+                error: "A disciplina selecionada não pertence à matriz curricular desta turma.",
             };
         }
 

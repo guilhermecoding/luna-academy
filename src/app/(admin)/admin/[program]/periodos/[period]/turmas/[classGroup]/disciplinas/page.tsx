@@ -44,7 +44,7 @@ async function AdminClassGroupCoursesPageContent({
 
                 <TitlePage
                     title={classGroup.name}
-                    description={`${classGroup.degree.name} • ${classGroup.basePeriod}ª Série • ${classGroup.shift === "MORNING" ? "Manhã" : classGroup.shift === "AFTERNOON" ? "Tarde" : "Noite"}`}
+                    description={`${classGroup.degree.name} • ${classGroup.shift === "MORNING" ? "Manhã" : classGroup.shift === "AFTERNOON" ? "Tarde" : "Noite"}`}
                 />
                 <div className="flex justify-end mt-4">
                     {canWrite && (
