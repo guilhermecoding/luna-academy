@@ -5,6 +5,12 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.4] - 2026-07-20
+
+### Adicionado
+
+- Aviso fixo na tela de chamada para usuários com acesso **somente leitura**, informando que não é possível realizar chamadas.
+
 ## [1.7.3] - 2026-07-20
 
 ### Adicionado
