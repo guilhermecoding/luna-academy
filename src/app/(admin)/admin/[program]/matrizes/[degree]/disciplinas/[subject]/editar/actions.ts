@@ -24,7 +24,6 @@ export async function editSubjectAction(subjectId: string, programSlug: string, 
             name: validatedData.name,
             code: existing.code,
             workload: validatedData.workload,
-            basePeriod: validatedData.basePeriod,
         });
 
         // Invalida cache de subjects e da disciplina especifica

@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { hashString } from "@/lib/avatar-utils";
 import { getClassGroupsByPeriodId } from "@/services/class-groups/class-groups.service";
-import { IconBook, IconChevronRight, IconClock, IconCodeAsterisk, IconSchool, IconUser, IconUsersGroup } from "@tabler/icons-react";
+import { IconBook, IconChevronRight, IconClock, IconCodeAsterisk, IconUser, IconUsersGroup } from "@tabler/icons-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { shiftLabels } from "../schema";
@@ -165,10 +165,6 @@ async function ListClassGroupsContent({
 
                                     {/* Informações */}
                                     <div className="flex flex-row gap-2 flex-wrap z-20">
-                                        <div className="flex flex-row gap-1 items-center border border-surface-border rounded-full px-2 py-1 whitespace-nowrap">
-                                            <IconSchool className="size-4" />
-                                            <span className="font-medium text-xs">{group.basePeriod}ª Série / {group.basePeriod}º Ano</span>
-                                        </div>
                                         <div className="flex flex-row gap-1 items-center border border-surface-border rounded-full px-2 py-1 whitespace-nowrap">
                                             <IconClock className="size-4" />
                                             <span className="font-medium text-xs">

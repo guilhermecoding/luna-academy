@@ -17,7 +17,6 @@ import { useForm, type SubmitHandler, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useEffect, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { deleteSubjectAction, editSubjectAction } from "../actions";
 import { editSubjectSchema } from "../schema";
 import { IconAlertTriangle, IconLoader2 } from "@tabler/icons-react";
@@ -53,7 +52,6 @@ export function EditSubjectForm({ programSlug, degreeSlug, degreeId, subjectId, 
         defaultValues: {
             name: initialData.name,
             workload: initialData.workload || undefined,
-            basePeriod: initialData.basePeriod || undefined,
         },
     });
 
@@ -182,19 +180,6 @@ export function EditSubjectForm({ programSlug, degreeSlug, degreeId, subjectId, 
                         className="p-5 h-[62px] rounded-lg bg-background"
                     />
                     {errors.workload && <p className="text-sm text-red-600">{errors.workload.message}</p>}
-                </div>
-
-                <div className="space-y-2 md:col-span-1">
-                    <Label htmlFor="basePeriod">Nível (Semestre/Período) *</Label>
-                    <Input
-                        id="basePeriod"
-                        type="number"
-                        placeholder="Ex: 1"
-                        {...register("basePeriod")}
-                        disabled={isSubmitting}
-                        className="p-5 h-[62px] rounded-lg bg-background"
-                    />
-                    {errors.basePeriod && <p className="text-sm text-red-600 mt-1">{errors.basePeriod.message}</p>}
                 </div>
             </div>
 

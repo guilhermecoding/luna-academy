@@ -100,11 +100,11 @@ export const classGroupSchema = z.object({
         .min(2, "O código deve ter no mínimo 2 caracteres")
         .regex(/^[a-zA-Z0-9-]+$/, "O código deve conter apenas letras, números e hífens"),
     degreeId: z.string().min(1, "Selecione uma matriz curricular"),
-    basePeriod: z.coerce.number().int().min(1, "Selecione a série"),
     shift: z.enum(SHIFTS, {
         message: "Selecione um turno",
     }),
     groupLink: z.string().url("Link inválido").optional().or(z.literal("")),
+    subjectIds: z.array(z.string().uuid()).min(1, "Selecione ao menos uma disciplina"),
 });
 
 export const classGroupEditSchema = z.object({

@@ -7,7 +7,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
-import { getSubjectsByDegreeAndBasePeriod } from "@/services/subjects/subjects.service";
+import { getSubjectsByDegreeId } from "@/services/subjects/subjects.service";
 import { getAllRooms } from "@/services/rooms/rooms.service";
 import { getTeachers, getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
 import { CreateClassGroupSubjectForm } from "./_components/create-class-group-subject-form";
@@ -34,7 +34,7 @@ async function NewClassGroupSubjectContent({
         notFound();
     }
 
-    const allSubjects = await getSubjectsByDegreeAndBasePeriod(classGroup.degreeId, classGroup.basePeriod);
+    const allSubjects = await getSubjectsByDegreeId(classGroup.degreeId);
     const usedSubjectIds = new Set(classGroup.courses.map((course) => course.subjectId));
     const availableSubjects = allSubjects.filter((subject) => !usedSubjectIds.has(subject.id));
     const [rooms, timeSlots, teachers] = await Promise.all([

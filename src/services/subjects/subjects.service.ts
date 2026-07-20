@@ -17,10 +17,7 @@ export async function getSubjectsByDegreeId(degreeId: string): Promise<Subject[]
         where: {
             degreeId,
         },
-        orderBy: [
-            { basePeriod: "asc" },
-            { name: "asc" },
-        ],
+        orderBy: { name: "asc" },
     });
 }
 
@@ -56,27 +53,6 @@ export async function getSubjectsByProgramSlug(programSlug: string) {
             { degree: { name: "asc" } },
             { name: "asc" },
         ],
-    });
-}
-
-/**
- * Lista disciplinas de uma matriz/série específicas.
- * Usado para ofertar novas disciplinas dentro de uma turma física.
- */
-export async function getSubjectsByDegreeAndBasePeriod(
-    degreeId: string,
-    basePeriod: number,
-): Promise<Subject[]> {
-    "use cache";
-    cacheLife("max");
-    cacheTag(`degree:${degreeId}:subjects`);
-
-    return await prisma.subject.findMany({
-        where: {
-            degreeId,
-            basePeriod,
-        },
-        orderBy: { name: "asc" },
     });
 }
 
@@ -119,7 +95,6 @@ export async function createSubject(data: {
     degreeId: string;
     code: string;
     workload?: number;
-    basePeriod?: number;
 }): Promise<Subject> {
     try {
         const subject = await prisma.subject.create({
@@ -128,7 +103,6 @@ export async function createSubject(data: {
                 degreeId: data.degreeId,
                 code: data.code,
                 workload: data.workload || null,
-                basePeriod: data.basePeriod || null,
             },
         });
 
@@ -154,7 +128,6 @@ export async function updateSubject(
         name: string;
         code: string;
         workload?: number;
-        basePeriod?: number;
     },
 ): Promise<Subject> {
     try {
@@ -166,7 +139,6 @@ export async function updateSubject(
                 name: data.name,
                 code: data.code,
                 workload: data.workload || null,
-                basePeriod: data.basePeriod || null,
             },
         });
 

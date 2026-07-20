@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -29,7 +30,6 @@ type SubjectData = {
     id: string;
     name: string;
     code: string;
-    basePeriod: number | null;
     degreeId: string;
 };
 
@@ -63,9 +63,9 @@ export function CreateClassForm({
             name: "",
             slug: "",
             degreeId: "",
-            basePeriod: undefined,
             shift: undefined,
             groupLink: "",
+            subjectIds: [],
         },
     });
 
@@ -82,38 +82,42 @@ export function CreateClassForm({
     const nameValue = useWatch({ control, name: "name" });
     const slugValue = useWatch({ control, name: "slug" });
     const degreeIdValue = useWatch({ control, name: "degreeId" });
+    const subjectIdsValue = useWatch({ control, name: "subjectIds" }) ?? [];
 
     const canSubmit =
         isValid && isDirty && !isSubmitting && Boolean(nameValue?.trim()) && Boolean(slugValue?.trim());
 
-    // Extrair séries disponíveis para a matriz selecionada
-    const availableBasePeriods = useMemo(() => {
+    const degreeSubjects = useMemo(() => {
         if (!degreeIdValue) return [];
-        const periodsSet = new Set<number>();
-        subjects
-            .filter((s) => s.degreeId === degreeIdValue && s.basePeriod !== null)
-            .forEach((s) => periodsSet.add(s.basePeriod!));
-        return Array.from(periodsSet).sort((a, b) => a - b);
+        return subjects.filter((s) => s.degreeId === degreeIdValue);
     }, [degreeIdValue, subjects]);
-
-    // Contar disciplinas que serão auto-geradas
-    const selectedBasePeriod = useWatch({ control, name: "basePeriod" });
-    const matchingSubjects = useMemo(() => {
-        if (!degreeIdValue || !selectedBasePeriod) return [];
-        return subjects.filter(
-            (s) => s.degreeId === degreeIdValue && s.basePeriod === selectedBasePeriod,
-        );
-    }, [degreeIdValue, selectedBasePeriod, subjects]);
 
     useEffect(() => {
         clearErrors();
         reset();
     }, [clearErrors, reset]);
 
-    // Limpar basePeriod quando trocar de Degree
     useEffect(() => {
-        setValue("basePeriod", undefined as unknown as number, { shouldValidate: false });
+        setValue("subjectIds", [], { shouldValidate: false, shouldDirty: false });
     }, [degreeIdValue, setValue]);
+
+    const toggleSubject = (subjectId: string, checked: boolean) => {
+        const next = checked
+            ? [...subjectIdsValue, subjectId]
+            : subjectIdsValue.filter((id) => id !== subjectId);
+        setValue("subjectIds", next, { shouldDirty: true, shouldValidate: true });
+    };
+
+    const toggleAll = (checked: boolean) => {
+        setValue(
+            "subjectIds",
+            checked ? degreeSubjects.map((s) => s.id) : [],
+            { shouldDirty: true, shouldValidate: true },
+        );
+    };
+
+    const allSelected =
+        degreeSubjects.length > 0 && degreeSubjects.every((s) => subjectIdsValue.includes(s.id));
 
     const onSubmit: SubmitHandler<ClassGroupInput> = async (data) => {
         clearErrors("root");
@@ -139,7 +143,7 @@ export function CreateClassForm({
                 router.refresh();
                 return;
             }
-        } catch (error) {
+        } catch {
             const params = new URLSearchParams(searchParams.toString());
             params.set("toast", "error");
             params.set("message", "Erro fatal ao criar classe");
@@ -161,7 +165,6 @@ export function CreateClassForm({
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Nome */}
                 <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="name">Nome da Classe *</Label>
                     <Input
@@ -177,7 +180,6 @@ export function CreateClassForm({
                     )}
                 </div>
 
-                {/* Código */}
                 <div className="space-y-2 col-span-1">
                     <Label htmlFor="slug">Código da Classe *</Label>
                     <div className="flex gap-2">
@@ -219,7 +221,6 @@ export function CreateClassForm({
                     )}
                 </div>
 
-                {/* Matriz Curricular */}
                 <div className="space-y-2">
                     <Label htmlFor="degreeId">Matriz Curricular *</Label>
                     {degrees.length === 0 ? (
@@ -260,54 +261,6 @@ export function CreateClassForm({
                     )}
                 </div>
 
-                {/* Série */}
-                <div className="space-y-2">
-                    <Label htmlFor="basePeriod">Série *</Label>
-                    {!degreeIdValue ? (
-                        <div className="p-4 border-2 border-dashed border-surface-border rounded-xl bg-surface/30 text-center">
-                            <p className="text-sm text-muted-foreground">
-                                Selecione uma Matriz primeiro.
-                            </p>
-                        </div>
-                    ) : availableBasePeriods.length === 0 ? (
-                        <div className="p-4 border-2 border-dashed border-surface-border rounded-xl bg-surface/30 text-center">
-                            <p className="text-sm text-muted-foreground">
-                                Nenhuma disciplina com série definida nesta Matriz.
-                            </p>
-                        </div>
-                    ) : (
-                        <Controller
-                            control={control}
-                            name="basePeriod"
-                            render={({ field }) => (
-                                <Select
-                                    value={field.value?.toString() || ""}
-                                    onValueChange={(v) => field.onChange(parseInt(v))}
-                                    disabled={isSubmitting}
-                                >
-                                    <SelectTrigger
-                                        id="basePeriod"
-                                        className="p-5 rounded-lg bg-background w-full"
-                                    >
-                                        <SelectValue placeholder="Selecione a série" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {availableBasePeriods.map((bp) => (
-                                            <SelectItem key={bp} value={bp.toString()}>
-                                                {bp}ª Série / {bp}º Ano
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        />
-                    )}
-                    {errors.basePeriod && (
-                        <p className="text-sm text-red-600">{errors.basePeriod.message}</p>
-                    )}
-                </div>
-
-                {/* Turno */}
                 <div className="space-y-2">
                     <Label htmlFor="shift">Turno *</Label>
                     <Controller
@@ -348,7 +301,6 @@ export function CreateClassForm({
                     )}
                 </div>
 
-                {/* Link Grupo */}
                 <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="groupLink">Link para grupo de comunicação</Label>
                     <Input
@@ -365,27 +317,68 @@ export function CreateClassForm({
                 </div>
             </div>
 
-            {/* Preview das disciplinas que serão criadas */}
-            {matchingSubjects.length > 0 && (
-                <div className="p-4 border border-blue-200 dark:border-blue-800 rounded-xl bg-blue-50 dark:bg-blue-950/30 space-y-3">
-                    <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
-                        <IconBooks className="size-5" />
-                        <p className="font-semibold text-sm">
-                            {matchingSubjects.length} disciplina{matchingSubjects.length !== 1 ? "s" : ""} ser{matchingSubjects.length !== 1 ? "ão" : "á"} gerada{matchingSubjects.length !== 1 ? "s" : ""} automaticamente:
+            <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                        <IconBooks className="size-5 text-muted-foreground" />
+                        <Label>Disciplinas da matriz *</Label>
+                    </div>
+                    {degreeSubjects.length > 0 && (
+                        <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                            <Checkbox
+                                checked={allSelected}
+                                onChange={(e) => toggleAll(e.target.checked)}
+                                disabled={isSubmitting}
+                            />
+                            Selecionar todas
+                        </label>
+                    )}
+                </div>
+
+                {!degreeIdValue ? (
+                    <div className="p-4 border-2 border-dashed border-surface-border rounded-xl bg-surface/30 text-center">
+                        <p className="text-sm text-muted-foreground">
+                            Selecione uma Matriz para listar as disciplinas.
                         </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        {matchingSubjects.map((s) => (
-                            <span
-                                key={s.id}
-                                className="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-medium"
-                            >
-                                {s.name}
-                            </span>
-                        ))}
+                ) : degreeSubjects.length === 0 ? (
+                    <div className="p-4 border-2 border-dashed border-surface-border rounded-xl bg-surface/30 text-center">
+                        <p className="text-sm text-muted-foreground">
+                            Nenhuma disciplina cadastrada nesta Matriz.
+                        </p>
                     </div>
-                </div>
-            )}
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4 border border-surface-border rounded-xl bg-background">
+                        {degreeSubjects.map((subject) => {
+                            const checked = subjectIdsValue.includes(subject.id);
+                            return (
+                                <label
+                                    key={subject.id}
+                                    className="flex items-start gap-3 rounded-lg border border-surface-border/60 px-3 py-2.5 cursor-pointer hover:bg-muted/40 transition-colors"
+                                >
+                                    <Checkbox
+                                        className="mt-0.5"
+                                        checked={checked}
+                                        onChange={(e) => toggleSubject(subject.id, e.target.checked)}
+                                        disabled={isSubmitting}
+                                    />
+                                    <span className="min-w-0">
+                                        <span className="block text-sm font-medium leading-tight">
+                                            {subject.name}
+                                        </span>
+                                        <span className="block text-xs text-muted-foreground font-mono mt-0.5">
+                                            {subject.code}
+                                        </span>
+                                    </span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                )}
+                {errors.subjectIds && (
+                    <p className="text-sm text-red-600">{errors.subjectIds.message}</p>
+                )}
+            </div>
 
             <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-4 border-t items-center mt-6">
                 <Button
