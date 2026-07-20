@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { IconCheck, IconDeviceFloppy, IconLoader2, IconSearch, IconX } from "@tabler/icons-react";
+import { IconCheck, IconDeviceFloppy, IconInfoCircle, IconLoader2, IconSearch, IconX } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { bulkUpdateAttendanceAction } from "../../../actions";
 import type { AttendanceWithStudent } from "@/services/lessons/lessons.service";
@@ -298,6 +298,18 @@ export function AttendanceTable({
                         )}
                         {isPending ? "Salvando..." : "Salvar Presenças"}
                     </Button>
+                </div>
+            )}
+
+            {!canWrite && (
+                <div
+                    role="status"
+                    className="fixed z-50 bottom-4 left-4 right-4 md:left-auto md:right-6 md:bottom-6 md:max-w-sm flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 shadow-md dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200"
+                >
+                    <IconInfoCircle className="size-4 mt-0.5 shrink-0" />
+                    <p>
+                        Você está no modo &quot;somente leitura&quot;. Diante disso, não é possível realizar chamadas
+                    </p>
                 </div>
             )}
         </div>
