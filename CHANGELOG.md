@@ -5,6 +5,19 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.2] - 2026-07-19
+
+### Alterado
+
+- Disciplinas da matriz curricular passam a ser cadastradas sem vínculo com série ou período
+- Na criação de turma, as disciplinas ofertadas são escolhidas manualmente a partir da matriz selecionada
+- Telas de turmas e disciplinas deixam de exibir a série vinculada à turma
+
+### Removido
+
+- Configuração de nível/série nas disciplinas da matriz curricular
+- Campo de série na turma e geração automática de disciplinas ao criar uma turma
+
 ## [1.7.1] - 2026-07-11
 
 ### Adicionado

@@ -7,9 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { useEffect, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { useEffect } from "react";
 import { createSubjectAction } from "../actions";
 import { createSubjectSchema } from "../schema";
 import { IconLoader2 } from "@tabler/icons-react";
@@ -35,7 +33,6 @@ export function CreateSubjectForm({ programSlug, degreeSlug }: Props) {
             name: "",
             code: "",
             workload: undefined,
-            basePeriod: undefined,
         },
     });
 
@@ -57,7 +54,6 @@ export function CreateSubjectForm({ programSlug, degreeSlug }: Props) {
                 name: "",
                 code: "",
                 workload: undefined,
-                basePeriod: undefined,
             });
         };
     }, [clearErrors, reset]);
@@ -145,19 +141,6 @@ export function CreateSubjectForm({ programSlug, degreeSlug }: Props) {
                         className="p-5 h-[62px] rounded-lg bg-background"
                     />
                     {errors.workload && <p className="text-sm text-red-600">{errors.workload.message}</p>}
-                </div>
-
-                <div className="space-y-2 md:col-span-1">
-                    <Label htmlFor="basePeriod">Nível (Semestre/Período) *</Label>
-                    <Input
-                        id="basePeriod"
-                        type="number"
-                        placeholder="Ex: 1"
-                        {...register("basePeriod")}
-                        disabled={isSubmitting}
-                        className="p-5 h-[62px] rounded-lg bg-background"
-                    />
-                    {errors.basePeriod && <p className="text-sm text-red-600 mt-1">{errors.basePeriod.message}</p>}
                 </div>
             </div>
 

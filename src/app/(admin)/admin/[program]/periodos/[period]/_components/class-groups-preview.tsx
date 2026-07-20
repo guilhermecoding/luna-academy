@@ -8,7 +8,6 @@ type PreviewClassGroup = {
     id: string;
     name: string;
     slug: string;
-    basePeriod: number;
     _count: {
         courses: number;
     };
@@ -155,9 +154,6 @@ function SectionPreviewWrapper({
                                         </p>
                                     </div>
                                     <div className="flex flex-wrap gap-2 text-xs">
-                                        <span className="px-2 py-1 rounded-full border border-surface-border whitespace-nowrap">
-                                            {group.basePeriod}ª Série
-                                        </span>
                                         <span className="px-2 py-1 rounded-full border border-surface-border whitespace-nowrap">
                                             {group._count.courses} disciplina{group._count.courses !== 1 ? "s" : ""}
                                         </span>

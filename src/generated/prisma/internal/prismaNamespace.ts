@@ -2498,7 +2498,6 @@ export const SubjectScalarFieldEnum = {
   name: 'name',
   code: 'code',
   workload: 'workload',
-  basePeriod: 'basePeriod',
   degreeId: 'degreeId'
 } as const
 
@@ -2567,7 +2566,6 @@ export const ClassGroupScalarFieldEnum = {
   slug: 'slug',
   periodId: 'periodId',
   degreeId: 'degreeId',
-  basePeriod: 'basePeriod',
   shift: 'shift',
   groupLink: 'groupLink'
 } as const

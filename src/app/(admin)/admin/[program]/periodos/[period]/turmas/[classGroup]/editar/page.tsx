@@ -47,7 +47,6 @@ async function EditClassGroupContent({
                                 name: classGroup.name,
                                 slug: classGroup.slug,
                                 degreeName: classGroup.degree.name,
-                                basePeriod: classGroup.basePeriod,
                                 shift: classGroup.shift,
                                 groupLink: classGroup.groupLink || "",
                             }}

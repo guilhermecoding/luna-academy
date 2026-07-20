@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { getClassGroupByPeriodIdAndSlug } from "@/services/class-groups/class-groups.service";
 import { getCourseByPeriodIdAndCode } from "@/services/courses/courses.service";
 import { getPeriodByProgramAndSlug } from "@/services/periods/periods.service";
-import { getSubjectsByDegreeAndBasePeriod } from "@/services/subjects/subjects.service";
+import { getSubjectsByDegreeId } from "@/services/subjects/subjects.service";
 import { getAllRooms } from "@/services/rooms/rooms.service";
 import { getTeachers, getTimeSlotsByProgramSlug } from "@/services/schedules/schedules.service";
 import { scheduleToTeacherEntries } from "@/lib/schedule-teacher-utils";
@@ -46,7 +46,7 @@ async function EditClassGroupCourseContent({
         notFound();
     }
 
-    const allSubjects = await getSubjectsByDegreeAndBasePeriod(classGroup.degreeId, classGroup.basePeriod);
+    const allSubjects = await getSubjectsByDegreeId(classGroup.degreeId);
     const usedSubjectIds = new Set(
         classGroup.courses
             .filter((groupCourse) => groupCourse.id !== course.id)

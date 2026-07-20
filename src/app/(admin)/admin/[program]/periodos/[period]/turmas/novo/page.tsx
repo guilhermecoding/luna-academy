@@ -13,7 +13,7 @@ import { notFound } from "next/navigation";
 import { WritePageGuard } from "@/components/write-page-guard";
 
 export const metadata: Metadata = {
-    title: "Nova Classe",
+    title: "Nova Turma",
 };
 
 async function NewClassContent({
@@ -40,8 +40,8 @@ async function NewClassContent({
             <Page>
                 <Section>
                     <BaseForm
-                        title="Nova Classe"
-                        description={"Selecione a Matriz e a Série. O sistema criará automaticamente as disciplinas ofertadas."}
+                        title="Nova Turma"
+                        description="Selecione a matriz e marque as disciplinas que serão ofertadas nesta turma."
                     >
                         <div className="mt-6">
                             <Suspense fallback={<SkeletonForm />}>
@@ -57,7 +57,6 @@ async function NewClassContent({
                                         id: s.id,
                                         name: s.name,
                                         code: s.code,
-                                        basePeriod: s.basePeriod,
                                         degreeId: s.degreeId,
                                     }))}
                                 />

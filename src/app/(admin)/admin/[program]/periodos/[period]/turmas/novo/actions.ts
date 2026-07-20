@@ -29,9 +29,9 @@ export async function createClassAction(
             slug: validatedData.slug,
             periodId: period.id,
             degreeId: validatedData.degreeId,
-            basePeriod: validatedData.basePeriod,
             shift: validatedData.shift as Shift,
             groupLink: validatedData.groupLink,
+            subjectIds: validatedData.subjectIds,
         });
 
         updateTag(`period:${period.id}:class-groups`);
@@ -50,7 +50,7 @@ export async function createClassAction(
 
     const params = new URLSearchParams({
         toast: "success",
-        message: "Classe criada com sucesso! As disciplinas foram geradas automaticamente.",
+        message: "Classe criada com sucesso!",
     });
 
     return {

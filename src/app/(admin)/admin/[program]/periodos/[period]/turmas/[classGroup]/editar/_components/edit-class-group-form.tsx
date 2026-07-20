@@ -35,7 +35,6 @@ interface EditClassGroupFormProps {
         name: string;
         slug: string;
         degreeName: string;
-        basePeriod: number;
         shift: Shift;
         groupLink: string;
     };
@@ -153,11 +152,6 @@ export function EditClassGroupForm({
                 <div className="space-y-2 cursor-not-allowed">
                     <Label htmlFor="degree">Matriz</Label>
                     <Input id="degree" defaultValue={defaultValues.degreeName} readOnly disabled className="p-5 rounded-lg bg-muted text-muted-foreground" />
-                    <p className="text-[10px] text-muted-foreground px-1">Este campo não pode ser alterado.</p>
-                </div>
-                <div className="space-y-2 cursor-not-allowed">
-                    <Label htmlFor="basePeriod">Série</Label>
-                    <Input id="basePeriod" defaultValue={`${defaultValues.basePeriod}ª Série / ${defaultValues.basePeriod}º Ano`} readOnly disabled className="p-5 rounded-lg bg-muted text-muted-foreground" />
                     <p className="text-[10px] text-muted-foreground px-1">Este campo não pode ser alterado.</p>
                 </div>
                 <div className="space-y-2 flex flex-col justify-end">

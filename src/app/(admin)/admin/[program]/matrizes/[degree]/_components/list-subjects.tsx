@@ -56,7 +56,6 @@ async function ListSubjectsContent({
                         <th className="px-6 py-4 font-medium">Disciplina/Matéria</th>
                         <th className="px-6 text-center py-4 font-medium">Código</th>
                         <th className="px-6 text-center py-4 font-medium">Carga (h)</th>
-                        <th className="px-6 text-center py-4 font-medium">Nível Base</th>
                         <th className="px-6 py-4 font-medium text-right">Ação</th>
                     </tr>
                 </thead>
@@ -76,9 +75,6 @@ async function ListSubjectsContent({
                             </td>
                             <td className="px-6 text-center py-4">
                                 {subject.workload ? `${subject.workload}h` : "Não atribuível"}
-                            </td>
-                            <td className="px-6 text-center py-4 text-muted-foreground">
-                                {subject.basePeriod ? `${subject.basePeriod}º Período` : "Não atribuível"}
                             </td>
                             <td className="px-6 py-4 text-right">
                                 <CanWrite>
