@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
-import { Prisma } from "@/generated/prisma/client";
+import { DayOfWeek, Prisma } from "@/generated/prisma/client";
 import { cacheLife, cacheTag } from "next/cache";
+import { expandScheduleDates } from "@/lib/lesson-schedule-utils";
 
 type TransactionClient = Prisma.TransactionClient;
 
@@ -181,6 +182,167 @@ export async function getLessonIdsByCourseIds(courseIds: string[]) {
 }
 
 /**
+ * Marca aulas como removidas da grade antes de apagar os schedules.
+ */
+export async function markLessonsRemovedFromSchedules(
+    tx: TransactionClient,
+    scheduleIds: string[],
+) {
+    if (scheduleIds.length === 0) return;
+
+    await tx.lesson.updateMany({
+        where: { scheduleId: { in: scheduleIds } },
+        data: {
+            scheduleRemovedAt: new Date(),
+            scheduleId: null,
+        },
+    });
+}
+
+/**
+ * Gera aulas faltantes a partir dos schedules ativos no intervalo do período.
+ * Não cria attendances (sob demanda na abertura da chamada).
+ * Religa aulas órfãs quando o mesmo timeSlot volta à grade.
+ */
+export async function syncLessonsFromSchedules(
+    tx: TransactionClient,
+    courseId: string,
+    periodStart: Date,
+    periodEnd: Date,
+): Promise<{ created: number; relinked: number }> {
+    const schedules = await tx.schedule.findMany({
+        where: { courseId },
+        select: {
+            id: true,
+            dayOfWeek: true,
+            timeSlotId: true,
+            teacherId: true,
+        },
+    });
+
+    if (schedules.length === 0) {
+        return { created: 0, relinked: 0 };
+    }
+
+    const existingLessons = await tx.lesson.findMany({
+        where: {
+            courseId,
+            timeSlotId: { in: schedules.map((s) => s.timeSlotId) },
+        },
+        select: {
+            id: true,
+            date: true,
+            timeSlotId: true,
+            scheduleId: true,
+            scheduleRemovedAt: true,
+        },
+    });
+
+    const byDateSlot = new Map<string, (typeof existingLessons)[number]>(
+        existingLessons.map((l) => {
+            const dateKey = new Date(l.date).toISOString().split("T")[0];
+            return [`${dateKey}_${l.timeSlotId}`, l];
+        }),
+    );
+
+    const toCreate: {
+        courseId: string;
+        date: Date;
+        topic: string;
+        scheduleId: string;
+        timeSlotId: string;
+        teacherId: string | null;
+    }[] = [];
+
+    const toRelink: { id: string; scheduleId: string; teacherId: string | null }[] = [];
+
+    for (const schedule of schedules) {
+        const dates = expandScheduleDates(
+            schedule.dayOfWeek as DayOfWeek,
+            periodStart,
+            periodEnd,
+        );
+
+        for (const date of dates) {
+            const dateKey = date.toISOString().split("T")[0];
+            const key = `${dateKey}_${schedule.timeSlotId}`;
+            const existing = byDateSlot.get(key);
+
+            if (!existing) {
+                toCreate.push({
+                    courseId,
+                    date,
+                    topic: "Aula",
+                    scheduleId: schedule.id,
+                    timeSlotId: schedule.timeSlotId,
+                    teacherId: schedule.teacherId,
+                });
+                continue;
+            }
+
+            if (
+                existing.scheduleRemovedAt != null
+                || existing.scheduleId !== schedule.id
+            ) {
+                toRelink.push({
+                    id: existing.id,
+                    scheduleId: schedule.id,
+                    teacherId: schedule.teacherId,
+                });
+            }
+        }
+    }
+
+    let created = 0;
+    if (toCreate.length > 0) {
+        const result = await tx.lesson.createMany({
+            data: toCreate,
+            skipDuplicates: true,
+        });
+        created = result.count;
+    }
+
+    let relinked = 0;
+    for (const item of toRelink) {
+        await tx.lesson.update({
+            where: { id: item.id },
+            data: {
+                scheduleId: item.scheduleId,
+                teacherId: item.teacherId,
+                scheduleRemovedAt: null,
+            },
+        });
+        relinked += 1;
+    }
+
+    return { created, relinked };
+}
+
+/**
+ * Garante registros de presença para todos os matriculados na abertura da chamada.
+ */
+export async function ensureAttendancesForLesson(
+    lessonId: string,
+    courseId: string,
+) {
+    const enrollments = await prisma.enrollment.findMany({
+        where: { courseId },
+        select: { studentId: true },
+    });
+
+    if (enrollments.length === 0) return;
+
+    await prisma.attendance.createMany({
+        data: enrollments.map((e) => ({
+            lessonId,
+            studentId: e.studentId,
+            isPresent: true,
+        })),
+        skipDuplicates: true,
+    });
+}
+
+/**
  * Cria uma nova aula e gera registros de presença para todos os alunos matriculados
  * na disciplina. O default de isPresent é true (conforme schema.prisma).
  */
@@ -201,6 +363,7 @@ export async function createLesson(data: {
                 teacherId: data.teacherId || null,
                 timeSlotId: data.timeSlotId || null,
                 scheduleId: data.scheduleId || null,
+                scheduleRemovedAt: null,
             },
         });
 
@@ -236,6 +399,7 @@ export async function updateLesson(
         teacherId?: string | null;
         timeSlotId?: string | null;
         scheduleId?: string | null;
+        scheduleRemovedAt?: Date | null;
     },
 ) {
     return await prisma.lesson.update({

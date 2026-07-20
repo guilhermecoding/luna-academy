@@ -96,7 +96,11 @@ export async function editClassGroupCourseAction(
         updateTag(`period:${period.id}:class-group:${classGroup.slug}`);
         updateTag(`period:${period.id}:class-groups`);
         updateTag(`program-periods:${programSlug}`);
+        updateTag(`course:${course.id}:lessons`);
+        updateTag(`course:${course.id}:lessons-count`);
         revalidateCoursePaths(programSlug, periodSlug, classGroupSlug, course.code);
+        revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${course.code}/aulas`);
+        revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${course.code}`);
     } catch (error) {
         if (error instanceof ZodError) {
             return { success: false, error: error.issues[0]?.message || "Erro de validação" };
@@ -109,7 +113,7 @@ export async function editClassGroupCourseAction(
 
     const params = new URLSearchParams({
         toast: "success",
-        message: "Disciplina atualizada com sucesso",
+        message: "Disciplina atualizada com sucesso. Aulas sincronizadas com a grade.",
     });
     return {
         success: true,
