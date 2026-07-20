@@ -9,6 +9,7 @@ import {
     getLessonById,
     getAttendancesByLessonId,
     getAttendanceStatsByLessonId,
+    ensureAttendancesForLesson,
 } from "@/services/lessons/lessons.service";
 import {
     IconCheck,
@@ -78,6 +79,8 @@ async function ProfLessonPageContent({
 
     const lesson = await getLessonById(lessonId);
     if (!lesson || lesson.course.id !== courseData.id) notFound();
+
+    await ensureAttendancesForLesson(lessonId, courseData.id);
 
     const [attendances, stats] = await Promise.all([
         getAttendancesByLessonId(lessonId, courseData.id),

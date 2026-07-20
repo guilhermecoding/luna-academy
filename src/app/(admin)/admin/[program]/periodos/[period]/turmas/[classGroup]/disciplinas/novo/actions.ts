@@ -67,7 +67,7 @@ export async function createClassGroupSubjectAction(
             return { success: false, error: "Já existe uma disciplina com este código neste período." };
         }
 
-        await createCourse({
+        const created = await createCourse({
             name: validatedData.name,
             code: validatedData.code,
             periodId: period.id,
@@ -84,8 +84,12 @@ export async function createClassGroupSubjectAction(
         updateTag(`period:${period.id}:class-group:${classGroup.slug}`);
         updateTag(`period:${period.id}:class-groups`);
         updateTag(`program-periods:${programSlug}`);
+        updateTag(`course:${created.id}:lessons`);
+        updateTag(`course:${created.id}:lessons-count`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas`);
         revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas/${validatedData.code}/editar`);
+        revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${validatedData.code}/aulas`);
+        revalidatePath(`/admin/${programSlug}/periodos/${periodSlug}/turmas/${classGroupSlug}/disciplinas/${validatedData.code}`);
     } catch (error) {
         if (error instanceof ZodError) {
             return { success: false, error: error.issues[0]?.message || "Erro de validação" };
@@ -98,7 +102,7 @@ export async function createClassGroupSubjectAction(
 
     const params = new URLSearchParams({
         toast: "success",
-        message: "Disciplina adicionada com sucesso",
+        message: "Disciplina adicionada com sucesso. Aulas geradas a partir da grade.",
     });
 
     return {

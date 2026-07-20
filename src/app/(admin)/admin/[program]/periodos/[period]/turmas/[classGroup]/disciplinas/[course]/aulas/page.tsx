@@ -15,6 +15,7 @@ import { generateUpcomingLessons, type LessonFilter } from "@/lib/lesson-schedul
 import { getScheduleTeacherDisplayName } from "@/lib/schedule-teacher-utils";
 import { CreateLessonSheet } from "../_components/create-lesson-dialog";
 import { LessonsFilteredList } from "../_components/lessons-filtered-list";
+import { SyncLessonsButton } from "../_components/sync-lessons-button";
 import { IconCalendarEvent } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -98,6 +99,12 @@ async function AdminClassGroupCourseLessonsPageContent({
                     </div>
                     {canWrite && (
                         <div className="flex flex-col sm:flex-row flex-1 gap-3 justify-end items-end">
+                            <SyncLessonsButton
+                                programSlug={program}
+                                periodSlug={period}
+                                classGroupSlug={classGroupSlug}
+                                courseCode={courseCode}
+                            />
                             <CreateLessonSheet
                                 programSlug={program}
                                 periodSlug={period}

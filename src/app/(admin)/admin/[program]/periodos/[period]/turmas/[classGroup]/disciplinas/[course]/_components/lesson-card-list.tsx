@@ -130,6 +130,11 @@ export default function LessonCardList({
                         <div className="flex-1 min-w-0 pr-24 sm:pr-32">
                             <h3 className="font-bold text-foreground text-sm sm:text-base truncate">
                                 {lesson.topic}
+                                {lesson.scheduleRemovedAt && (
+                                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-rose-200 text-rose-800 dark:bg-rose-900 dark:text-rose-300 uppercase tracking-wider font-black">
+                                        Removida
+                                    </span>
+                                )}
                                 {isLate && (
                                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-amber-200 text-amber-800 dark:bg-amber-900 dark:text-amber-300 uppercase tracking-wider font-black">
                                         Chamada Pendente
