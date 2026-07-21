@@ -5,6 +5,12 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.7] - 2026-07-21
+
+### Corrigido
+
+- Geração de aulas a partir da grade horária deixava de incluir o último dia do período (ex.: sábado final omitido); as datas de início/fim do período passam a ser interpretadas em calendário UTC
+
 ## [1.7.6] - 2026-07-21
 
 ### Alterado
