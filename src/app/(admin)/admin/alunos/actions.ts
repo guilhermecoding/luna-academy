@@ -503,3 +503,114 @@ export async function findStudentsByListAction(identifiers: string[], periodId: 
     }
 }
 
+export async function findStudentsForPeriodAssociationAction(identifiers: string[]) {
+    const authResult = await requireAdmin();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
+    try {
+        const cleanedIdentifiers = identifiers
+            .map(id => id.trim())
+            .filter(id => id.length > 0);
+
+        if (cleanedIdentifiers.length === 0) return { success: true, students: [], notFound: [] as string[] };
+
+        const students = await prisma.student.findMany({
+            where: {
+                OR: [
+                    { lunaId: { in: cleanedIdentifiers } },
+                    { cpf: { in: cleanedIdentifiers.map(id => id.replace(/\D/g, "")) } },
+                ],
+            },
+            select: {
+                id: true,
+                name: true,
+                lunaId: true,
+                cpf: true,
+            },
+        });
+
+        const foundLunaIds = new Set(students.map(s => s.lunaId));
+        const foundCpfs = new Set(students.map(s => s.cpf));
+
+        const notFound = cleanedIdentifiers.filter(id => {
+            const clean = id.replace(/\D/g, "");
+            return !foundLunaIds.has(id) && !foundCpfs.has(clean);
+        });
+
+        return { success: true, students, notFound };
+    } catch (error) {
+        console.error("Erro ao buscar alunos para associação:", error);
+        return { success: false, error: "Erro ao processar lista." };
+    }
+}
+
+export async function associateStudentsToPeriodAction(studentIds: string[], periodId: string) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
+    if (!periodId) {
+        return { success: false, error: "Período não informado." };
+    }
+
+    if (!studentIds || studentIds.length === 0) {
+        return { success: false, error: "Nenhum aluno selecionado para associação." };
+    }
+
+    try {
+        const period = await prisma.period.findUnique({
+            where: { id: periodId },
+            select: { id: true },
+        });
+
+        if (!period) {
+            return { success: false, error: "Período não encontrado." };
+        }
+
+        const { associateStudentsToPeriod } = await import("@/services/students/students.service");
+        const result = await associateStudentsToPeriod(studentIds, periodId);
+
+        updateTag("students-list");
+        updateTag(`period:${periodId}:students-list`);
+        updateTag(`period:${periodId}:students-count`);
+        updateTag(`period:${periodId}:indicators`);
+
+        return { success: true, count: result.count };
+    } catch (error) {
+        console.error("Erro ao associar alunos ao período:", error);
+        return { success: false, error: "Erro inesperado ao associar alunos ao período." };
+    }
+}
+
+export async function associateAllStudentsToPeriodAction(periodId: string) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
+    if (!periodId) {
+        return { success: false, error: "Período não informado." };
+    }
+
+    try {
+        const period = await prisma.period.findUnique({
+            where: { id: periodId },
+            select: { id: true },
+        });
+
+        if (!period) {
+            return { success: false, error: "Período não encontrado." };
+        }
+
+        const { associateAllStudentsToPeriod } = await import("@/services/students/students.service");
+        const result = await associateAllStudentsToPeriod(periodId);
+
+        updateTag("students-list");
+        updateTag(`period:${periodId}:students-list`);
+        updateTag(`period:${periodId}:students-count`);
+        updateTag(`period:${periodId}:indicators`);
+
+        return { success: true, count: result.count };
+    } catch (error) {
+        console.error("Erro ao associar todos os alunos ao período:", error);
+        return { success: false, error: "Erro inesperado ao associar alunos ao período." };
+    }
+}
+

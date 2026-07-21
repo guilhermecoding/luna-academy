@@ -711,6 +711,41 @@ export async function bulkUpsertStudents(students: BulkStudentInput[], periodId?
 
     return { created, updated, errors, total: students.length };
 }
+
+/**
+ * Associa alunos já existentes a um período (status WAITING). Duplicatas são ignoradas.
+ */
+export async function associateStudentsToPeriod(studentIds: string[], periodId: string) {
+    if (studentIds.length === 0) {
+        return { count: 0 };
+    }
+
+    const result = await prisma.studentPeriod.createMany({
+        data: studentIds.map((studentId) => ({
+            studentId,
+            periodId,
+            status: "WAITING",
+        })),
+        skipDuplicates: true,
+    });
+
+    return { count: result.count };
+}
+
+/**
+ * Associa todos os alunos do sistema a um período (status WAITING). Duplicatas são ignoradas.
+ */
+export async function associateAllStudentsToPeriod(periodId: string) {
+    const students = await prisma.student.findMany({
+        select: { id: true },
+    });
+
+    return associateStudentsToPeriod(
+        students.map((s) => s.id),
+        periodId,
+    );
+}
+
 /**
  * Desvincula uma lista de alunos de um período, removendo todos os seus dados relacionados a esse período.
  */

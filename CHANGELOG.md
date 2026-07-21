@@ -5,6 +5,14 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.5] - 2026-07-21
+
+### Adicionado
+
+- Aba **Associação em Massa** na criação/importação de alunos a partir de um período, para vincular alunos já cadastrados via CPF ou matrícula
+- Validação da lista colada com boxes scrolláveis de alunos encontrados e de identificadores não encontrados
+- Opção **Vincular todos os alunos do sistema**, que oculta o colar de CPF/matrícula e associa todos os alunos existentes ao período (já vinculados são ignorados)
+
 ## [1.7.4] - 2026-07-20
 
 ### Adicionado
