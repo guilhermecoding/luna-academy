@@ -9,14 +9,15 @@ import { notFound } from "next/navigation";
 import { getDegreeBySlug } from "@/services/degrees/degrees.service";
 import SkeletonForm from "@/components/skeletons/skeleton-form";
 import { WritePageGuard } from "@/components/write-page-guard";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Editar Disciplina",
 };
 
-export default async function EditSubjectPage({
+async function EditSubjectPageContent({
     params,
-}: PageProps<"/admin/[program]/matrizes/[degree]/disciplinas/[subject]/editar">) {
+}: Omit<PageProps<"/admin/[program]/matrizes/[degree]/disciplinas/[subject]/editar">, "searchParams">) {
     const { program, degree, subject } = await params;
 
     // Validar se dados existem (subject params contains code instead of ID)
@@ -29,26 +30,36 @@ export default async function EditSubjectPage({
 
     return (
         <WritePageGuard redirectTo={`/admin/${program}/matrizes/${degree}/disciplinas`}>
-        <Page>
-            <Section>
-                <BaseForm
-                    title="Editar Disciplina"
-                    description={`Editando a matéria: ${subjectData.name} (${degreeData.name})`}
-                >
-                    <div className="mt-6">
-                        <Suspense fallback={<SkeletonForm />}>
-                            <EditSubjectForm
-                                programSlug={program}
-                                degreeSlug={degreeData.slug}
-                                degreeId={degreeData.id}
-                                subjectId={subjectData.id}
-                                initialData={subjectData}
-                            />
-                        </Suspense>
-                    </div>
-                </BaseForm>
-            </Section>
-        </Page>
+            <Page>
+                <Section>
+                    <BaseForm
+                        title="Editar Disciplina"
+                        description={`Editando a matéria: ${subjectData.name} (${degreeData.name})`}
+                    >
+                        <div className="mt-6">
+                            <Suspense fallback={<SkeletonForm />}>
+                                <EditSubjectForm
+                                    programSlug={program}
+                                    degreeSlug={degreeData.slug}
+                                    degreeId={degreeData.id}
+                                    subjectId={subjectData.id}
+                                    initialData={subjectData}
+                                />
+                            </Suspense>
+                        </div>
+                    </BaseForm>
+                </Section>
+            </Page>
         </WritePageGuard>
+    );
+}
+
+export default function EditSubjectPage({
+    params,
+}: PageProps<"/admin/[program]/matrizes/[degree]/disciplinas/[subject]/editar">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <EditSubjectPageContent params={params} />
+        </Suspense>
     );
 }

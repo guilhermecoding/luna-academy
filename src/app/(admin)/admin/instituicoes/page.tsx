@@ -6,12 +6,14 @@ import ListCampuses from "./_components/list-campuses";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Metadata } from "next";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Instituições",
 };
 
-export default async function CampusesPage() {
+async function CampusesPageContent() {
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
     const canWrite = userCanWrite(authResult.session.user);
@@ -45,5 +47,13 @@ export default async function CampusesPage() {
                 <ListCampuses />
             </Section>
         </Page>
+    );
+}
+
+export default function CampusesPage() {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <CampusesPageContent />
+        </Suspense>
     );
 }

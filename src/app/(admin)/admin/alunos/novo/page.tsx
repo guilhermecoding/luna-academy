@@ -5,12 +5,14 @@ import { IconSchool } from "@tabler/icons-react";
 import { Metadata } from "next";
 import CreateStudentForm from "./_components/create-student-form";
 import { WritePageGuard } from "@/components/write-page-guard";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Novo Aluno",
 };
 
-export default async function NewStudentPage({
+async function NewStudentPageContent({
     searchParams,
 }: {
     searchParams: Promise<{ periodId?: string; redirect?: string }>;
@@ -40,5 +42,18 @@ export default async function NewStudentPage({
                 </Section>
             </Page>
         </WritePageGuard>
+    );
+}
+
+
+export default function NewStudentPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ periodId?: string; redirect?: string }>;
+}) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <NewStudentPageContent searchParams={searchParams} />
+        </Suspense>
     );
 }

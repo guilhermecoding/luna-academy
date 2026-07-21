@@ -56,7 +56,7 @@ async function AdminDegreesPageContent({
     );
 }
 
-export default async function AdminDegreesPage({
+export default function AdminDegreesPage({
     params,
 }: PageProps<"/admin/[program]/matrizes">) {
     return (
