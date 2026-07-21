@@ -15,6 +15,7 @@ import type { UserGenre } from "@/generated/prisma/client";
 import { useRouter } from "next/navigation";
 import { maskCPF, maskPhone, unmask } from "@/lib/masks";
 import ImportStudentsTab from "./import-students-tab";
+import AssociateStudentsTab from "./associate-students-tab";
 import { useCanWrite } from "@/components/write-access-provider";
 
 export default function CreateStudentForm({
@@ -30,7 +31,7 @@ export default function CreateStudentForm({
 } = {}) {
     const router = useRouter();
     const canWrite = useCanWrite();
-    const [mode, setMode] = useState<"single" | "bulk">("single");
+    const [mode, setMode] = useState<"single" | "bulk" | "associate">("single");
 
     const form = useForm<CreateStudentInput, unknown, CreateStudentData>({
         resolver: zodResolver(createStudentSchema),
@@ -88,14 +89,14 @@ export default function CreateStudentForm({
 
     return (
         <div className="bg-surface w-full border border-surface-border p-6 rounded-4xl">
-            <div className="flex flex-col sm:flex-row gap-2 mb-8 bg-background p-1 rounded-2xl sm:rounded-3xl w-full sm:w-fit">
+            <div className="flex flex-col @4xl/main:flex-row gap-2 mb-8 bg-background p-1 rounded-2xl @4xl/main:rounded-3xl w-full @4xl/main:w-fit">
                 <Button
                     type="button"
                     variant={mode === "single" ? "default" : "ghost"}
                     onClick={() => setMode("single")}
                     className="rounded-xl sm:rounded-3xl w-full sm:w-auto"
                 >
-                    Adicionar Aluno Unicamente
+                    Adicionar Aluno
                 </Button>
                 {canWrite && (
                     <Button
@@ -105,6 +106,16 @@ export default function CreateStudentForm({
                         className="rounded-xl sm:rounded-3xl w-full sm:w-auto"
                     >
                         Importação em Massa
+                    </Button>
+                )}
+                {canWrite && periodId && (
+                    <Button
+                        type="button"
+                        variant={mode === "associate" ? "default" : "ghost"}
+                        onClick={() => setMode("associate")}
+                        className="rounded-xl sm:rounded-3xl w-full sm:w-auto"
+                    >
+                        Associação em Massa
                     </Button>
                 )}
             </div>
@@ -271,9 +282,11 @@ export default function CreateStudentForm({
                         </Button>
                     </div>
                 </form>
-            ) : (
+            ) : mode === "bulk" ? (
                 <ImportStudentsTab key={mode} periodId={periodId} redirectPath={redirectPath} />
-            )}
+            ) : periodId ? (
+                <AssociateStudentsTab key={mode} periodId={periodId} redirectPath={redirectPath} />
+            ) : null}
         </div>
     );
 }
