@@ -8,14 +8,16 @@ import type { Metadata } from "next";
 import CurrentPeriod from "./_components/current-period";
 import ListOthersPeriods from "./_components/list-others-periods";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import { Suspense } from "react";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Períodos Letivos",
 };
 
-export default async function PeriodsPage({
+async function PeriodsPageContent({
     params,
-}: PageProps<"/admin/[program]/periodos">) {
+}: Omit<PageProps<"/admin/[program]/periodos">, "searchParams">) {
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
     const canWrite = userCanWrite(authResult.session.user);
@@ -53,5 +55,15 @@ export default async function PeriodsPage({
                 <ListOthersPeriods periods={periods} programSlug={program} />
             </Section>
         </Page>
+    );
+}
+
+export default function PeriodsPage({
+    params,
+}: PageProps<"/admin/[program]/periodos">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <PeriodsPageContent params={params} />
+        </Suspense>
     );
 }

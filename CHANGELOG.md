@@ -5,6 +5,16 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.7.6] - 2026-07-21
+
+### Alterado
+
+- Nome da aplicação no metadata (`APP_NAME`): "LUNA ACADEMY" → "Luna Academy"
+
+### Corrigido
+
+- Páginas admin e perfil do professor envolvidas em `Suspense` com `PageSkeleton`, evitando bloqueio de rota durante o carregamento assíncrono (programas, instituições, salas, períodos, matrizes, disciplinas, horários e novo aluno)
+
 ## [1.7.5] - 2026-07-21
 
 ### Adicionado

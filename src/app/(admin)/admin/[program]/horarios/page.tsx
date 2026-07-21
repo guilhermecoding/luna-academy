@@ -62,7 +62,7 @@ async function AdminTimeSlotsPageContent({
     );
 }
 
-export default async function TimeSlotsPage({
+export default function TimeSlotsPage({
     params,
 }: PageProps<"/admin/[program]/horarios">) {
     return (
