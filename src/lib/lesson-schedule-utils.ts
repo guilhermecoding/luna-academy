@@ -21,15 +21,15 @@ function dateFromDayKey(key: number): Date {
     return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
 }
 
-/** Expande um dayOfWeek em datas UTC (@db.Date) no intervalo do período, no timezone da app. */
+/** Expande um dayOfWeek em datas UTC (@db.Date) no intervalo do período (calendário UTC). */
 export function expandScheduleDates(
     dayOfWeek: DayOfWeek,
     periodStart: Date,
     periodEnd: Date,
 ): Date[] {
     const targetJsDay = dayOfWeekToJs[dayOfWeek];
-    const start = dateFromDayKey(getDayKeyInTimeZone(periodStart, APP_TIMEZONE));
-    const end = dateFromDayKey(getDayKeyInTimeZone(periodEnd, APP_TIMEZONE));
+    const start = dateFromDayKey(getDayKeyInTimeZone(periodStart, "UTC"));
+    const end = dateFromDayKey(getDayKeyInTimeZone(periodEnd, "UTC"));
 
     const dates: Date[] = [];
     const cursor = new Date(start);
@@ -88,9 +88,9 @@ export function generateUpcomingLessons(
     if (schedules.length === 0) return [];
 
     const todayKey = getDayKeyInTimeZone(new Date(), APP_TIMEZONE);
-    const periodStartKey = getDayKeyInTimeZone(periodStart, APP_TIMEZONE);
+    const periodStartKey = getDayKeyInTimeZone(periodStart, "UTC");
     const startKey = Math.max(periodStartKey, todayKey);
-    const endKey = getDayKeyInTimeZone(periodEnd, APP_TIMEZONE);
+    const endKey = getDayKeyInTimeZone(periodEnd, "UTC");
 
     if (startKey > endKey) return [];
 
