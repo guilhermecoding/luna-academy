@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +37,16 @@ export default function AssociateStudentsTab({
     const [notFound, setNotFound] = useState<string[]>([]);
     const [isValidating, setIsValidating] = useState(false);
     const [isPending, startTransition] = useTransition();
+
+    useEffect(() => {
+        return () => {
+            setBulkInput("");
+            setFoundStudents([]);
+            setNotFound([]);
+            setIsValidating(false);
+            toast.dismiss();
+        };
+    }, []);
 
     const handleValidate = async () => {
         if (!bulkInput.trim()) return;
@@ -112,7 +122,7 @@ export default function AssociateStudentsTab({
                         variant="outline"
                         className="text-[10px] uppercase tracking-wider opacity-60"
                     >
-                        Matrículas ou CPFs
+                        {"Matrículas ou CPF's"}
                     </Badge>
                 </div>
                 <Textarea
