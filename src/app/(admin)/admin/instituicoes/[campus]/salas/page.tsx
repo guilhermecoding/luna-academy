@@ -8,14 +8,16 @@ import { getCampusBySlug } from "@/services/campuses/campuses.service";
 import { notFound } from "next/navigation";
 import ListRooms from "./_components/list-rooms";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Gerenciar Salas",
 };
 
-export default async function RoomsPage({
+async function RoomsPageContent({
     params,
-}: PageProps<"/admin/instituicoes/[campus]/salas">) {
+}: Omit<PageProps<"/admin/instituicoes/[campus]/salas">, "searchParams">) {
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
     const canWrite = userCanWrite(authResult.session.user);
@@ -56,5 +58,15 @@ export default async function RoomsPage({
                 <ListRooms campusSlug={campus} />
             </Section>
         </Page>
+    );
+}
+
+export default function RoomsPage({
+    params,
+}: PageProps<"/admin/instituicoes/[campus]/salas">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <RoomsPageContent params={params} />
+        </Suspense>
     );
 }

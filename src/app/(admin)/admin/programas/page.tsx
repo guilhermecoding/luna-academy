@@ -6,12 +6,14 @@ import ListPrograms from "./_components/list-programs";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Metadata } from "next";
 import { requireAdmin, userCanWrite } from "@/lib/auth-guards";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Programas",
 };
 
-export default async function ProgramsPage() {
+async function ProgramsPageContent() {
     const authResult = await requireAdmin();
     if (!authResult.ok) return null;
     const canWrite = userCanWrite(authResult.session.user);
@@ -41,5 +43,13 @@ export default async function ProgramsPage() {
                 <ListPrograms />
             </Section>
         </Page>
+    );
+}
+
+export default function ProgramsPage() {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <ProgramsPageContent />
+        </Suspense>
     );
 }

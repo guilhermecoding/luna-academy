@@ -32,7 +32,7 @@ export const viewport: Viewport = {
     ],
 };
 
-const APP_NAME = "LUNA ACADEMY";
+const APP_NAME = "Luna Academy";
 
 export const metadata: Metadata = {
     manifest: "/manifest.webmanifest",

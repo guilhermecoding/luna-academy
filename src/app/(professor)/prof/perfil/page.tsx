@@ -9,6 +9,8 @@ import EditProfileForm from "./_components/edit-profile-form";
 import { auth, isGoogleAuthConfigured } from "@/lib/auth";
 import { headers, cookies } from "next/headers";
 import { getProgramsForTeacher } from "@/services/programs/programs.service";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
+import { Suspense } from "react";
 
 const ACTIVE_PROGRAM_COOKIE_NAME = "active_program_slug";
 
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
     title: "Meu Perfil",
 };
 
-export default async function ProfessorProfilePage() {
+async function ProfessorProfilePageContent() {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -68,5 +70,13 @@ export default async function ProfessorProfilePage() {
                 />
             </Section>
         </Page>
+    );
+}
+
+export default function ProfessorProfilePage() {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <ProfessorProfilePageContent />
+        </Suspense>
     );
 }

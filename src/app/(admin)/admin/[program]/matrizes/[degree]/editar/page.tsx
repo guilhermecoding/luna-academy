@@ -7,14 +7,15 @@ import { Metadata } from "next";
 import { getDegreeBySlug } from "@/services/degrees/degrees.service";
 import { notFound } from "next/navigation";
 import { WritePageGuard } from "@/components/write-page-guard";
+import PageSkeleton from "@/components/skeletons/page-skeleton";
 
 export const metadata: Metadata = {
     title: "Editar Matriz Curricular",
 };
 
-export default async function EditDegreePage({
+async function EditDegreePageContent({
     params,
-}: PageProps<"/admin/[program]/matrizes/[degree]/editar">) {
+}: Omit<PageProps<"/admin/[program]/matrizes/[degree]/editar">, "searchParams">) {
     const { program, degree } = await params;
     const degreeData = await getDegreeBySlug(program, degree);
 
@@ -24,25 +25,35 @@ export default async function EditDegreePage({
 
     return (
         <WritePageGuard redirectTo={`/admin/${program}/matrizes/${degree}`}>
-        <Page>
-            <Section>
-                <BaseForm
-                    title="Editar Matriz Curricular"
-                    description={`Atualizando dados da matriz: ${degreeData.name}`}
-                >
-                    <div className="mt-6">
-                        <Suspense fallback={null}>
-                            <EditDegreeForm 
-                                programSlug={program} 
-                                degreeId={degreeData.id}
-                                degreeSlug={degreeData.slug}
-                                initialData={degreeData} 
-                            />
-                        </Suspense>
-                    </div>
-                </BaseForm>
-            </Section>
-        </Page>
+            <Page>
+                <Section>
+                    <BaseForm
+                        title="Editar Matriz Curricular"
+                        description={`Atualizando dados da matriz: ${degreeData.name}`}
+                    >
+                        <div className="mt-6">
+                            <Suspense fallback={null}>
+                                <EditDegreeForm
+                                    programSlug={program}
+                                    degreeId={degreeData.id}
+                                    degreeSlug={degreeData.slug}
+                                    initialData={degreeData}
+                                />
+                            </Suspense>
+                        </div>
+                    </BaseForm>
+                </Section>
+            </Page>
         </WritePageGuard>
+    );
+}
+
+export default function EditDegreePage({
+    params,
+}: PageProps<"/admin/[program]/matrizes/[degree]/editar">) {
+    return (
+        <Suspense fallback={<PageSkeleton />}>
+            <EditDegreePageContent params={params} />
+        </Suspense>
     );
 }
