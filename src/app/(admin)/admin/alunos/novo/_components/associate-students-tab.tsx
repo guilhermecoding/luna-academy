@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     IconSearch,
     IconLoader2,
@@ -14,6 +15,7 @@ import {
 import {
     findStudentsForPeriodAssociationAction,
     associateStudentsToPeriodAction,
+    associateAllStudentsToPeriodAction,
 } from "../../actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -32,6 +34,7 @@ export default function AssociateStudentsTab({
     redirectPath?: string;
 }) {
     const router = useRouter();
+    const [linkAll, setLinkAll] = useState(false);
     const [bulkInput, setBulkInput] = useState("");
     const [foundStudents, setFoundStudents] = useState<FoundStudent[]>([]);
     const [notFound, setNotFound] = useState<string[]>([]);
@@ -40,6 +43,7 @@ export default function AssociateStudentsTab({
 
     useEffect(() => {
         return () => {
+            setLinkAll(false);
             setBulkInput("");
             setFoundStudents([]);
             setNotFound([]);
@@ -47,6 +51,31 @@ export default function AssociateStudentsTab({
             toast.dismiss();
         };
     }, []);
+
+    const clearListState = () => {
+        setBulkInput("");
+        setFoundStudents([]);
+        setNotFound([]);
+    };
+
+    const handleLinkAllChange = (checked: boolean) => {
+        setLinkAll(checked);
+        if (checked) {
+            clearListState();
+        }
+    };
+
+    const finishAssociation = (count: number) => {
+        toast.success(`${count} aluno(s) associado(s) ao período com sucesso!`);
+        if (redirectPath === "none") {
+            setLinkAll(false);
+            clearListState();
+            router.refresh();
+        } else {
+            router.push(redirectPath || "/admin/alunos");
+            router.refresh();
+        }
+    };
 
     const handleValidate = async () => {
         if (!bulkInput.trim()) return;
@@ -87,18 +116,19 @@ export default function AssociateStudentsTab({
             );
 
             if (res.success) {
-                toast.success(
-                    `${foundStudents.length} aluno(s) associado(s) ao período com sucesso!`,
-                );
-                if (redirectPath === "none") {
-                    setBulkInput("");
-                    setFoundStudents([]);
-                    setNotFound([]);
-                    router.refresh();
-                } else {
-                    router.push(redirectPath || "/admin/alunos");
-                    router.refresh();
-                }
+                finishAssociation(foundStudents.length);
+            } else {
+                toast.error(res.error || "Erro ao associar alunos.");
+            }
+        });
+    };
+
+    const handleAssociateAll = () => {
+        startTransition(async () => {
+            const res = await associateAllStudentsToPeriodAction(periodId);
+
+            if (res.success) {
+                finishAssociation(res.count ?? 0);
             } else {
                 toast.error(res.error || "Erro ao associar alunos.");
             }
@@ -110,119 +140,154 @@ export default function AssociateStudentsTab({
             <div>
                 <h3 className="text-lg font-bold text-foreground">Associação em Massa</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                    Associa alunos já cadastrados no sistema a este período através do CPF ou
+                    Associa alunos já cadastrados no sistema a este período. Adicione todos de uma vez ou através do CPF ou
                     Matrícula.
                 </p>
             </div>
 
-            <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-foreground">Cole a lista abaixo</p>
-                    <Badge
-                        variant="outline"
-                        className="text-[10px] uppercase tracking-wider opacity-60"
-                    >
-                        {"Matrículas ou CPF's"}
-                    </Badge>
-                </div>
-                <Textarea
-                    placeholder={
-                        "Ex: 2024001, 2024002, 123.456.789-00\nPode separar por vírgula ou nova linha.\nAlunos já vinculados ao período serão ignorados."
-                    }
-                    value={bulkInput}
-                    onChange={(e) => setBulkInput(e.target.value)}
-                    className="min-h-37.5 max-h-48 field-sizing-fixed overflow-y-auto rounded-2xl bg-background border-surface-border resize-none focus:ring-primary/20"
+            <label className="flex items-center gap-2 text-sm cursor-pointer w-fit">
+                <Checkbox
+                    checked={linkAll}
+                    onChange={(e) => handleLinkAllChange(e.target.checked)}
+                    disabled={isPending}
                 />
-                <div className="flex justify-center items-center">
-                    <Button
-                        type="button"
-                        className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
-                        variant="secondary"
-                        onClick={handleValidate}
-                        disabled={!bulkInput.trim() || isValidating}
-                    >
-                        {isValidating ? (
-                            <IconLoader2 className="size-4 mr-2 animate-spin" />
-                        ) : (
-                            <IconSearch className="size-4 mr-2" />
-                        )}
-                        {isValidating ? "Validando..." : "Validar Lista"}
-                    </Button>
-                </div>
-            </div>
+                Vincular todos os alunos do sistema
+            </label>
 
-            {(foundStudents.length > 0 || notFound.length > 0) && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                    <div className="flex items-center justify-between border-b border-surface-border pb-2">
-                        <p className="text-sm font-bold">Resultados da Validação</p>
-                        <Badge className="bg-emerald-500/10 text-emerald-600 border-none">
-                            {foundStudents.length} encontrados
-                        </Badge>
+            {linkAll ? (
+                <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                        Todos os alunos cadastrados no sistema serão vinculados a este período.
+                        Alunos já vinculados serão ignorados.
+                    </p>
+                    <div className="flex justify-end pt-2 border-t border-surface-border">
+                        <Button
+                            type="button"
+                            disabled={isPending}
+                            onClick={handleAssociateAll}
+                            className="h-11"
+                        >
+                            {isPending ? (
+                                <IconLoader2 className="size-4 mr-2 animate-spin" />
+                            ) : (
+                                <IconUserPlus className="size-4 mr-2" />
+                            )}
+                            Associar todos os alunos
+                        </Button>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm font-bold text-foreground">Cole a lista abaixo</p>
+                            <Badge
+                                variant="outline"
+                                className="text-[10px] uppercase tracking-wider opacity-60"
+                            >
+                                {"Matrículas ou CPF's"}
+                            </Badge>
+                        </div>
+                        <Textarea
+                            placeholder={
+                                "Ex: 2024001, 2024002, 123.456.789-00\nPode separar por vírgula ou nova linha.\nAlunos já vinculados ao período serão ignorados."
+                            }
+                            value={bulkInput}
+                            onChange={(e) => setBulkInput(e.target.value)}
+                            className="min-h-37.5 max-h-48 field-sizing-fixed overflow-y-auto rounded-2xl bg-background border-surface-border resize-none focus:ring-primary/20"
+                        />
+                        <div className="flex justify-center items-center">
+                            <Button
+                                type="button"
+                                className="w-full sm:w-auto bg-transparent border-2 border-dashed border-primary hover:bg-primary text-primary hover:text-background hover:border-solid"
+                                variant="secondary"
+                                onClick={handleValidate}
+                                disabled={!bulkInput.trim() || isValidating}
+                            >
+                                {isValidating ? (
+                                    <IconLoader2 className="size-4 mr-2 animate-spin" />
+                                ) : (
+                                    <IconSearch className="size-4 mr-2" />
+                                )}
+                                {isValidating ? "Validando..." : "Validar Lista"}
+                            </Button>
+                        </div>
                     </div>
 
-                    {foundStudents.length > 0 && (
-                        <div className="border border-emerald-500/10 rounded-xl overflow-hidden bg-emerald-500/5">
-                            <div className="max-h-60 overflow-y-auto divide-y divide-emerald-500/10">
-                                {foundStudents.map((student) => (
-                                    <div
-                                        key={student.id}
-                                        className="flex items-center gap-3 p-3"
-                                    >
-                                        <IconUserCheck className="size-4 text-emerald-600 shrink-0" />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-bold truncate">
-                                                {student.name}
-                                            </p>
-                                            <p className="text-[10px] text-emerald-600/70 font-mono">
-                                                {student.lunaId || "—"}
-                                            </p>
-                                        </div>
+                    {(foundStudents.length > 0 || notFound.length > 0) && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                            <div className="flex items-center justify-between border-b border-surface-border pb-2">
+                                <p className="text-sm font-bold">Resultados da Validação</p>
+                                <Badge className="bg-emerald-500/10 text-emerald-600 border-none">
+                                    {foundStudents.length} encontrados
+                                </Badge>
+                            </div>
+
+                            {foundStudents.length > 0 && (
+                                <div className="border border-emerald-500/10 rounded-xl overflow-hidden bg-emerald-500/5">
+                                    <div className="max-h-60 overflow-y-auto divide-y divide-emerald-500/10">
+                                        {foundStudents.map((student) => (
+                                            <div
+                                                key={student.id}
+                                                className="flex items-center gap-3 p-3"
+                                            >
+                                                <IconUserCheck className="size-4 text-emerald-600 shrink-0" />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold truncate">
+                                                        {student.name}
+                                                    </p>
+                                                    <p className="text-[10px] text-emerald-600/70 font-mono">
+                                                        {student.lunaId || "—"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            )}
+
+                            {notFound.length > 0 && (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-amber-600 px-1">
+                                        <IconAlertCircle className="size-4" />
+                                        <p className="text-xs font-bold uppercase tracking-tight">
+                                            Não encontrados ({notFound.length})
+                                        </p>
+                                    </div>
+                                    <div className="max-h-40 overflow-y-auto flex flex-wrap gap-1.5 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10">
+                                        {notFound.map((id, i) => (
+                                            <Badge
+                                                key={i}
+                                                variant="outline"
+                                                className="bg-background border-amber-200 text-amber-700 font-mono text-[10px]"
+                                            >
+                                                {id}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
-                    {notFound.length > 0 && (
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-amber-600 px-1">
-                                <IconAlertCircle className="size-4" />
-                                <p className="text-xs font-bold uppercase tracking-tight">
-                                    Não encontrados ({notFound.length})
-                                </p>
-                            </div>
-                            <div className="max-h-40 overflow-y-auto flex flex-wrap gap-1.5 p-3 bg-amber-500/5 rounded-xl border border-amber-500/10">
-                                {notFound.map((id, i) => (
-                                    <Badge
-                                        key={i}
-                                        variant="outline"
-                                        className="bg-background border-amber-200 text-amber-700 font-mono text-[10px]"
-                                    >
-                                        {id}
-                                    </Badge>
-                                ))}
-                            </div>
+                    {foundStudents.length > 0 && (
+                        <div className="flex justify-end pt-2 border-t border-surface-border">
+                            <Button
+                                type="button"
+                                disabled={isPending}
+                                onClick={handleAssociate}
+                                className="h-11"
+                            >
+                                {isPending ? (
+                                    <IconLoader2 className="size-4 mr-2 animate-spin" />
+                                ) : (
+                                    <IconUserPlus className="size-4 mr-2" />
+                                )}
+                                Associar {foundStudents.length} aluno(s)
+                            </Button>
                         </div>
                     )}
-                </div>
-            )}
-
-            {foundStudents.length > 0 && (
-                <div className="flex justify-end pt-2 border-t border-surface-border">
-                    <Button
-                        type="button"
-                        disabled={isPending}
-                        onClick={handleAssociate}
-                        className="h-11"
-                    >
-                        {isPending ? (
-                            <IconLoader2 className="size-4 mr-2 animate-spin" />
-                        ) : (
-                            <IconUserPlus className="size-4 mr-2" />
-                        )}
-                        Associar {foundStudents.length} aluno(s)
-                    </Button>
-                </div>
+                </>
             )}
         </div>
     );

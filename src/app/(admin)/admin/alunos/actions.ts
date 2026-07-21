@@ -581,3 +581,36 @@ export async function associateStudentsToPeriodAction(studentIds: string[], peri
     }
 }
 
+export async function associateAllStudentsToPeriodAction(periodId: string) {
+    const authResult = await requireAdminWrite();
+    if (!authResult.ok) return { success: false, error: authResult.error };
+
+    if (!periodId) {
+        return { success: false, error: "Período não informado." };
+    }
+
+    try {
+        const period = await prisma.period.findUnique({
+            where: { id: periodId },
+            select: { id: true },
+        });
+
+        if (!period) {
+            return { success: false, error: "Período não encontrado." };
+        }
+
+        const { associateAllStudentsToPeriod } = await import("@/services/students/students.service");
+        const result = await associateAllStudentsToPeriod(periodId);
+
+        updateTag("students-list");
+        updateTag(`period:${periodId}:students-list`);
+        updateTag(`period:${periodId}:students-count`);
+        updateTag(`period:${periodId}:indicators`);
+
+        return { success: true, count: result.count };
+    } catch (error) {
+        console.error("Erro ao associar todos os alunos ao período:", error);
+        return { success: false, error: "Erro inesperado ao associar alunos ao período." };
+    }
+}
+
